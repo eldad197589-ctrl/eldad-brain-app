@@ -12,7 +12,7 @@
 
 // #region Imports
 import { useState, useMemo } from 'react';
-import { Search, Music, Star, Check, Plus, X } from 'lucide-react';
+import { Search, Music, Star, Check, Plus, X, PlayCircle } from 'lucide-react';
 import type { Song, SongCategory, MasteryLevel } from '../types';
 import { SONG_CATEGORY_LABELS, SONG_CATEGORY_COLORS } from '../constants';
 // #endregion
@@ -218,32 +218,57 @@ export default function SongSelector({ songs, selectedIds, onToggle, onAddSong }
               </div>
               {artistSongs.map(song => {
                 const isSelected = selectedIds.has(song.id);
+                // Determine URL: either direct video/audio, or a YouTube search
+                const listenUrl = song.youtubeUrl || song.audioUrl || `https://www.youtube.com/results?search_query=${encodeURIComponent(song.artist + ' ' + song.name)}`;
+                
                 return (
-                  <button
-                    key={song.id}
-                    onClick={() => onToggle(song.id)}
-                    className={`signup-song-item ${isSelected ? 'selected' : ''}`}
-                  >
-                    <div className={`signup-checkbox ${isSelected ? 'checked' : ''}`}>
-                      {isSelected && <Check size={14} />}
-                    </div>
-                    <span
-                      className="hobbies-category-dot"
-                      style={{ background: SONG_CATEGORY_COLORS[song.category] }}
-                    />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{song.name}</div>
-                    </div>
-                    <span className="hobbies-tag" style={{
-                      background: `${SONG_CATEGORY_COLORS[song.category]}20`,
-                      color: SONG_CATEGORY_COLORS[song.category],
-                      borderColor: `${SONG_CATEGORY_COLORS[song.category]}40`,
-                      fontSize: '0.68rem'
-                    }}>
-                      {SONG_CATEGORY_LABELS[song.category]}
-                    </span>
-                    <MiniStars level={song.mastery} />
-                  </button>
+                  <div key={song.id} style={{ display: 'flex', gap: 6 }}>
+                    {/* The song container for selection */}
+                    <button
+                      onClick={() => onToggle(song.id)}
+                      className={`signup-song-item ${isSelected ? 'selected' : ''}`}
+                      style={{ flex: 1 }}
+                    >
+                      <div className={`signup-checkbox ${isSelected ? 'checked' : ''}`}>
+                        {isSelected && <Check size={14} />}
+                      </div>
+                      <span
+                        className="hobbies-category-dot"
+                        style={{ background: SONG_CATEGORY_COLORS[song.category] }}
+                      />
+                      <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
+                        <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{song.name}</div>
+                      </div>
+                      <span className="hobbies-tag" style={{
+                        background: `${SONG_CATEGORY_COLORS[song.category]}20`,
+                        color: SONG_CATEGORY_COLORS[song.category],
+                        borderColor: `${SONG_CATEGORY_COLORS[song.category]}40`,
+                        fontSize: '0.68rem'
+                      }}>
+                        {SONG_CATEGORY_LABELS[song.category]}
+                      </span>
+                      <MiniStars level={song.mastery} />
+                    </button>
+                    
+                    {/* The Play / Listen button */}
+                    <a
+                      href={listenUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="האזן לשיר"
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: 44, height: 44, borderRadius: 10,
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        color: '#f472b6', flexShrink: 0,
+                        transition: 'all 0.2s', border: '1px solid rgba(255, 255, 255, 0.08)'
+                      }}
+                      onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(244, 114, 182, 0.15)'}
+                      onMouseOut={e => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'}
+                    >
+                      <PlayCircle size={20} />
+                    </a>
+                  </div>
                 );
               })}
             </div>
