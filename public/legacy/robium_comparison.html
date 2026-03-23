@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>השוואת הסכמי מייסדים: טיוטת "רצף אחיד" מול Robium 2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Heebo', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        .glass-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .compare-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8 max-w-7xl mx-auto">
+
+    <header class="mb-12 text-center">
+        <div class="inline-block p-2 bg-blue-100 text-blue-600 rounded-full mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                </path>
+            </svg>
+        </div>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-slate-800 mb-4">דו"ח השוואת הסכמים: מניעת מוקשים עסקיים</h1>
+        <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+            מסמך זה מפרק לגורמים את ההבדלים המהותיים בין הטיוטה הראשונית המוצעת (Draft 1.0) לבין ההסכם הסופי
+            והמתקדם (Robium 2.0).
+            מייסדים חייבים לבנות מערכת הפעלה בריאה לחברה, והנה ההבדלים הקריטיים שהצילו אותנו מנעילה עסקית.
+        </p>
+    </header>
+
+    <main class="space-y-10">
+
+        <!-- 1. זכות הוטו וזכות ההכרעה -->
+        <section class="glass-card p-6 md:p-8 border-t-4 border-rose-500">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-sm font-bold">ליבת השליטה (סעיפים
+                    4.5, 4.7 בטיוטה)</span>
+                <h2 class="text-2xl font-bold text-slate-800">ביטול זכויות וטו אישיות והעברת המילה האחרונה למנכ"ל</h2>
+            </div>
+
+            <div class="compare-grid mb-6">
+                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                    <h3 class="font-bold text-slate-500 mb-2 border-b border-slate-200 pb-2">טיוטה ראשונית (33%)</h3>
+                    <p class="text-slate-700">סעיף 4.5 העניק לכל שותף <strong>זכות וטו מוחלטת</strong> בתחומו
+                        (אלדד-פיננסי, קיריל-טכנולוגי, צד ג'-פיתוח עסקי). סעיף 4.7 קבע דבר חריג: שבמקרה של חוסר הסכמה
+                        בנושא שלא מוגן בו למישהו זכות וטו, צד ג' תחזיק ב<strong>זכות הכרעה סופית, בלעדית ומחייבת
+                            ("שלא יוגבל בידי הרוב")</strong>.</p>
+                    <div class="mt-4 p-3 bg-red-50 text-red-700 text-sm rounded border border-red-100">
+                        <strong>סכנה:</strong> יצירת "מפלצת משולשת". אם כל אחד יכול לעכב את השני בשל תחומו, החברה לא
+                        תזוז מילימטר מול משקיעים. הענקת זכות הכרעה סופית ומחייבת לצד ג' למעשה הפכה אותה למנהלת-על, גם
+                        כשחלקה ההוני לעולם לא איפשר זאת.
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 p-5 rounded-lg border border-blue-200">
+                    <h3 class="font-bold text-blue-600 mb-2 border-b border-blue-200 pb-2">ההסכם החדש (Robium 2.0)</h3>
+                    <p class="text-slate-800 font-medium">המנכ"ל (אלדד) מנהל את החברה באופן שוטף עם זכות הכרעה (Casting
+                        Vote) במקרה של שוויון. אין לאף שותף זכות וטו (כלומר, אקדח לרקה). החלטות אסטרטגיות (כגון
+                        מיזוג/הכנסת עובדי מפתח) דורשות <strong>רוב של 75%</strong>, מה שמחייב הסכמה רחבה תוך צמצום
+                        סיכויי השיתוק.</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 text-white p-5 rounded-lg">
+                <h4 class="font-bold text-amber-400 mb-2">💡 ההסבר הפתוח לשותפים:</h4>
+                <p class="text-slate-300">"חברים, בחברת הייטק לא יכול להיות שכל שותף בודד יכול לשתק החלטות גדולות בגלל
+                    'וטו'. משקיע שרואה הסכם כזה בורח מיד. מנהל/מנכ"ל חייב נווט להחלטות קצה, ורוב מיוחס של 75% מעניק
+                    מספיק כוח למיעוט להישמע, בלי לתת לו מפתחות לעצור את הספינה."</p>
+            </div>
+        </section>
+
+        <!-- 2. קניין רוחני והמערכות הישנות (Background IP) -->
+        <section class="glass-card p-6 md:p-8 border-t-4 border-emerald-500">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-bold">נכסי עבר (סעיף
+                    8.8 בטיוטה)</span>
+                <h2 class="text-2xl font-bold text-slate-800">הכרה בשווי המערכות שהביאו אלדד וקיריל לחברה (השקעת בעלים)
+                </h2>
+            </div>
+
+            <div class="compare-grid mb-6">
+                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                    <h3 class="font-bold text-slate-500 mb-2 border-b border-slate-200 pb-2">טיוטה ראשונית (33%)</h3>
+                    <p class="text-slate-700">סעיף 8.8.2 קבע שכל הנכסים, התוכנות, הדומיינים, והקוד שנכתב מחודש אוגוסט
+                        (רוביום, תכלס, מתמלל, אפוטרופוס) עוברים באופן מיידי לשותפות <strong>"ללא תמורה נוספת", ו"עם
+                            ויתור מלא על זכויות או תמלוגים".</strong></p>
+                    <div class="mt-4 p-3 bg-red-50 text-red-700 text-sm rounded border border-red-100">
+                        <strong>סכנה:</strong> מי שעמל לבנות מודלים טכנולוגיים במשך חודשים, בעלות שוק של למעלה מחצי
+                        מיליון שקל (!), פשוט נותן אותם במתנה לשותף החדש שלא לקח חלק בעבודה הזו ושותף עכשיו ב-33%.
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 p-5 rounded-lg border border-blue-200">
+                    <h3 class="font-bold text-blue-600 mb-2 border-b border-blue-200 pb-2">ההסכם החדש (Robium 2.0)</h3>
+                    <p class="text-slate-800 font-medium">הנכסים אכן עוברים לידי השותפות לחלוטין. עם זאת, התקיימה שקיפות
+                        חשבונאית: השווי של הנכסים האלו הוערך על בסיס עלות שחזור תיאורטית (Sweat Equity) בכ-530,000 ש"ח.
+                        הסכום הזה נרשם כ<strong>קדימות בחלוקה (Liquidation Preference)</strong> לאלדד ולקיריל מתוך
+                        הדיבידנדים העתידיים או במסגרת חלוקה/מכירה לפני חלוקה יחסית שווה.</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 text-white p-5 rounded-lg">
+                <h4 class="font-bold text-amber-400 mb-2">💡 ההסבר הפתוח לשותפים:</h4>
+                <p class="text-slate-300">"כעסקים הוגנים, קוד ששווה 500 אלף שקל שפיתחו שני מייסדים בלבד, שייך אצלנו
+                    לחברה וכולנו נהנה ממנו, אבל אי אפשר פשוט 'להלאים' אותו. כשהחברה שלנו תרוויח (וכולנו נפעל לכך שזה
+                    יקרה), קיריל ואני, שהבאנו את ההון הזה מהבית כזיעה ודם, נהיה זכאים לקבל קצת מהערך הזה שייחסך לנו
+                    בחזרה. ככה יוצרים שותפות ללא עלבונות."</p>
+            </div>
+        </section>
+
+        <!-- 3. חלוקת הדילול ומאגר אופציות (ESOP) -->
+        <section class="glass-card p-6 md:p-8 border-t-4 border-amber-500">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-bold">הון ודילול (סעיף 3.2
+                    בטיוטה)</span>
+                <h2 class="text-2xl font-bold text-slate-800">ביטול שוויון 33%-33%-33% והצגת דילול פרו-ראטה (Pro-Rata)
+                </h2>
+            </div>
+
+            <div class="compare-grid mb-6">
+                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                    <h3 class="font-bold text-slate-500 mb-2 border-b border-slate-200 pb-2">טיוטה ראשונית (33%)</h3>
+                    <p class="text-slate-700">חלוקה עיוורת לחלוטין (33% * 3) שלא מכניסה למשוואה את הפער בין מי שעובדים
+                        (כותבים קוד/מאפיינים שעות ארוכות) לבין מי שפותחת דלתות (מכירת שירותים). מעבר לכך, אין שום
+                        התייחסות להקצאת אופציות לעובדים עתידיים.</p>
+                </div>
+
+                <div class="bg-blue-50 p-5 rounded-lg border border-blue-200">
+                    <h3 class="font-bold text-blue-600 mb-2 border-b border-blue-200 pb-2">ההסכם החדש (Robium 2.0)</h3>
+                    <p class="text-slate-800 font-medium">חלוקה פרופורציונלית לאקטיביות (37.5%, 37.5%, 15% לצד ג' + 10%
+                        מאגר עובדים עתידי - ESOP). כל דילול עתידי לחלוטין (למשקיע או עובד) ייעשה בצורה אחידה (Pro-Rata)
+                        על גב כולם באופן יחסי ולא ייפול רק על הצוות הטכני. בנוסף, לצד ג' הוכנס סעיף "Earn-out" – אם
+                        תעמוד ביעדי מפלצת, היא תהיה זכאית לדילול של השאר כך שתעלה לאחזקות של 20% ומעלה.</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 text-white p-5 rounded-lg">
+                <h4 class="font-bold text-amber-400 mb-2">💡 ההסבר הפתוח לשותפים:</h4>
+                <p class="text-slate-300">"חברות שמתחלקות שליש-שליש-שליש בלי קשר להיקף העבודה נקרעות מבפנים ביום פקודה.
+                    כולם משלמים באחוזים כדי לגייס מתכנתים טובים. הוספנו מנגנון Earn-Out שמייצר תמריץ אמיתי – תביאי
+                    פיילוטים ולקוחות מהותיים, משקל האחזקות שלך בחברה יעלה משמעותית. כולם מרוויחים ממוטיבציה במקום הגנות
+                    דילול."</p>
+            </div>
+        </section>
+
+        <!-- 4. חתימות בנק ותשלום "משכורת מינימום מרווחים" -->
+        <section class="glass-card p-6 md:p-8 border-t-4 border-indigo-500">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold">חשבונאות ופעילות
+                    (סעיפים 4.12, 6.1.3 בטיוטה)</span>
+                <h2 class="text-2xl font-bold text-slate-800">מחיקת הבטחות למשכורת מינימום ושחרור החסמים בפעילות בנקאית
+                    מנהלתית</h2>
+            </div>
+
+            <div class="compare-grid mb-6">
+                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                    <h3 class="font-bold text-slate-500 mb-2 border-b border-slate-200 pb-2">טיוטה ראשונית (33%)</h3>
+                    <p class="text-slate-700">הבטחה (סעיף 4.12) שקיריל יקבל שתי משכורות <strong>"מינימום"</strong>
+                        במשיכה חד-פעמית כאשר החברה תרשום את הרווחים הראשונים שלה. במקביל, סעיף 6 קבע שכל העברה או
+                        התחייבות מעל 10,000 ש"ח דורשת **חתימה טריפל של שלושת השותפים**.</p>
+                </div>
+
+                <div class="bg-blue-50 p-5 rounded-lg border border-blue-200">
+                    <h3 class="font-bold text-blue-600 mb-2 border-b border-blue-200 pb-2">ההסכם החדש (Robium 2.0)</h3>
+                    <p class="text-slate-800 font-medium">בוטלו הפירורים. קיריל מקבל הון עצמי רחב מאוד (37.5%) ומוגדר
+                        כ-CTO ראשי, יחד עם חלוקה בהחזר השקעת הבעלים (265,000 ש"ח) לעת חלוקה. אין "שכר מינימום". הניהול
+                        הכלכלי, כולל הוצאות בסיסיות לשרתים ותפעול (שחורגות לעיתים מ-10K בחודש), יבוצע בלעדית בחתימת
+                        המנכ"ל (אלדד) – בסמכות ותחת תקציב מסודר. רק תמרונים אסטרטגיים חריגים דורשים 75% אישורים.</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 text-white p-5 rounded-lg">
+                <h4 class="font-bold text-amber-400 mb-2">💡 ההסבר הפתוח לשותפים:</h4>
+                <p class="text-slate-300">"קיריל הוא מנהל טכנולוגי בכיר המחזיק ביותר משליש מהחברה, השווי שלו זה מאות
+                    אלפי שקלים של הון. להציע לו תשלום חד פעמי של שכר מינימום מרווח ראשון זה זלזול גם בסטטוס שלו וגם
+                    בקופת החברה הדחוקה. לגבי התפעול הבנקאי - צריכים שמנכ"ל ינהל מהלכים גם בהוצאות גדולות כדי לנוע מהר.
+                    אי אפשר לאסוף שלוש חתימות כדי לסגור הליך עבודה או לשלם ספק טכנולוגי בעשר אלף שקל, אנחנו לא רשות
+                    ממשלתית."</p>
+            </div>
+        </section>
+
+        <!-- 5. הגדרת השליטה: מבחן מהותי לעומת מבחן כמותי (מניות) -->
+        <section class="glass-card p-6 md:p-8 border-t-4 border-purple-500">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-bold">שליטה ומניות (חוק
+                    החברות)</span>
+                <h2 class="text-2xl font-bold text-slate-800">הפרדת כוח הניהול מאחוזי המניות (המבחן המהותי מול הכמותי)
+                </h2>
+            </div>
+
+            <div class="compare-grid mb-6">
+                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                    <h3 class="font-bold text-slate-500 mb-2 border-b border-slate-200 pb-2">גישה מיושנת (דגש מוגזם על
+                        אחוזים)</h3>
+                    <p class="text-slate-700">בטיוטות קודמות (ואצל יזמים מתחילים רבים) קיימת תפיסה שגויה ש"שליטה"
+                        אוטומטית שווה ל"אחוז המניות שאני מחזיק". זה מוביל למלחמות אגו מיותרות על כל אחוז, מכיוון שאנשים
+                        מרגישים שאם ידוללו או אם יקבלו פחות מ-33%, הם "מאבדים שליטה" ואין להם כוח בחברה.</p>
+                </div>
+
+                <div class="bg-blue-50 p-5 rounded-lg border border-blue-200">
+                    <h3 class="font-bold text-blue-600 mb-2 border-b border-blue-200 pb-2">ההסכם החדש (Robium 2.0)</h3>
+                    <p class="text-slate-800 font-medium">הוכנס סעיף ייעודי (4.5) המיישם את <strong>המבחן המהותי של
+                            "שליטה"</strong> ברוח חוק החברות, הפסיקה הישראלית והתקינה החשבונאית. "שליטה" מוגדרת כיכולת
+                        להכווין בפועל את מדיניות התאגיד, והיא מוקנית אופרטיבית למנכ"ל (אלדד). כך, גם אם אחוזי המניות של
+                        חלק מהשותפים נמוכים יותר או מדוללים עם הזמן – יציבות הניהול של החברה וקווי המדיניות שלה נשמרים
+                        ללא זעזועים.</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 text-white p-5 rounded-lg">
+                <h4 class="font-bold text-amber-400 mb-2">💡 ההסבר הפתוח לשותפים:</h4>
+                <p class="text-slate-300">"חלוקת המניות נועדה בעיקר לקבוע מי מקבל כמה כסף ביום פקודה או בדיבידנדים.
+                    אנשים מייחסים משקל מוגזם למניות כ'כלי שליטה'. בישראל, פסיקת בתי המשפט וחוק החברות כבר קבעו שניתן
+                    לנתק בין הבעלות הכמותית לכוח הניהול ('המבחן האיכותי'). ההסכם שלנו מנתק מספרי אחוזים משליטה אופרטיבית
+                    – המנכ"ל מנהל ולכולם יש מנדט לדחוף קדימה ולגזור רווח יחסי לתרומתם, בלי להתקע על כמה אחוזים יש בטבו
+                    במקרה של דילול."</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="mt-12 text-center text-slate-500 border-t border-slate-200 pt-8 pb-12">
+        <p>נותח, נכתב והותאם אסטרטגית עבור מנהלי Robium.</p>
+    </footer>
+
+</body>
+
+</html>

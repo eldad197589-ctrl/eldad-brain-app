@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robium - Incubator Team</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #f59e0b;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+        }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: var(--dark-bg);
+            color: #f8fafc;
+            line-height: 1.6;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to left, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .member-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .member-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .badge {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: white;
+            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+        }
+
+        .vesting-meter {
+            height: 6px;
+            background: #334155;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .vesting-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            width: 15%;
+            /* Initial state illustrative */
+            border-radius: 999px;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4 md:p-8 lg:p-12">
+
+    <header class="max-w-6xl mx-auto mb-16 text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border-indigo-500/30 mb-6">
+            <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+            <span class="text-sm font-semibold text-indigo-300 uppercase tracking-wider">Robium ESOP & Incubator</span>
+        </div>
+        <h1 class="text-4xl md:text-6xl font-extrabold mb-4 font-heebo tracking-tight">
+            תוכנית <span class="gradient-text">החממה לעובדים מייסדים</span>
+        </h1>
+        <p class="text-xl text-slate-400 max-w-3xl mx-auto">
+            מתוך הבנה שהון אנושי הוא סוד ההצלחה של רוביום, אנו חושפים את נבחרת "העובדים המייסדים" שתקלט לחברה. מעבר
+            לכישוריהם, לכל הצוות כאן יש <strong>"פאשן ל-AI" (חזון ותשוקה אמיתית לבינה מלאכותית)</strong>. הם מזהים את
+            הפוטנציאל העצום של הקידמה. כל עובד מקבל את זכויותיו ממאגר ה-10% (ESOP) בכפוף ל<strong>הסכמי חממה ותפוקה
+                מוכחת (Vesting)</strong>.
+        </p>
+    </header>
+
+    <main class="max-w-7xl mx-auto">
+        <!-- המנגנון -->
+        <section class="glass-card p-8 mb-16 border-t-4 border-indigo-500">
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h2 class="text-2xl font-bold mb-4 text-white">איך עובד הסכם החממה? (מריטוקרטיה)</h2>
+                    <p class="text-slate-300 mb-4">
+                        עובדים אסטרטגיים מקבלים הצעת מניות (אופציות) מהמאגר המשותף שהקצו המייסדים. אולם, הזכויות הללו
+                        אינן "מתנת חינם".
+                    </p>
+                    <ul class="space-y-3 text-slate-300">
+                        <li class="flex items-start gap-3">
+                            <span class="text-green-400 font-bold mt-1">✓</span>
+                            <span><strong>მבוסס יעדים (KPIs):</strong> המניות מבשילות לאורך זמן וכנגד השגת יעדים ברורים
+                                (סגירת עסקאות, פיתוח מערכת, שעות עבודה).</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-green-400 font-bold mt-1">✓</span>
+                            <span><strong>תקופת הבשלה (Vesting):</strong> עובד נדרש למינימום זמן והוכחת נאמנות. מי שעוזב
+                                מוקדם - מאבד את אופציות החממה שלו למאגר.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-green-400 font-bold mt-1">✓</span>
+                            <span><strong>הוכחת שירות (Proof of Value):</strong> אם אתה מנהל מכירות, אתה נמדד בהכנסות.
+                                אם את מהנדסת, בספרינטים של קוד. מריטוקרטיה אמיתית.</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Cap Table Visual -->
+                <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                    <h3 class="text-indigo-400 font-bold mb-4 text-center">חלוקת הון השותפות (Cap Table)</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-slate-300">אלדד וקיריל (Tech, Logic & Strategy)</span>
+                                <span class="font-bold text-white">90%</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-2">
+                                <div class="bg-blue-500 h-2 rounded-full" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-amber-400 font-bold">מאגר חממה (ESOP למועמדים מטה)</span>
+                                <span class="font-bold text-amber-400">10%</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-2">
+                                <div class="bg-amber-400 h-2 rounded-full shadow-[0_0_10px_rgba(251,191,36,0.5)]"
+                                    style="width: 10%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <h2 class="text-3xl font-bold mb-8 text-center text-white glow-text">נבחרת העובדים המייסדים - מחזור א'</h2>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
+
+            <!-- דורון ביטון -->
+            <div class="glass-card p-6 member-card">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-xl font-bold border-2 border-indigo-300 shadow-lg text-white">
+                            ד"ב</div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">דורון ביטון</h3>
+                            <p class="text-indigo-300 text-sm font-medium">סמנכ"ל שיווק ומכירות (VP Sales & Marketing)
+                            </p>
+                        </div>
+                    </div>
+                    <span class="badge">ESOP Pool</span>
+                </div>
+                <div class="mb-4">
+                    <p class="text-slate-300 text-sm">
+                        בעל ניסיון עשיר וקשרים ענפים בתעשייה העסקית, אך מעבר לכך – מדובר באדם שנושם סטרטאפים ואוהב את
+                        הקדמה (Passion for AI). דורון ייקח אחריות מלאה על מערך המכירות ברוביום,
+                        פתיחת דלתות לחברות ענק והבאת כסף לקופה והכנסות B2B.
+                    </p>
+                </div>
+                <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-700 mt-auto">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">תנאי הבשלה (Milestones)
+                    </h4>
+                    <p class="text-sm border-r-2 border-green-500 pr-3 m-0 text-slate-200">
+                        קבלת האופציות מותנית בסגירת פיילוטים והשגת יעדי מכירות (ARR) בפועל. החלק שלו יבשיל ככל שיכניס
+                        לקוחות לחברה.
+                    </p>
+                    <div class="vesting-meter">
+                        <div class="vesting-fill text-right" style="width: 15%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- דביר (גביר) -->
+            <div class="glass-card p-6 member-card flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-xl font-bold border-2 border-teal-300 shadow-lg text-white">
+                            ג"י</div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">גביר ימין</h3>
+                            <p class="text-teal-300 text-sm font-medium">סמנכ"ל מערכות מידע, סייבר ופיתוח מוצר</p>
+                        </div>
+                    </div>
+                    <span class="badge">ESOP Pool</span>
+                </div>
+                <div class="mb-4">
+                    <p class="text-slate-300 text-sm">
+                        מהנדס תוכנה וארכיטקט במקצועו. אמון על אבטחת המידע (סייבר), ניהול מערכות המידע (IT), ופיתוח פנימי
+                        של ארכיטקטורת המוצרים הדורשת רמת דיוק עצומה.
+                    </p>
+                </div>
+                <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-700 mt-auto">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">תנאי הבשלה (Milestones)
+                    </h4>
+                    <p class="text-sm border-r-2 border-green-500 pr-3 m-0 text-slate-200">
+                        תלוי בעמידה במבדקי "סייבר" ואבטחת לקוחות מוסדיים, הרמת תשתיות ענן מתקדמות וסגירת גרסאות מוצר
+                        (Sprints).
+                    </p>
+                    <div class="vesting-meter">
+                        <div class="vesting-fill" style="width: 25%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ענבר ברבי דאבוש -->
+            <div class="glass-card p-6 member-card flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-14 h-14 rounded-full bg-gradient-to-br from-pink-400 to-rose-600 flex items-center justify-center text-xl font-bold border-2 border-rose-300 shadow-lg text-white">
+                            ע"ב</div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">ענבר ברבי דאבוש</h3>
+                            <p class="text-rose-300 text-sm font-medium">מהנדסת מוצר ופרזנטורית ראשית</p>
+                        </div>
+                    </div>
+                    <span class="badge">ESOP Pool</span>
+                </div>
+                <div class="mb-4">
+                    <p class="text-slate-300 text-sm">
+                        מהנדסת חברותית וחדה, אמונה על פתוח המוצר ולייצג אותו כלפי חוץ. ענבר תהיה ה"פרזנטורית" שתדגים
+                        ללקוחות ולארגונים רשמיים את הטכנולוגיה תוך הבנת המורכבות ההנדסית.
+                    </p>
+                </div>
+                <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-700 mt-auto">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">תנאי הבשלה (Milestones)
+                    </h4>
+                    <p class="text-sm border-r-2 border-green-500 pr-3 m-0 text-slate-200">
+                        האופציות מותנות באפיוני מוצר, הנגשת המערכות לשוק, וקיום מצגות מוצלחות למשקיעים ולקוחות ענק להבאת
+                        ערך.
+                    </p>
+                    <div class="vesting-meter">
+                        <div class="vesting-fill" style="width: 10%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- סוניה אילוס -->
+            <div class="glass-card p-6 member-card flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center text-xl font-bold border-2 border-orange-300 shadow-lg text-white">
+                            ס"א</div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">סוניה אילוז</h3>
+                            <p class="text-amber-400 text-sm font-medium">AI PA & מזכירת סינתטית</p>
+                        </div>
+                    </div>
+                    <span class="badge">ESOP Pool</span>
+                </div>
+                <div class="mb-4">
+                    <p class="text-slate-300 text-sm">
+                        מינוי טכנולוגי-אנושי: מזכירת AI ועוזרת למנכ"ל הפועלת בשילוב עם הטכנולוגיה. אחראית לניתוב משימות,
+                        ארגון זמנים למנכ"ל (אלדד), ושחרור צווארי בקבוק ניהוליים.
+                    </p>
+                </div>
+                <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-700 mt-auto">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">תנאי הבשלה (Milestones)
+                    </h4>
+                    <p class="text-sm border-r-2 border-green-500 pr-3 m-0 text-slate-200">
+                        חיסכון מוכח בשעות הניהול של אלדד (שמאפשרות ללוגיקה העסקית לפרוח), ניהול המשימות במערכות AI
+                        ארגוניות וייעול שוטף.
+                    </p>
+                    <div class="vesting-meter">
+                        <div class="vesting-fill" style="width: 20%"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+</body>
+
+</html>

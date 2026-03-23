@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניהול דוד אלדד רו"ח | תיק: דוח אפוטרופוס — אנריקה</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-logo">
+                <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
+                    <text x="12" y="62" font-family="Georgia, serif" font-size="56" font-weight="bold"
+                        fill="#c9a84c">D</text>
+                    <text x="48" y="44" font-family="Georgia, serif" font-size="32" fill="#c9a84c">&amp;</text>
+                    <text x="58" y="62" font-family="Georgia, serif" font-size="56" font-weight="bold"
+                        fill="#7ba3c9">E</text>
+                    <text x="60" y="82" text-anchor="middle" font-family="Heebo, sans-serif" font-size="10"
+                        fill="#7ba3c9">רו"ח</text>
+                </svg>
+            </div>
+            <div class="brand-text">
+                <span class="brand-name">ניהול דוד אלדד</span>
+                <span class="brand-sub">רואה חשבון</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                </svg>
+                דשבורד
+            </a>
+            <a href="clients.html" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                    <path d="M16 3.13a4 4 0 010 7.75" />
+                </svg>
+                📁 כל הלקוחות (147)
+            </a>
+            <a href="case-guardian-enrique.html" class="nav-item active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                🛡️ אפוטרופוס — אנריקה
+            </a>
+            <a href="case-view.html" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3h18v18H3z" />
+                    <path d="M3 9h18M9 21V9" />
+                </svg>
+                💰 הלמן — רווח הון
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-date">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <path d="M16 2v4M8 2v4M3 10h18" />
+                </svg>
+                <span id="currentDate"></span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Case View Header -->
+        <div class="case-view-header">
+            <div class="case-breadcrumb">
+                <a href="dashboard.html" class="back-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                    חזרה לדשבורד
+                </a>
+            </div>
+            <div class="case-view-title">
+                <h1>דין וחשבון לאפוטרופוס — אנריקה</h1>
+                <span class="case-status-badge ready">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    הושלם והוגש (2024-2023)
+                </span>
+            </div>
+            <p class="case-view-subtitle">לקוח משרד אהרוני שלחון דוד · דוח כספי שנתי ע"פ תקנות האפוטרופסות</p>
+        </div>
+
+        <!-- Checklist -->
+        <section class="checklist-section">
+            <div class="checklist-card">
+                <div class="checklist-header">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                    נושאים שטופלו באפוטרופוס הראשי (Guardian Pro)
+                </div>
+                <div class="checklist-body">
+                    <div class="checklist-item">
+                        <div class="check-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                        </div>
+                        סיווג אוטומטי של תנועות הבנק הבינלאומי באמצעות מנוע AI (כ-500 שורות בשנה)
+                    </div>
+                    <div class="checklist-item">
+                        <div class="check-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                        </div>
+                        הפקת דוחות מלאים: שינויים בהון, מאזן בוחן סופי, הכנסות והוצאות
+                    </div>
+                    <div class="checklist-item">
+                        <div class="check-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                        </div>
+                        חתימה על חוות דעת לא מסוייגת ע"י רואה החשבון והגשה
+                    </div>
+                    <div class="checklist-item">
+                        <div class="check-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                        </div>
+                        וידוא אסמכתאות (נסח טאבו, אישורי יתרה 31.12, דפי בנק מרוכזים)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Documents: Reports -->
+        <section class="docs-section">
+            <div class="docs-section-header">
+                <h2>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    דוחות וחוות דעת שהופקו
+                </h2>
+            </div>
+
+            <div class="docs-grid">
+                <!-- Expert Opinion -->
+                <div class="doc-card" style="animation-delay: 0.1s">
+                    <div class="doc-card-top">
+                        <div class="doc-icon letter">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                <line x1="9" y1="3" x2="9" y2="21" />
+                            </svg>
+                        </div>
+                        <div class="doc-info">
+                            <h4>חוות דעת רואה חשבון</h4>
+                            <p>חוות דעת לא מסוייגת חתומה · דין וחשבון סופי</p>
+                            <span class="doc-type-badge type-letter">חוות דעת</span>
+                        </div>
+                    </div>
+                    <div class="doc-actions">
+                        <a href="חוות_דעת_אנריקה.pdf" target="_blank" class="doc-btn primary">
+                            פתח PDF
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Financial Reports -->
+                <div class="doc-card" style="animation-delay: 0.2s">
+                    <div class="doc-card-top">
+                        <div class="doc-icon worksheet">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="20" x2="18" y2="10" />
+                                <line x1="12" y1="20" x2="12" y2="4" />
+                                <line x1="6" y1="20" x2="6" y2="14" />
+                            </svg>
+                        </div>
+                        <div class="doc-info">
+                            <h4>דוחות שינויים בהון</h4>
+                            <p>דוח שינויים בהון סופי · מאזן בוחן · הוצאות והכנסות סופי</p>
+                            <span class="doc-type-badge type-worksheet">דוחות כספיים</span>
+                        </div>
+                    </div>
+                    <div class="doc-actions">
+                        <a href="דין_וחשבון_סופי_אנריקה.pdf" target="_blank" class="doc-btn primary">
+                            פתח PDF
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Guardian Excel -->
+                <div class="doc-card" style="animation-delay: 0.3s">
+                    <div class="doc-card-top">
+                        <div class="doc-icon form">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10 9 9 9 8 9" />
+                            </svg>
+                        </div>
+                        <div class="doc-info">
+                            <h4>דוח אקסל Guardian</h4>
+                            <p>דוח אקסל מעודכן סופי סיווג אוטומטי · מאושר ע"י מסד נתונים</p>
+                            <span class="doc-type-badge type-form">גיליון עבודה</span>
+                        </div>
+                    </div>
+                    <div class="doc-actions">
+                        <a href="דוח_אקסל_אנריקה.xlsx" target="_blank" class="doc-btn">
+                            פתח Excel
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Flowchart -->
+                <div class="doc-card" style="animation-delay: 0.4s">
+                    <div class="doc-card-top">
+                        <div class="doc-icon form">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                            </svg>
+                        </div>
+                        <div class="doc-info">
+                            <h4>תרשים זרימה — Guardian Pro</h4>
+                            <p>תהליך הכנת דוח אפוטרופוס מאיסוף הנתונים ל-Submission</p>
+                            <span class="doc-type-badge type-form">תרשים זרימה</span>
+                        </div>
+                    </div>
+                    <div class="doc-actions">
+                        <a href="flowchart-guardian-pro.html" class="doc-btn primary">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+                                <polyline points="15 3 21 3 21 9" />
+                                <line x1="10" y1="14" x2="21" y2="3" />
+                            </svg>
+                            פתח
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Documents: Attachments -->
+        <section class="docs-section">
+            <div class="docs-section-header">
+                <h2>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
+                    </svg>
+                    אסמכתאות וניירת (סרוקים)
+                </h2>
+            </div>
+
+            <div class="docs-grid">
+                <!-- Tabu -->
+                <div class="doc-card" style="animation-delay: 0.4s">
+                    <div class="doc-card-top">
+                        <div class="doc-icon attachment">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                        </div>
+                        <div class="doc-info">
+                            <h4>נסח טאבו</h4>
+                            <p>נסח טאבו של נכס המקרקעין של החסוי</p>
+                            <span class="doc-type-badge type-attachment">רשם המקרקעין</span>
+                        </div>
+                    </div>
+                    <div class="doc-actions">
+                        <a href="נסח_טאבו_אנריקה.pdf" target="_blank" class="doc-btn primary">
+                            פתח PDF
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Bank Statements -->
+                <div class="doc-card" style="animation-delay: 0.5s">
+                    <div class="doc-card-top">
+                        <div class="doc-icon attachment">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="2" y="4" width="20" height="16" rx="2" />
+                                <line x1="2" y1="10" x2="22" y2="10" />
+                            </svg>
+                        </div>
+                        <div class="doc-info">
+                            <h4>אישורי יתרה ודפי בנק</h4>
+                            <p>אישור יתרה 31.12.23 · דפי בנק הבנלאומי 1.1-31.12 מרוכזים</p>
+                            <span class="doc-type-badge type-attachment">פיננסי</span>
+                        </div>
+                    </div>
+                    <div class="doc-actions">
+                        <a href="אישורי_יתרה_אנריקה.pdf" target="_blank" class="doc-btn primary">
+                            פתח PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Set current date
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('he-IL', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        document.getElementById('currentDate').textContent = dateStr;
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+# Cursor Rules — brain-app (Eldad's Brain Dashboard)
+
+## Language & Framework
+- TypeScript strict mode (no `any`)
+- React 19 with functional components only
+- React Router 7 for navigation
+- Lucide React for icons
+- Vite for build
+
+## Code Style
+- Use `interface` (not `type`) for object shapes
+- Named `interface Props {}` for every component — never inline types
+- JSDoc on every exported function, component, and hook
+- `#region` / `#endregion` blocks for file sections
+- Max 300 lines per file
+- PascalCase for component files, camelCase for utils/hooks
+
+## Architecture
+- Feature folder pattern: `src/pages/<feature>/` with orchestrator
+- Orchestrator components: layout ONLY, no business logic
+- Custom hooks for all state logic and data transformations
+- Barrel exports (`index.ts`) in every feature folder
+- No circular dependencies
+
+## Component Pattern
+```tsx
+/** Brief description of component */
+interface Props {
+  /** prop description */
+  propName: string;
+}
+export default function ComponentName({ propName }: Props) {
+  return <div>{propName}</div>;
+}
+```
+
+## Naming
+- Components: `PascalCase.tsx` (e.g., `StatsBar.tsx`)
+- Hooks: `use<Name>` in `hooks.ts` (e.g., `useMeetings`)
+- Constants: `UPPER_SNAKE_CASE` (e.g., `DAYS_HE`)
+- Utils: descriptive names (e.g., `calendarUtils.ts` not `utils.ts`)
+
+## Important Context
+- App is RTL (Hebrew) — `dir="rtl"`
+- All data in localStorage (no backend)
+- Dark theme with glass morphism
+- All pages lazy-loaded in `main.tsx`
+- Date format: `YYYY-MM-DD` strings
