@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: officeProfile.ts
+   PURPOSE: officeProfile module
+   DEPENDENCIES: None (local only)
+   EXPORTS: OfficeProfile, OFFICE_PROFILES, getActiveProfile, setActiveProfile
+   ============================================ */
 /**
  * FILE: officeProfile.ts
  * PURPOSE: Office profile types, defaults, and storage utilities.

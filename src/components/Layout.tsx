@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: Layout.tsx
+   PURPOSE: Layout component
+   DEPENDENCIES: react-router-dom, react, lucide-react
+   EXPORTS: Layout (default)
+   ============================================ */
 /**
  * FILE: Layout.tsx
  * PURPOSE: Main app layout — sidebar navigation + top bar + content area

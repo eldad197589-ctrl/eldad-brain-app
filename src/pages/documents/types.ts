@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: types.ts
+   PURPOSE: Domain-specific interfaces and types
+   DEPENDENCIES: lucide-react
+   EXPORTS: FieldType, LetterField, CategoryId, LetterCategory, LetterTemplate, ViewMode
+   ============================================ */
 /**
  * Documents — Domain-Specific Types
  *

@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: SetlistManager.tsx
+   PURPOSE: SetlistManager component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: SetlistManager (default)
+   ============================================ */
 /**
  * FILE: SetlistManager.tsx
  * PURPOSE: Create, manage, and share setlists — curate songs from the repertoire

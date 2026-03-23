@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: hooks.ts
+   PURPOSE: Custom React hooks (data, computed values)
+   DEPENDENCIES: react
+   EXPORTS: useDashboardStats
+   ============================================ */
 /**
  * FILE: hooks.ts
  * PURPOSE: Dashboard computed statistics — static neurons + live brainStore data

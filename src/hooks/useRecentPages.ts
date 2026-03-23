@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: useRecentPages.ts
+   PURPOSE: useRecentPages module
+   DEPENDENCIES: react, react-router-dom
+   EXPORTS: RecentPage, useRecentPages, useRecentPagesStatic
+   ============================================ */
 /**
  * FILE: useRecentPages.ts
  * PURPOSE: Tracks recently visited pages for CommandPalette "recent pages" section

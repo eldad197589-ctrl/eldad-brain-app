@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: supabaseService.ts
+   PURPOSE: supabaseService module
+   DEPENDENCIES: None (local only)
+   EXPORTS: None
+   ============================================ */
 /**
  * FILE: supabaseService.ts
  * PURPOSE: CRUD operations for Supabase — mirrors brainStore actions

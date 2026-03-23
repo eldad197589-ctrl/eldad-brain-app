@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: DocumentsPage.tsx
+   PURPOSE: DocumentsPage component
+   DEPENDENCIES: react
+   EXPORTS: DocumentsPage (default)
+   ============================================ */
 /**
  * DocumentsPage — Orchestrator (Layout Wrapper)
  *

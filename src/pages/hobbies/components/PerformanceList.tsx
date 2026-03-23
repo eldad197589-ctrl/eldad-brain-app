@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: PerformanceList.tsx
+   PURPOSE: PerformanceList component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: PerformanceList (default)
+   ============================================ */
 /**
  * FILE: PerformanceList.tsx
  * PURPOSE: Manage upcoming and past performances/events

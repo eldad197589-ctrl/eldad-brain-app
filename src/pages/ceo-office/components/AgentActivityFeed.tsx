@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: AgentActivityFeed.tsx
+   PURPOSE: AgentActivityFeed component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: AgentActivityFeed (default)
+   ============================================ */
 /**
  * AgentActivityFeed — Live Agent Activity Dashboard
  *

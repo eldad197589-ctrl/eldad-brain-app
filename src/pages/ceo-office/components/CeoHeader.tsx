@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: CeoHeader.tsx
+   PURPOSE: CeoHeader component
+   DEPENDENCIES: None (local only)
+   EXPORTS: CeoHeader (default)
+   ============================================ */
 /**
  * FILE: CeoHeader.tsx
  * PURPOSE: CEO Office header — clean title per doctrine Part 6

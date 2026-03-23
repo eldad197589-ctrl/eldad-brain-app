@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: agreementData.ts
+   PURPOSE: Type definitions
+   DEPENDENCIES: None (local only)
+   EXPORTS: ClauseStatus, SubClause, AgreementClause, EquityRow, SignatureBox, EQUITY_TABLE, SIGNATURES, AGREEMENT_CLAUSES, STORAGE_KEY_STATUSES, STORAGE_KEY_NOTES, STORAGE_KEY_GENERAL_NOTES
+   ============================================ */
 /**
  * FILE: agreementData.ts
  * PURPOSE: Structured data for the Robium Founders Agreement (extracted from robium_final_agreement.html)

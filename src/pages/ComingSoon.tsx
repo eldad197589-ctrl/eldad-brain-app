@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: ComingSoon.tsx
+   PURPOSE: ComingSoon component
+   DEPENDENCIES: lucide-react
+   EXPORTS: ComingSoon (default)
+   ============================================ */
 import { Clock } from 'lucide-react';
 
 export default function ComingSoon() {

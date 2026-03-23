@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: supabaseClient.ts
+   PURPOSE: supabaseClient module
+   DEPENDENCIES: @supabase
+   EXPORTS: isSupabaseConfigured, getSupabase
+   ============================================ */
 /**
  * FILE: supabaseClient.ts
  * PURPOSE: Initialize Supabase client with graceful fallback

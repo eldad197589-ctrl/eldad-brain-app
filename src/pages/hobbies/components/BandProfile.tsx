@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: BandProfile.tsx
+   PURPOSE: BandProfile component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: BandProfile (default)
+   ============================================ */
 /**
  * FILE: BandProfile.tsx
  * PURPOSE: Dedicated profile page for להקת צ'ארלי בראון with bio, photos, songs, and message board

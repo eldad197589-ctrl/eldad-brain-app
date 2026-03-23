@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: HobbiesPage.tsx
+   PURPOSE: HobbiesPage component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: HobbiesPage (default)
+   ============================================ */
 /**
  * FILE: HobbiesPage.tsx
  * PURPOSE: Orchestrator — tab-based layout for the professional singer toolkit

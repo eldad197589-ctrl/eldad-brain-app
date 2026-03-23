@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: hooks.ts
+   PURPOSE: Custom React hooks (data, computed values)
+   DEPENDENCIES: react
+   EXPORTS: HobbiesDataReturn, useHobbiesData
+   ============================================ */
 /**
  * FILE: hooks.ts
  * PURPOSE: Custom React hooks for CRUD on songs, setlists, musicians, performances, and hobbies

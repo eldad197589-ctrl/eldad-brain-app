@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: flowchartTypes.ts
+   PURPOSE: Type definitions
+   DEPENDENCIES: None (local only)
+   EXPORTS: DetailItem, FormulaLine, DecisionBranch, FlowStep, Decision, IronRule, FlowchartResult, FlowchartData
+   ============================================ */
 /* ═══ Flowchart Types ═══ */
 
 export interface DetailItem {

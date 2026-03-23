@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: TemplateGrid.tsx
+   PURPOSE: TemplateGrid component
+   DEPENDENCIES: lucide-react
+   EXPORTS: TemplateGrid (default)
+   ============================================ */
 /**
  * TemplateGrid — List of templates for a selected category
  *

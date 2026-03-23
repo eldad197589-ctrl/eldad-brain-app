@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: DailyNotes.tsx
+   PURPOSE: DailyNotes component
+   DEPENDENCIES: lucide-react
+   EXPORTS: DailyNotes (default)
+   ============================================ */
 /**
  * DailyNotes — Quick notes pad for the selected day.
  * Auto-saves to localStorage via the useDailyNotes hook.

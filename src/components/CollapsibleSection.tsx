@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: CollapsibleSection.tsx
+   PURPOSE: CollapsibleSection component
+   DEPENDENCIES: react
+   EXPORTS: CollapsibleSection (default)
+   ============================================ */
 /**
  * FILE: CollapsibleSection.tsx
  * PURPOSE: Collapsible sidebar panel — card-based design with accent color and description

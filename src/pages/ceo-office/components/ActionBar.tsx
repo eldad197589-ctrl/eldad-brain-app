@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: ActionBar.tsx
+   PURPOSE: ActionBar component
+   DEPENDENCIES: lucide-react
+   EXPORTS: ActionBar (default)
+   ============================================ */
 import { Plus, RefreshCw, Calendar } from 'lucide-react';
 
 interface Props {

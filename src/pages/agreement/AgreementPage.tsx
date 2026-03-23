@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: AgreementPage.tsx
+   PURPOSE: AgreementPage component
+   DEPENDENCIES: react, react-router-dom, lucide-react
+   EXPORTS: AgreementPage (default)
+   ============================================ */
 /**
  * FILE: AgreementPage.tsx
  * PURPOSE: Founders agreement viewer with status annotations and notes (Orchestrator)

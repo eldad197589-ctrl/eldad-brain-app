@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: FormFillerView.tsx
+   PURPOSE: FormFillerView component
+   DEPENDENCIES: react
+   EXPORTS: FormFillerView (default)
+   ============================================ */
 /**
  * FILE: FormFillerView.tsx
  * PURPOSE: UI for filling Form 2279 (ייפוי כוח רשות המיסים) using the PDF overlay engine.

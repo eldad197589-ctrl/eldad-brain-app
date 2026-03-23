@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: agentExecutionService.ts
+   PURPOSE: agentExecutionService module
+   DEPENDENCIES: None (local only)
+   EXPORTS: StepExecutionResult
+   ============================================ */
 /**
  * FILE: agentExecutionService.ts
  * PURPOSE: Real AI execution engine for agent mission steps

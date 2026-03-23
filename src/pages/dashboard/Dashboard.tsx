@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: Dashboard.tsx
+   PURPOSE: Dashboard component
+   DEPENDENCIES: react
+   EXPORTS: Dashboard (default)
+   ============================================ */
 /**
  * Dashboard — Orchestrator (Layout Wrapper)
  *

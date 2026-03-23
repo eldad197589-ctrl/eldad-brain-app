@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: CommandPalette.tsx
+   PURPOSE: CommandPalette component
+   DEPENDENCIES: react, react-router-dom, lucide-react
+   EXPORTS: CommandPalette (default)
+   ============================================ */
 /**
  * FILE: CommandPalette.tsx
  * PURPOSE: Ctrl+K command palette — fast search, recent pages, and contextual actions

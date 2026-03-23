@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: constants.tsx
+   PURPOSE: Static data and configuration
+   DEPENDENCIES: lucide-react
+   EXPORTS: ClauseCard, TabId, TABS, PARTY_C_CLAUSES, KIRILL_CLAUSES, ESOP_TABLE
+   ============================================ */
 /**
  * Founders Page — Constants & Data
  *

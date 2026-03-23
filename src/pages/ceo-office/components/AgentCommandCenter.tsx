@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: AgentCommandCenter.tsx
+   PURPOSE: AgentCommandCenter component
+   DEPENDENCIES: react, react-router-dom, lucide-react
+   EXPORTS: AgentCommandCenter (default)
+   ============================================ */
 /**
  * AgentCommandCenter — The AI-Powered Heart of CEO Office v2.0
  *

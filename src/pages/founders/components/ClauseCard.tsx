@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: ClauseCard.tsx
+   PURPOSE: ClauseCardComponent component
+   DEPENDENCIES: None (local only)
+   EXPORTS: ClauseCardComponent (default)
+   ============================================ */
 /**
  * ClauseCardComponent — Renders a single founders agreement clause card
  */

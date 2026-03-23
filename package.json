@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "lint:rules": "node scripts/lint-rules.mjs",
+    "add-headers": "node scripts/add-file-headers.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

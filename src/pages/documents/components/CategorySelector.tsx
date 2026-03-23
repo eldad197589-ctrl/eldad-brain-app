@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: CategorySelector.tsx
+   PURPOSE: CategorySelector component
+   DEPENDENCIES: lucide-react
+   EXPORTS: CategorySelector (default)
+   ============================================ */
 /**
  * CategorySelector — Grid of document category cards
  *

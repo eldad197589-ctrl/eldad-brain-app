@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: OverdueAlerts.tsx
+   PURPOSE: OverdueAlerts component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: OverdueAlerts (default)
+   ============================================ */
 /**
  * FILE: OverdueAlerts.tsx
  * PURPOSE: Loop closure alerts — shows overdue + stuck tasks per doctrine Part 5

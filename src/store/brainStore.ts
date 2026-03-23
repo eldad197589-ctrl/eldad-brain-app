@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: brainStore.ts
+   PURPOSE: Type definitions
+   DEPENDENCIES: zustand
+   EXPORTS: KnowledgeEntry, IncomingDocument, SyncStatus, useBrainStore
+   ============================================ */
 /**
  * FILE: brainStore.ts
  * PURPOSE: Central Zustand store — single source of truth for all shared data

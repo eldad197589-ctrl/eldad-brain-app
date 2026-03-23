@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: breadcrumbsMap.ts
+   PURPOSE: breadcrumbsMap module
+   DEPENDENCIES: None (local only)
+   EXPORTS: BreadcrumbNode, BREADCRUMB_MAP, DYNAMIC_BREADCRUMBS, resolveBreadcrumb, buildBreadcrumbChain
+   ============================================ */
 /**
  * FILE: breadcrumbsMap.ts
  * PURPOSE: Maps route paths to Hebrew breadcrumb labels for navigation awareness

@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: DriveImportModal.tsx
+   PURPOSE: DriveImportModal component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: DriveImportModal (default)
+   ============================================ */
 /**
  * FILE: DriveImportModal.tsx
  * PURPOSE: Browse and import files directly from Google Drive into the Document Intake system

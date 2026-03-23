@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: gmailService.ts
+   PURPOSE: gmailService module
+   DEPENDENCIES: None (local only)
+   EXPORTS: GmailMessage, getGoogleClientId, setGoogleClientId, clearGmailToken, isGmailConnected, signInWithGoogle, signOutGoogle
+   ============================================ */
 /**
  * FILE: gmailService.ts
  * PURPOSE: Gmail API integration via Google Identity Services (browser OAuth2)

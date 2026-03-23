@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: geminiService.ts
+   PURPOSE: geminiService module
+   DEPENDENCIES: @google
+   EXPORTS: ChatMessage, isAIConfigured
+   ============================================ */
 /**
  * Gemini AI Service — Brain Agent Engine
  *

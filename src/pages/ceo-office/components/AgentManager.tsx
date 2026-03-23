@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: AgentManager.tsx
+   PURPOSE: AgentManager component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: AgentManager (default)
+   ============================================ */
 /**
  * AgentManager — The Agent Management System UI
  *

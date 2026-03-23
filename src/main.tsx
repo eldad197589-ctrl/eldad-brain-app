@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: main.tsx
+   PURPOSE: App root — routes, providers, lazy loading
+   DEPENDENCIES: react, react-dom, react-router-dom
+   EXPORTS: None
+   ============================================ */
 import { StrictMode, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'

@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: pdfLetterService.ts
+   PURPOSE: pdfLetterService module
+   DEPENDENCIES: pdf-lib, @pdf-lib
+   EXPORTS: LetterPdfData
+   ============================================ */
 /**
  * FILE: pdfLetterService.ts
  * PURPOSE: Generates professional PDF letters (release letters, document requests)

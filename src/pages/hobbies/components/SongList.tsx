@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: SongList.tsx
+   PURPOSE: SongList component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: SongList (default)
+   ============================================ */
 /**
  * FILE: SongList.tsx
  * PURPOSE: Professional repertoire — display, add, filter, play songs with musical metadata

@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: DocumentEditor.tsx
+   PURPOSE: DocumentEditor component
+   DEPENDENCIES: lucide-react
+   EXPORTS: DocumentEditor (default)
+   ============================================ */
 /**
  * DocumentEditor — Dynamic form for filling in document template fields
  *

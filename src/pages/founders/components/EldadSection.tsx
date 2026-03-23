@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: EldadSection.tsx
+   PURPOSE: EldadSection component
+   DEPENDENCIES: lucide-react
+   EXPORTS: EldadSection (default)
+   ============================================ */
 /**
  * EldadSection — CEO negotiation playbook (private)
  */

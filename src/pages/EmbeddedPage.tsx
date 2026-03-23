@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: EmbeddedPage.tsx
+   PURPOSE: EmbeddedPage component
+   DEPENDENCIES: react-router-dom, lucide-react
+   EXPORTS: EmbeddedPage (default)
+   ============================================ */
 /**
  * FILE: EmbeddedPage.tsx
  * PURPOSE: Generic wrapper for loading legacy HTML files in an iframe within the app layout

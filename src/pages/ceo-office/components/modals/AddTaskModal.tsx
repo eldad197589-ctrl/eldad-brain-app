@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: AddTaskModal.tsx
+   PURPOSE: AddTaskModal component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: AddTaskModal (default)
+   ============================================ */
 import { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import type { Task } from '../../types';

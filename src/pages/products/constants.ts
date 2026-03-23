@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: constants.ts
+   PURPOSE: Static data and configuration
+   DEPENDENCIES: None (local only)
+   EXPORTS: Product, Module, Partnership, RoadmapItem, STATUS_BADGE, LIVE_PRODUCTS, MODULES, PARTNERSHIPS, ROADMAP_Q1, ROADMAP_Q2, ROADMAP_Q34
+   ============================================ */
 /**
  * Products Page — Constants & Data
  */

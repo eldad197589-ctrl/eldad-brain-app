@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: CaseHelman.tsx
+   PURPOSE: CaseHelman component
+   DEPENDENCIES: react-router-dom, lucide-react
+   EXPORTS: CaseHelman (default)
+   ============================================ */
 import { Link } from 'react-router-dom';
 import { Home, CheckCircle, ExternalLink, FileText, Paperclip, Activity } from 'lucide-react';
 

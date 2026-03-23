@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: DocumentIntake.tsx
+   PURPOSE: DocumentIntake component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: DocumentIntake (default)
+   ============================================ */
 /**
  * FILE: DocumentIntake.tsx
  * PURPOSE: Document intake box — receives, classifies, and links documents

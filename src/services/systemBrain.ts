@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: systemBrain.ts
+   PURPOSE: systemBrain module
+   DEPENDENCIES: None (local only)
+   EXPORTS: loadMissions, updateStepStatus, startNextStep, generateForm4, deleteMission
+   ============================================ */
 /**
  * System Brain — The Orchestrator for Agent Missions
  *

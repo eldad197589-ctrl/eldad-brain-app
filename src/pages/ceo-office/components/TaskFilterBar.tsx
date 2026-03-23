@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: TaskFilterBar.tsx
+   PURPOSE: TaskFilterBar component
+   DEPENDENCIES: lucide-react
+   EXPORTS: TaskFilterBar (default)
+   ============================================ */
 /**
  * TaskFilterBar — Filtering controls for the tasks overview.
  * Supports category, priority, status pills + live search.

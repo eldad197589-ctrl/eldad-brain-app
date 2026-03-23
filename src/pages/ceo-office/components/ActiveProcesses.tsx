@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: ActiveProcesses.tsx
+   PURPOSE: ActiveProcesses component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: ActiveProcesses (default)
+   ============================================ */
 /**
  * ActiveProcesses — Shows currently active/recent brain processes
  *

@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: CeoFooter.tsx
+   PURPOSE: CeoFooter component
+   DEPENDENCIES: None (local only)
+   EXPORTS: CeoFooter (default)
+   ============================================ */
 export default function CeoFooter() {
   return (
     <footer style={{ textAlign: 'center', padding: '32px 0', fontSize: '0.78rem', color: '#475569' }}>

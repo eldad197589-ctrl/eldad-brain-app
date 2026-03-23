@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: CeoOffice.tsx
+   PURPOSE: CeoOffice component
+   DEPENDENCIES: react, react-router-dom, lucide-react
+   EXPORTS: CeoOffice (default)
+   ============================================ */
 /**
  * CEO Office — Orchestrator (Layout Wrapper)
  *
@@ -270,8 +276,11 @@ export default function CeoOffice() {
 }
 
 // #region Components
+/** Tab identifier type for CEO Office navigation */
+type TabId = 'overview' | 'calendar' | 'kanban' | 'knowledge';
+
 function TabButton({ id, label, icon, activeTab, onClick }: {
-  id: any, label: string, icon: React.ReactNode, activeTab: string, onClick: (id: any) => void
+  id: TabId, label: string, icon: React.ReactNode, activeTab: string, onClick: (id: TabId) => void
 }) {
   const active = activeTab === id;
   return (

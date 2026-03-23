@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: ragService.ts
+   PURPOSE: ragService module
+   DEPENDENCIES: None (local only)
+   EXPORTS: RAGStatus, getRAGStatus, getChunkCount
+   ============================================ */
 /**
  * FILE: ragService.ts
  * PURPOSE: Retrieval-Augmented Generation — queryable knowledge from markdown files

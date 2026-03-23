@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: types.ts
+   PURPOSE: Domain-specific interfaces and types
+   DEPENDENCIES: None (local only)
+   EXPORTS: CalendarDay, DayEvents
+   ============================================ */
 /**
  * CEO Office — Domain-Specific Types
  *

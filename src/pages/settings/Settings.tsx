@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: Settings.tsx
+   PURPOSE: Settings component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: Settings (default)
+   ============================================ */
 /**
  * FILE: Settings.tsx
  * PURPOSE: Integrations & settings dashboard — connect Gmail, Drive, configure API keys

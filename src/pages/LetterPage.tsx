@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: LetterPage.tsx
+   PURPOSE: LetterPage component
+   DEPENDENCIES: react-router-dom, lucide-react
+   EXPORTS: LetterPage (default)
+   ============================================ */
 import { Link } from 'react-router-dom';
 import { Home, Printer, ArrowRight } from 'lucide-react';
 

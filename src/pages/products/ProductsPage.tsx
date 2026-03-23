@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: ProductsPage.tsx
+   PURPOSE: ProductsPage component
+   DEPENDENCIES: react-router-dom, lucide-react
+   EXPORTS: ProductsPage (default)
+   ============================================ */
 /**
  * ProductsPage — Orchestrator
  */

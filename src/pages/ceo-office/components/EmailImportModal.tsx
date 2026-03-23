@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: EmailImportModal.tsx
+   PURPOSE: EmailImportModal component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: EmailImportModal (default)
+   ============================================ */
 /**
  * FILE: EmailImportModal.tsx
  * PURPOSE: Modal to import work-relevant emails into DocumentIntake

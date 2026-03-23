@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: calendarUtils.ts
+   PURPOSE: Pure utility functions
+   DEPENDENCIES: None (local only)
+   EXPORTS: toDateStr, uid, getDaysInMonth, getFirstDayOfWeek
+   ============================================ */
 /**
  * CEO Office — Calendar & Date Utilities
  *

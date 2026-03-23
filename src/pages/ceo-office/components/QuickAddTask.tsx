@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: QuickAddTask.tsx
+   PURPOSE: QuickAddTask component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: QuickAddTask (default)
+   ============================================ */
 import { useState, useEffect, useRef } from 'react';
 import { Zap, Plus } from 'lucide-react';
 import type { Task } from '../types';

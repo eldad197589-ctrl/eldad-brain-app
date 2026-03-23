@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: PartyCSection.tsx
+   PURPOSE: PartyCSection component
+   DEPENDENCIES: lucide-react
+   EXPORTS: PartyCSection (default)
+   ============================================ */
 /**
  * PartyCSection — Confrontation zone for Party C (business development partner)
  */

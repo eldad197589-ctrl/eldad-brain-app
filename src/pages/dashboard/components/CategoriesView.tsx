@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: CategoriesView.tsx
+   PURPOSE: CategoriesView component
+   DEPENDENCIES: lucide-react
+   EXPORTS: CategoriesView (default)
+   ============================================ */
 /**
  * CategoriesView — Category grid with progress and neuron items
  */

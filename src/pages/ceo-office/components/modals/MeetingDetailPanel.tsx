@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: MeetingDetailPanel.tsx
+   PURPOSE: MeetingDetailPanel component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: MeetingDetailPanel (default)
+   ============================================ */
 /**
  * FILE: MeetingDetailPanel.tsx
  * PURPOSE: Full-screen modal showing meeting details — topics, related tasks, decisions

@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: DailyTimeline.tsx
+   PURPOSE: DailyTimeline component
+   DEPENDENCIES: None (local only)
+   EXPORTS: DailyTimeline (default)
+   ============================================ */
 /**
  * DailyTimeline — Vertical timeline view showing meetings as time blocks
  * and undated tasks at the top.

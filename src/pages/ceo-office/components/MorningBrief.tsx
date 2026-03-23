@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: MorningBrief.tsx
+   PURPOSE: MorningBrief component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: MorningBrief (default)
+   ============================================ */
 /**
  * FILE: MorningBrief.tsx
  * PURPOSE: Automated daily brief for CEO — real data summary

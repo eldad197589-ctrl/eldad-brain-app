@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: constants.ts
+   PURPOSE: Static data and configuration
+   DEPENDENCIES: lucide-react
+   EXPORTS: FIELD_DATE, FIELD_CLIENT_NAME, FIELD_CLIENT_ID, FIELD_SENDER, CATEGORIES, TEMPLATES, getTemplatesByCategory, searchTemplates
+   ============================================ */
 /**
  * Documents — Constants & Template Data
  *
@@ -7,7 +13,7 @@
  */
 import {
   Landmark, Shield, Building2, Users, FileText,
-  Clock, AlertTriangle, CreditCard, FileCheck, Wallet,
+  Clock, AlertTriangle, CreditCard, FileCheck,
 } from 'lucide-react';
 import type { LetterCategory, LetterTemplate, LetterField } from './types';
 

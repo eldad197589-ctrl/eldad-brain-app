@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: AddMeetingModal.tsx
+   PURPOSE: AddMeetingModal component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: AddMeetingModal (default)
+   ============================================ */
 import { useState } from 'react';
 import { Calendar } from 'lucide-react';
 import type { Meeting } from '../../types';

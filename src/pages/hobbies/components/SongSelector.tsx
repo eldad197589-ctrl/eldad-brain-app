@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: SongSelector.tsx
+   PURPOSE: SongSelector component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: SongSelector (default)
+   ============================================ */
 /**
  * FILE: SongSelector.tsx
  * PURPOSE: Interactive song selector with checkboxes, search, and category filtering for musician signup

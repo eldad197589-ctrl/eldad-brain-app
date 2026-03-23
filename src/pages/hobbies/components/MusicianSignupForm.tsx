@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: MusicianSignupForm.tsx
+   PURPOSE: MusicianSignupForm component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: MusicianSignupForm (default), SignupFormData
+   ============================================ */
 /**
  * FILE: MusicianSignupForm.tsx
  * PURPOSE: Personal details form for musician/audience signup — name, phone, instruments, notes

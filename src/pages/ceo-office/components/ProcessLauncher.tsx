@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: ProcessLauncher.tsx
+   PURPOSE: ProcessLauncher component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: ProcessLauncher (default)
+   ============================================ */
 /**
  * ProcessLauncher — Brain Process Command Center
  *

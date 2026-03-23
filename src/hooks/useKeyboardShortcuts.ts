@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: useKeyboardShortcuts.ts
+   PURPOSE: useKeyboardShortcuts module
+   DEPENDENCIES: react, react-router-dom
+   EXPORTS: useKeyboardShortcuts
+   ============================================ */
 /**
  * FILE: useKeyboardShortcuts.ts
  * PURPOSE: Global keyboard shortcuts for quick actions

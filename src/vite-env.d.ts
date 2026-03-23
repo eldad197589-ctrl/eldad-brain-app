@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: vite-env.d.ts
+   PURPOSE: Type definitions
+   DEPENDENCIES: None (local only)
+   EXPORTS: None
+   ============================================ */
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {

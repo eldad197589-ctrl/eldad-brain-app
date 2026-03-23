@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: FoundersPage.tsx
+   PURPOSE: FoundersPage component
+   DEPENDENCIES: react, react-router-dom, lucide-react
+   EXPORTS: FoundersPage (default)
+   ============================================ */
 /**
  * FoundersPage — Orchestrator
  *

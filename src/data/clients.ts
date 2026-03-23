@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: clients.ts
+   PURPOSE: Type definitions
+   DEPENDENCIES: None (local only)
+   EXPORTS: Client, ClientProcess, PROCESS_LABELS, FILTER_OPTIONS, ALL_CLIENTS
+   ============================================ */
 export interface Client {
   name: string;
   process: ClientProcess;

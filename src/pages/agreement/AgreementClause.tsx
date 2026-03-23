@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: AgreementClause.tsx
+   PURPOSE: AgreementClause component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: AgreementClause (default)
+   ============================================ */
 /**
  * FILE: AgreementClause.tsx
  * PURPOSE: Single clause card with status buttons and inline notes

@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: BrainLearnedBlock.tsx
+   PURPOSE: BrainLearnedBlock component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: BrainLearnedBlock (default)
+   ============================================ */
 /**
  * FILE: BrainLearnedBlock.tsx
  * PURPOSE: Shows what the brain learned today + quick input to add knowledge

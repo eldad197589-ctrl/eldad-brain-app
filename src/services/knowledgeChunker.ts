@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: knowledgeChunker.ts
+   PURPOSE: knowledgeChunker module
+   DEPENDENCIES: None (local only)
+   EXPORTS: KnowledgeChunk, chunkMarkdown, KNOWLEDGE_FILES
+   ============================================ */
 /**
  * FILE: knowledgeChunker.ts
  * PURPOSE: Split markdown knowledge files into searchable chunks for RAG

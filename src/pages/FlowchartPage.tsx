@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: FlowchartPage.tsx
+   PURPOSE: FlowchartPage component
+   DEPENDENCIES: react-router-dom, lucide-react
+   EXPORTS: FlowchartPage (default)
+   ============================================ */
 import { useParams, Link } from 'react-router-dom';
 import { FLOWCHARTS } from '../data/flowcharts';
 import type { FlowStep, Decision, DetailItem, IronRule } from '../data/flowchartTypes';

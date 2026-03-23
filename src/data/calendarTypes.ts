@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: calendarTypes.ts
+   PURPOSE: Type definitions
+   DEPENDENCIES: None (local only)
+   EXPORTS: MeetingTopic, MeetingPrepItem, MeetingPrepStage, Meeting, Task, CalendarEvent, SEED_MEETINGS, SEED_TASKS, STORAGE_KEYS, PRIORITY_CONFIG, STATUS_CONFIG
+   ============================================ */
 /** A single topic discussed in a meeting */
 export interface MeetingTopic {
   text: string;

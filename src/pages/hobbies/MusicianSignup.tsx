@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: MusicianSignup.tsx
+   PURPOSE: MusicianSignup component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: MusicianSignup (default)
+   ============================================ */
 /**
  * FILE: MusicianSignup.tsx
  * PURPOSE: Standalone public page for musicians/audience to sign up and select songs they can perform

@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: TaskCard.tsx
+   PURPOSE: TaskCard component
+   DEPENDENCIES: lucide-react
+   EXPORTS: TaskCard (default)
+   ============================================ */
 import { CheckCircle, Trash2 } from 'lucide-react';
 import type { Task } from '../types';
 import { PRIORITY_CONFIG, STATUS_CONFIG } from '../../../data/calendarTypes';

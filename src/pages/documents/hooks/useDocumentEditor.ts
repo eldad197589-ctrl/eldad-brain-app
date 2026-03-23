@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: useDocumentEditor.ts
+   PURPOSE: useDocumentEditor module
+   DEPENDENCIES: react
+   EXPORTS: useDocumentEditor
+   ============================================ */
 /**
  * useDocumentEditor — Document editor state & logic
  *

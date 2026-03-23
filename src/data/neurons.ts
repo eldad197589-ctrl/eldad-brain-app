@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: neurons.ts
+   PURPOSE: Type definitions
+   DEPENDENCIES: None (local only)
+   EXPORTS: NeuronLink, Neuron, NeuronCategory, CATEGORIES, NEURONS, Synapse, SYNAPSES, PENDING
+   ============================================ */
 export interface NeuronLink {
   type: 'flowchart' | 'tool' | 'case';
   href: string;

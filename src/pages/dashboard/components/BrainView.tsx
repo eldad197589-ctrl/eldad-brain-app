@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: BrainView.tsx
+   PURPOSE: BrainView component
+   DEPENDENCIES: None (local only)
+   EXPORTS: BrainView (default)
+   ============================================ */
 /**
  * BrainView — Brain visualization mode with SVG and stats
  */

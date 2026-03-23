@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: EditPrepModal.tsx
+   PURPOSE: EditPrepModal component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: EditPrepModal (default)
+   ============================================ */
 /**
  * FILE: EditPrepModal.tsx
  * PURPOSE: Modal for self-service editing of meeting preparation stages and items
@@ -218,7 +224,7 @@ export default function EditPrepModal({ meetingId, initialStages, onClose }: Pro
 // #region StageEditor
 
 /** Editable stage card */
-function StageEditor({ stage, stageIndex, expanded, onToggle, onUpdateStage, onDelete, onAddItem, onUpdateItem, onDeleteItem }: {
+function StageEditor({ stage, stageIndex: _stageIndex, expanded, onToggle, onUpdateStage, onDelete, onAddItem, onUpdateItem, onDeleteItem }: {
   stage: MeetingPrepStage; stageIndex: number; expanded: boolean;
   onToggle: () => void;
   onUpdateStage: (updates: Partial<MeetingPrepStage>) => void;

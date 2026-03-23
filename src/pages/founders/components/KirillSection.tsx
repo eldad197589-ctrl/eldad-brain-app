@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: KirillSection.tsx
+   PURPOSE: KirillSection component
+   DEPENDENCIES: lucide-react
+   EXPORTS: KirillSection (default)
+   ============================================ */
 /**
  * KirillSection — Confrontation zone for Kirill (CTO)
  */

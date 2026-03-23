@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: Breadcrumbs.tsx
+   PURPOSE: Breadcrumbs component
+   DEPENDENCIES: react-router-dom, lucide-react
+   EXPORTS: Breadcrumbs (default)
+   ============================================ */
 /**
  * FILE: Breadcrumbs.tsx
  * PURPOSE: Location-aware breadcrumb trail with back button for navigation clarity

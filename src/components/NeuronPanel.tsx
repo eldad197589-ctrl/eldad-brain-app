@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: NeuronPanel.tsx
+   PURPOSE: NeuronPanel component
+   DEPENDENCIES: react-router-dom, lucide-react
+   EXPORTS: NeuronPanel (default)
+   ============================================ */
 import { Link } from 'react-router-dom';
 import { type Neuron, type NeuronLink } from '../data/neurons';
 import { X } from 'lucide-react';

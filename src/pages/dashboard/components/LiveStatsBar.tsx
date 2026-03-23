@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: LiveStatsBar.tsx
+   PURPOSE: LiveStatsBar component
+   DEPENDENCIES: None (local only)
+   EXPORTS: LiveStatsBar (default)
+   ============================================ */
 /**
  * FILE: LiveStatsBar.tsx
  * PURPOSE: Real-time operational stats bar for dashboard — tasks, meetings, documents

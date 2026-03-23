@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: BrainSVG.tsx
+   PURPOSE: BrainSVG component
+   DEPENDENCIES: None (local only)
+   EXPORTS: BrainSVG (default)
+   ============================================ */
 import { NEURONS, SYNAPSES, PENDING, CATEGORIES, type Neuron } from '../data/neurons';
 
 interface BrainSVGProps {

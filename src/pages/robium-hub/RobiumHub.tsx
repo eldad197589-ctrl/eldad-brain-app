@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: RobiumHub.tsx
+   PURPOSE: RobiumHub component
+   DEPENDENCIES: react, react-router-dom, lucide-react
+   EXPORTS: RobiumHub (default)
+   ============================================ */
 /**
  * FILE: RobiumHub.tsx
  * PURPOSE: Dynamic "Command Center" — shows the next upcoming meeting as a war room

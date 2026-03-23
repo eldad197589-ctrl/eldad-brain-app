@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: processRegistry.ts
+   PURPOSE: processRegistry module
+   DEPENDENCIES: None (local only)
+   EXPORTS: PROCESS_REGISTRY, getProcessById, getProcessesByDomain, findProcessByKeyword, getDomainStats
+   ============================================ */
 /**
  * Eldad Brain – Process Registry
  *

@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: pdfFormService.ts
+   PURPOSE: pdfFormService module
+   DEPENDENCIES: pdf-lib, @pdf-lib
+   EXPORTS: Form2279Data, downloadBlob
+   ============================================ */
 /**
  * FILE: pdfFormService.ts
  * PURPOSE: PDF form filling engine — overlays text on existing PDF templates

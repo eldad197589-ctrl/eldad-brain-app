@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: tabSync.ts
+   PURPOSE: tabSync module
+   DEPENDENCIES: None (local only)
+   EXPORTS: initTabSync, closeTabSync
+   ============================================ */
 /**
  * FILE: tabSync.ts
  * PURPOSE: BroadcastChannel middleware for Zustand — sync state across browser tabs

@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: constants.ts
+   PURPOSE: Static data and configuration
+   DEPENDENCIES: None (local only)
+   EXPORTS: HOBBIES_STORAGE_KEYS, MUSICAL_KEY_LABELS, MUSICAL_KEYS, INSTRUMENT_LABELS, INSTRUMENT_EMOJIS, SONG_CATEGORY_LABELS, SONG_CATEGORY_COLORS, PERFORMANCE_TYPE_LABELS, FREQUENCY_LABELS, FREQUENCY_COLORS, SEED_SONGS, SEED_SETLISTS, SEED_MUSICIANS, SEED_HOBBIES
+   ============================================ */
 /**
  * FILE: constants.ts
  * PURPOSE: Static data, localStorage keys, labels, and seed data for the Singer Toolkit

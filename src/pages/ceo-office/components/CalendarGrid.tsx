@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: CalendarGrid.tsx
+   PURPOSE: CalendarGrid component
+   DEPENDENCIES: lucide-react
+   EXPORTS: CalendarGrid (default)
+   ============================================ */
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import type { CalendarDay, DayEvents } from '../types';
 import { DAYS_HE, MONTHS_HE } from '../constants';

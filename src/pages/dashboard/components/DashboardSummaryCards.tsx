@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: DashboardSummaryCards.tsx
+   PURPOSE: DashboardSummaryCards component
+   DEPENDENCIES: lucide-react, react-router-dom
+   EXPORTS: DashboardSummaryCards (default)
+   ============================================ */
 /**
  * FILE: DashboardSummaryCards.tsx
  * PURPOSE: Show live lists of open tasks, today's meetings, and pending documents on the dashboard

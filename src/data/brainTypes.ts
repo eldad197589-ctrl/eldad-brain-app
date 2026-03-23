@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: brainTypes.ts
+   PURPOSE: Type definitions
+   DEPENDENCIES: None (local only)
+   EXPORTS: BrainDomain, BrainState, AgentRole, BrainProcessRegistryItem, BrainRouteResult, RouterRequestSource, RouterRequestType, BrainRouterRequest, BrainRouterResponse, AgentHandoff, OutputType, BrainOutput, CeoReportType, CeoReport
+   ============================================ */
 /**
  * Eldad Brain – Core Type Definitions
  * 

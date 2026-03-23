@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: emailClassifier.ts
+   PURPOSE: emailClassifier module
+   DEPENDENCIES: None (local only)
+   EXPORTS: EmailClassification, classifyEmail, extractIsraelDomainOrEntity
+   ============================================ */
 /**
  * FILE: emailClassifier.ts
  * PURPOSE: Smart classification of emails — work vs personal

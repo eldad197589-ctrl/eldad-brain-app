@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: flowcharts.ts
+   PURPOSE: flowcharts module
+   DEPENDENCIES: None (local only)
+   EXPORTS: FLOWCHARTS
+   ============================================ */
 import type { FlowchartData } from './flowchartTypes';
 
 /* ═══════════════════════════════════════════

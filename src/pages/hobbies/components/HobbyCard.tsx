@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: HobbyCard.tsx
+   PURPOSE: HobbyCard component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: HobbyCard (default)
+   ============================================ */
 /**
  * FILE: HobbyCard.tsx
  * PURPOSE: Display individual hobby cards with CRUD actions

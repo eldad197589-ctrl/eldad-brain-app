@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: constants.ts
+   PURPOSE: Static data and configuration
+   DEPENDENCIES: None (local only)
+   EXPORTS: DAYS_HE, MONTHS_HE, MEETING_COLORS, CATEGORY_KEYWORDS, detectCategory
+   ============================================ */
 /**
  * CEO Office — Constants & Configuration
  *

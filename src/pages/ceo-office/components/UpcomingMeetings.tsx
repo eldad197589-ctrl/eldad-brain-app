@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: UpcomingMeetings.tsx
+   PURPOSE: UpcomingMeetings component
+   DEPENDENCIES: None (local only)
+   EXPORTS: UpcomingMeetings (default)
+   ============================================ */
 import type { Meeting } from '../types';
 
 interface Props {

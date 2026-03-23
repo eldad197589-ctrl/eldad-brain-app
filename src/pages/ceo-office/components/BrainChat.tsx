@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: BrainChat.tsx
+   PURPOSE: BrainChat component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: BrainChat (default)
+   ============================================ */
 /**
  * BrainChat — AI Agent Chat Panel for CEO Office
  *

@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: QuickAddMeeting.tsx
+   PURPOSE: QuickAddMeeting component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: QuickAddMeeting (default)
+   ============================================ */
 import { useState, useRef } from 'react';
 import { Calendar, Plus } from 'lucide-react';
 import type { Meeting } from '../types';

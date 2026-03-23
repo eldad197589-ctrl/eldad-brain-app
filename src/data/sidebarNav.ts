@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: sidebarNav.ts
+   PURPOSE: Type definitions
+   DEPENDENCIES: None (local only)
+   EXPORTS: NavItem, NavSection, SIDEBAR_SECTIONS
+   ============================================ */
 /**
  * FILE: sidebarNav.ts
  * PURPOSE: Sidebar navigation — 7 domain-accurate panels with sub-chapter dividers

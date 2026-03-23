@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: ShareableSetlist.tsx
+   PURPOSE: ShareableSetlist component
+   DEPENDENCIES: react, react-router-dom, lucide-react
+   EXPORTS: ShareableSetlist (default)
+   ============================================ */
 /**
  * FILE: ShareableSetlist.tsx
  * PURPOSE: Read-only, print-friendly setlist view for musicians — accessible via /setlist/:id

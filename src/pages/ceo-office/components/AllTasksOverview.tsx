@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: AllTasksOverview.tsx
+   PURPOSE: AllTasksOverview component
+   DEPENDENCIES: react
+   EXPORTS: AllTasksOverview (default)
+   ============================================ */
 /**
  * AllTasksOverview — Tasks list with filtering, search, and progress bar.
  */

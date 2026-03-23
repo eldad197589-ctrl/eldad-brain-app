@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: types.ts
+   PURPOSE: Domain-specific interfaces and types
+   DEPENDENCIES: None (local only)
+   EXPORTS: MasteryLevel, SongCategory, MusicalKey, Song, SetlistItem, Setlist, InstrumentType, Musician, PerformanceType, PerformanceStatus, Performance, HobbyFrequency, Hobby
+   ============================================ */
 /**
  * FILE: types.ts
  * PURPOSE: Domain interfaces for the Singer Toolkit — songs, setlists, musicians, performances, hobbies

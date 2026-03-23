@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: agentRegistry.ts
+   PURPOSE: agentRegistry module
+   DEPENDENCIES: None (local only)
+   EXPORTS: AgentLayer, AgentStatus, Agent, MissionStep, Mission, Form4Report, LAYER_CONFIG, AGENTS, getAgentById, getAgentsByLayer, getLayerOrder
+   ============================================ */
 /**
  * Agent Registry — All 23 AI Agents in 6 Layers
  *

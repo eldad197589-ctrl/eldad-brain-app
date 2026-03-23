@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: ListView.tsx
+   PURPOSE: ListView component
+   DEPENDENCIES: react-router-dom, lucide-react
+   EXPORTS: ListView (default)
+   ============================================ */
 /**
  * ListView — Flat process list view with stat cards
  */

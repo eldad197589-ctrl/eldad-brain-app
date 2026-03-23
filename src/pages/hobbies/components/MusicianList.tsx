@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: MusicianList.tsx
+   PURPOSE: MusicianList component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: MusicianList (default)
+   ============================================ */
 /**
  * FILE: MusicianList.tsx
  * PURPOSE: Manage musicians — names, phones, instruments

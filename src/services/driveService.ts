@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: driveService.ts
+   PURPOSE: driveService module
+   DEPENDENCIES: None (local only)
+   EXPORTS: DriveFile, isDriveConnected, getDownloadUrl
+   ============================================ */
 /**
  * FILE: driveService.ts
  * PURPOSE: Google Drive API integration — list and search files

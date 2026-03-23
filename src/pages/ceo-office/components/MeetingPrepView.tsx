@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: MeetingPrepView.tsx
+   PURPOSE: MeetingPrepView component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: MeetingPrepView (default)
+   ============================================ */
 /**
  * FILE: MeetingPrepView.tsx
  * PURPOSE: Dynamic "war room" view for meeting preparation — stages, links, messages, checklists

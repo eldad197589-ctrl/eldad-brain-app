@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: MeetingCard.tsx
+   PURPOSE: MeetingCard component
+   DEPENDENCIES: lucide-react
+   EXPORTS: MeetingCard (default)
+   ============================================ */
 import { Users, Clock, Trash2, Package } from 'lucide-react';
 import type { Meeting } from '../types';
 

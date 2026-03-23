@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: StatsBar.tsx
+   PURPOSE: StatsBar component
+   DEPENDENCIES: react
+   EXPORTS: StatsBar (default)
+   ============================================ */
 /**
  * FILE: StatsBar.tsx
  * PURPOSE: CEO Office stats — 4 blocks per doctrine Part 6

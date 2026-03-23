@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: TaskDetailPanel.tsx
+   PURPOSE: TaskDetailPanel component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: TaskDetailPanel (default)
+   ============================================ */
 /**
  * TaskDetailPanel — Modal for viewing and editing task details.
  * Supports view mode (default) and edit mode.

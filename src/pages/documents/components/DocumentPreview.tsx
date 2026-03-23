@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: DocumentPreview.tsx
+   PURPOSE: DocumentPreview component
+   DEPENDENCIES: None (local only)
+   EXPORTS: DocumentPreview (default)
+   ============================================ */
 /**
  * DocumentPreview — A4-style preview of the filled document
  *

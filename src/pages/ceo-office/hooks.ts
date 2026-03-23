@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: hooks.ts
+   PURPOSE: Custom React hooks (data, computed values)
+   DEPENDENCIES: react
+   EXPORTS: useMeetings, useTasks, useDailyNotes, useCalendarGrid, useEventsByDate, useUpcomingMeetings, useOverdueTasks
+   ============================================ */
 /**
  * FILE: hooks.ts
  * PURPOSE: CEO Office hooks — reads from central brainStore + calendar utilities

@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: ProtocolSyncModal.tsx
+   PURPOSE: ProtocolSyncModal component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: ProtocolSyncModal (default)
+   ============================================ */
 import { useState, useMemo } from 'react';
 import { Calendar, RefreshCw, Check } from 'lucide-react';
 import type { Meeting, Task } from '../../types';

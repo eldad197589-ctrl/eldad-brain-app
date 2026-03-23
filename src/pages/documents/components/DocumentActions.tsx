@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: DocumentActions.tsx
+   PURPOSE: DocumentActions component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: DocumentActions (default)
+   ============================================ */
 /**
  * DocumentActions — Action buttons for the generated document
  *

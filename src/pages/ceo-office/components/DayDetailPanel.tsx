@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: DayDetailPanel.tsx
+   PURPOSE: DayDetailPanel component
+   DEPENDENCIES: react, lucide-react
+   EXPORTS: DayDetailPanel (default)
+   ============================================ */
 import { useState } from 'react';
 import { Calendar } from 'lucide-react';
 import type { Meeting, Task } from '../types';

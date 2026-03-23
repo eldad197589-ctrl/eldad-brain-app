@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: ViewToggle.tsx
+   PURPOSE: ViewToggle component
+   DEPENDENCIES: None (local only)
+   EXPORTS: ViewToggle (default)
+   ============================================ */
 /**
  * ViewToggle — Dashboard view mode selector (brain / categories / list)
  */

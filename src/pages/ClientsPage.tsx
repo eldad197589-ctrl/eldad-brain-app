@@ -1,3 +1,9 @@
+/* ============================================
+   FILE: ClientsPage.tsx
+   PURPOSE: ClientsPage component
+   DEPENDENCIES: react, lucide-react, react-router-dom
+   EXPORTS: ClientsPage (default)
+   ============================================ */
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Users, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
