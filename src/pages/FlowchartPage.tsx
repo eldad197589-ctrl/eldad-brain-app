@@ -4,11 +4,19 @@
    DEPENDENCIES: react-router-dom, lucide-react
    EXPORTS: FlowchartPage (default)
    ============================================ */
+// #region Imports
+
 import { useParams, Link } from 'react-router-dom';
 import { FLOWCHARTS } from '../data/flowcharts';
 import type { FlowStep, Decision, DetailItem, IronRule } from '../data/flowchartTypes';
 import { Home } from 'lucide-react';
 
+
+// #endregion
+
+// #region Component
+
+/** FlowchartPage component — FlowchartPage component */
 export default function FlowchartPage() {
   const { flowId } = useParams<{ flowId: string }>();
   const flow = FLOWCHARTS[flowId || ''];
@@ -178,3 +186,5 @@ function DecisionDiamond({ decision }: { decision: Decision }) {
     </div>
   );
 }
+
+// #endregion

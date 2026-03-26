@@ -163,13 +163,30 @@ function splitAtParagraphs(text: string, targetSize: number): string[] {
  * These are imported as raw strings at build time.
  */
 export const KNOWLEDGE_FILES = [
+  // Core brain knowledge
   'MASTER_BRAIN_INSTRUCTIONS.md',
-  'accounting_knowledge.md',
   'eldad_brain_master_knowledge.md',
-  'knowledge_robium.md',
+  // Accounting & Tax
+  'accounting_knowledge.md',
+  'knowledge_capital_statement.md',
+  'knowledge_penalty_cancellation.md',
+  // Labor Law
+  'knowledge_labor_law.md',
   'labor_law_letters_library.md',
   'labor_law_process_registry.md',
   'labor_law_verified_knowledge.md',
+  // Client & Business
+  'knowledge_client_onboarding.md',
+  'knowledge_business_plan.md',
+  'knowledge_smart_bareau_pricing.md',
+  // Legal & Agreements
+  'knowledge_robium.md',
+  'robium_legal_research.md',
+  'employment_agreement_template.md',
+  'esop_grant_agreement_template.md',
+  'esop_incubator_research.md',
+  // Seminars
+  'knowledge_seminar_tzila.md',
 ] as const;
 
 // #endregion

@@ -9,11 +9,19 @@
  * PURPOSE: Dashboard computed statistics — static neurons + live brainStore data
  * DEPENDENCIES: neurons data, brainStore
  */
+// #region Imports
+
 import { useMemo } from 'react';
 import { NEURONS, PENDING } from '../../data/neurons';
 import { useBrainStore } from '../../store/brainStore';
 
+
+// #endregion
+
 /** Computed dashboard statistics (static + live) */
+// #region Main
+
+/** useDashboardStats — Custom React hooks (data, computed values) */
 export function useDashboardStats() {
   const tasks = useBrainStore((s) => s.tasks);
   const meetings = useBrainStore((s) => s.meetings);
@@ -47,3 +55,5 @@ export function useDashboardStats() {
     };
   }, [tasks, meetings, documents, knowledgeLog]);
 }
+
+// #endregion

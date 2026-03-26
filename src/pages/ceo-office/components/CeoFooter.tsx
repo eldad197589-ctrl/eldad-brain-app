@@ -4,6 +4,7 @@
    DEPENDENCIES: None (local only)
    EXPORTS: CeoFooter (default)
    ============================================ */
+/** CeoFooter — Bottom footer for the CEO Office page with branding */
 export default function CeoFooter() {
   return (
     <footer style={{ textAlign: 'center', padding: '32px 0', fontSize: '0.78rem', color: '#475569' }}>

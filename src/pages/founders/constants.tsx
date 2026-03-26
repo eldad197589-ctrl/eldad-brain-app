@@ -1,98 +1,114 @@
 /* ============================================
    FILE: constants.tsx
-   PURPOSE: Static data and configuration
-   DEPENDENCIES: lucide-react
-   EXPORTS: ClauseCard, TabId, TABS, PARTY_C_CLAUSES, KIRILL_CLAUSES, ESOP_TABLE
+   PURPOSE: Founders portal constants — Cap Table synced from agreementData.ts
+   DEPENDENCIES: agreementData.ts, lucide-react
+   EXPORTS: ClauseCard, TabId, TABS, ELDAD_CLAUSES, OSNAT_CLAUSES, KIRILL_CLAUSES, ESOP_TABLE
    ============================================ */
-/**
- * Founders Page — Constants & Data
- *
- * All clause cards, ESOP table data, and tab configuration.
- */
-import { Shield, Code, AlertTriangle } from 'lucide-react';
+import { Shield, Code, Briefcase, PieChart } from 'lucide-react';
+import { EQUITY_TABLE } from '../agreement/agreementData';
 
 // #region Types
 
-/** A single clause card for the founders confrontation portal */
+/** A single KPI/Clause card for the founders portal */
 export interface ClauseCard {
   clauseNum: string;
   title: string;
   legalText: string;
-  question: string;
+  question: string;         // Re-purposed as "Actionable Focus"
   color: string;
   disclaimer?: string;
+  status?: 'green' | 'yellow' | 'red';
 }
 
-export type TabId = 'partyc' | 'kirill' | 'eldad';
+export type TabId = 'eldad' | 'kirill' | 'osnat' | 'esop';
 
 // #endregion
 
 // #region Tab Configuration
 
+/** TABS — Configuration */
 export const TABS: { id: TabId; icon: React.ReactNode; label: string; color: string }[] = [
-  { id: 'partyc', icon: <AlertTriangle size={18} />, label: 'צד ג\' (נציג/ת פיתוח עסקי)', color: '#f59e0b' },
-  { id: 'kirill', icon: <Code size={18} />, label: 'קיריל (37.5%)', color: '#06b6d4' },
-  { id: 'eldad', icon: <Shield size={18} />, label: 'מנכ"ל (הנחיות)', color: '#94a3b8' },
+  { id: 'eldad', icon: <Shield size={18} />, label: 'אלדד (Interim CEO)', color: '#3b82f6' },
+  { id: 'osnat', icon: <Briefcase size={18} />, label: 'אוסנת (CRO / HR)', color: '#f59e0b' },
+  { id: 'kirill', icon: <Code size={18} />, label: 'קיריל (CTO)', color: '#10b981' },
+  { id: 'esop', icon: <PieChart size={18} />, label: 'מאגר עובדים (ESOP)', color: '#8b5cf6' },
 ];
 
 // #endregion
 
 // #region Clause Data
 
-export const PARTY_C_CLAUSES: ClauseCard[] = [
+export const ELDAD_CLAUSES: ClauseCard[] = [
   {
-    clauseNum: 'סעיף 5.2', title: 'השקעת זמן ומרץ',
-    legalText: 'בעלי המניות מתחייבים להקדיש את זמנם, מרצם וכישוריהם לטובת החברה... לא לעסוק בצורה שתפגע בביצוע תפקידם.',
-    question: 'לאור הקליניקה הפרטית והפעילות בלשכת עוה"ד, האם את באמת יכולה להתחייב להקדיש את הזמן הנדרש להפיכת Robium לחברה בשווי עשרות מיליונים בשנתיים הקרובות? מהן מכסות השעות השבועיות הקשיחות שאת שמה לעצמך?',
-    color: '#3b82f6',
+    clauseNum: 'הגדרת IP וידע חוזי', title: 'Interim CEO ומייסד (Domain Oracle)',
+    legalText: 'המוח והלוגיקה העסקית שמאחורי המערכת. כל חוקי המיסוי, האלגוריתמים המשפטיים ואופן חשיבת הסוכנים.',
+    question: 'המערכת חייבת לשקף חד משמעית שה-IP המהותי ביותר אינו המסגרת הקודית, אלא הידע התשתיתי ("המוח"). ללא הידע, המערכת נטולת ערך תחרותי.',
+    color: '#3b82f6', status: 'green'
   },
   {
-    clauseNum: 'תפקיד CRO', title: 'הבאת לקוחות והכנסות',
-    legalText: 'תפקיד ה-CRO כולל הובלת מאמצי חדירה לשוק, בניית אסטרטגיה לגיוס לקוחות משפטיים ומוניטין.',
-    question: 'אנא הגדרי באילו משרדי עו״ד, קולגות או גופים פורמליים את מתחייבת להטמיע את המערכת בחצי השנה הראשונה כ-Pilot ממוסד? אנו חייבים KPI מדיד.',
-    disclaimer: 'הדסקליימר "הבאתי נכסים/מוניטין" אינו מחזיק חברה. מוניטין לא מכניס ARR.',
-    color: '#8b5cf6',
+    clauseNum: 'אסטרטגיה טובה', title: 'מנכ"ל זמני וליבת המוצר (Interim CEO)',
+    legalText: 'הסרת נטל מנכ"לות האופרציה כדי לאפשר ריכוז מלא בבניית המודלים וכיוון הפיתוח (Vision).',
+    question: 'העברת שרביט המנכ"ל לאוסנת מאפשרת לאלדד להתמקד ביצירת הערך היחיד שאינו בר תחליף בסטארטאפ.',
+    color: '#8b5cf6', status: 'green'
   },
   {
-    clauseNum: 'סעיף 5א-1', title: 'חובת למידת AI',
-    legalText: 'חובה ליישר קו בטכנולוגיית AI, שימוש בכלים וכו\' תוך 6 חודשים. מודלי שפה, אוטומציות, הבנת המוצר המלאה.',
-    question: 'חלק ניכר מהתשתיות ידרוש ממך להדגים ללקוחות את המערכת הלכה למעשה, כולל הפעלת מודלים ושליטה ב-Dashboard. כיצד את בונה את תוכנית ההכשרה העצמית שלך וכיצד נבדוק את עמידתך ביעד ביום ה-180?',
-    color: '#10b981',
+    clauseNum: 'רשת הפצה', title: 'ולידציה מסחרית חסרת תחליף',
+    legalText: 'חיבור ישיר למשרדי רואי חשבון ועורכי דין לביצוע פיילוטים והטמעת המערכת הלכה למעשה.',
+    question: 'שום מערכת AI למוסדות פיננסיים לא נמכרת ללא גושפנקא אוטוריטטיבית מהשטח. רשת ההפצה שווה הרבה יותר מעמלת מכירה מתויגת.',
+    color: '#0ea5e9', status: 'green'
+  }
+];
+
+export const OSNAT_CLAUSES: ClauseCard[] = [
+  {
+    clauseNum: 'CRO / HR', title: 'רגולציה, לקוחות מוסדיים ומשאבי אנוש',
+    legalText: 'אחראית על רגולציה ומשפטים, הקשר מול לקוחות מוסדיים, שיווק, ותחום ההון האנושי.',
+    question: `${EQUITY_TABLE[2].percent} עם Vesting ו-Earn-out מבוססי ביצועים. הכרה מלאה כמייסדת שווה-זכויות עם מסלול למנכ"לות בהוכחת יעדים.`,
+    color: '#f59e0b', status: 'green'
   },
   {
-    clauseNum: 'סעיף 5.5 מתוקן', title: 'זכות הוטו שבוטלה',
-    legalText: 'הרפורמה קובעת רוב של 75% לשינויי ליבה/אסטרטגיה במקום וטו מוחלט לכל צד (שמוביל ל-Deadlock).',
-    question: 'האם את חושבת שזה בר-קיימא ששותף ללא מעורבות טכנולוגית יטיל וטו שעלול לתקוע עסקאות ליבה, שאלדד עמל עליהן שבועות?',
-    color: '#ef4444',
+    clauseNum: 'Earn-out', title: 'מנגנון הגדלת אחזקות מבוסס ביצועים',
+    legalText: 'עמידה ביעדים עסקיים (3 פיילוטים מוסדיים + ARR מוסכם) מזכה ב-Equity Catch-up.',
+    question: 'מנגנון הוגן שנותן לאוסנת מוטיבציה אמיתית – כל עסקה שתסגור מגדילה את חלקה בחברה.',
+    color: '#10b981', status: 'yellow'
   },
+  {
+    clauseNum: 'Go-To-Market', title: 'יעד קשיח: 3 פיילוטים ב-6 חודשים',
+    legalText: 'אפיון מוצר מול פיתוח (Custom) ופיתוח קשרי לקוחות עם משרדי רו"ח ועו"ד.',
+    question: 'יעד מרכזי קשיח: הטמעת המערכת ב-3 משרדי ביקורת/משפט בחצי השנה הראשונה. תנאי ל-Earn-out.',
+    color: '#f43f5e', status: 'red'
+  }
 ];
 
 export const KIRILL_CLAUSES: ClauseCard[] = [
   {
-    clauseNum: 'סעיף 10.1', title: 'קניין רוחני (IP)',
-    legalText: 'כל הקניין הרוחני, כולל רעיונות ולוגיקה, עובר במלואו לחברה.',
-    question: 'חשוב לי לוודא שברור כי ה-Business Logic של החברה שייך לאלדד. התפקיד שלך הוא קידוד. האם אתה מסכים שאין מדובר רק בטכנולוגיה נקייה?',
-    color: '#06b6d4',
+    clauseNum: 'סעיף 6.2 – IP טכנולוגי', title: 'הכרה ב-IP של הארכיטקט',
+    legalText: 'ארכיטקטורת התוכנה, אלגוריתמי AI ושיטות הפיתוח מוכרים כנכס IP עצמאי ומובחן של קיריל, משויך לחברה.',
+    question: 'ההסכם מכיר מפורשות בתרומה הייחודית של קיריל – שני "מוחות" שווים: העסקי (אלדד) והאלגוריתמי (קיריל).',
+    color: '#10b981', status: 'green'
   },
   {
-    clauseNum: 'סעיף 18ג', title: 'חממה טכנולוגית',
-    legalText: 'מחויבות להקצות מכסת שעות חודשית לחממה.',
-    question: 'האם אתה מתחייב ליכולת ניהול צוות, הדרכה, ויצירת שדרה ניהולית טכנולוגית, ולא להיות רק שמורת בידוד?',
-    color: '#6366f1',
+    clauseNum: 'סעיף 8.2 – License בפירוק', title: 'הגנה על מפעל החיים',
+    legalText: 'בפירוק מרצון – קיריל מקבל License מלא, בלתי חוזר ופטור מתמלוגים לקוד שכתב.',
+    question: 'מנגנון זה מבטיח שקיריל לא יאבד את הקוד שלו אם החברה נסגרת. הגנה הדדית – אלדד מקבל בחזרה את המותג.',
+    color: '#3b82f6', status: 'green'
   },
   {
-    clauseNum: 'סעיף 5.5 מקורי', title: 'מניעת Deadlock',
-    legalText: 'הסכמות פה אחד לשינויי ליבה וטכנולוגיה.',
-    question: 'אי אפשר לנהל סטרטאפ בו אתה יכול להטיל וטו על אדריכלות שנדרשת ע"י עסקאות של אלדד. האם אתה מסכים לרפורמת הוטו (75% רוב)?',
-    color: '#a855f7',
-  },
+    clauseNum: 'סעיף 5.1 – Sweat Equity', title: '250,000 ₪ הכרה בהשקעת עבר',
+    legalText: '5 חודשים עבודה ללא שכר, Liquidation Preference פנימי. הסכום מוחזר לפני חלוקת רווחים.',
+    question: 'אלדד וקיריל שניהם "שמו את כל הביצים בסל" – ההסכם מכיר בכך עם סכום שווה ושמרני של 250א"ש לכל אחד.',
+    color: '#f59e0b', status: 'green'
+  }
 ];
 
-export const ESOP_TABLE = [
-  { name: 'צד א\' (אלדד)', before: '37.5%', afterCurrent: '33.75%', afterFair: '33.75%', currentDelta: '-3.75', fairDelta: '-3.75' },
-  { name: 'צד ב\' (קיריל)', before: '37.5%', afterCurrent: '33.75%', afterFair: '33.75%', currentDelta: '-3.75', fairDelta: '-3.75' },
-  { name: 'שותף ג\'', before: '15.0%', afterCurrent: '15.00%', afterFair: '13.50%', currentDelta: 'מוגנת!', fairDelta: '-1.50', highlight: true },
-  { name: 'מאגר ESOP', before: '0%', afterCurrent: '10%', afterFair: '10%', currentDelta: '', fairDelta: '', subtle: true },
-];
+/** ESOP_TABLE — Cap Table, synced from EQUITY_TABLE in agreementData.ts */
+export const ESOP_TABLE = EQUITY_TABLE.map(row => ({
+  name: row.name + (row.role ? ` (${row.role})` : ''),
+  before: row.percent === '20.0%' ? '0%' : '33.33%',
+  afterCurrent: row.percent,
+  currentDelta: row.percent === '20.0%' ? '+20.00%' : '-6.67%',
+  highlight: row.percent === '20.0%',
+  subtle: false,
+}));
 
 // #endregion

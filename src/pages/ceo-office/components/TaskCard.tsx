@@ -4,9 +4,16 @@
    DEPENDENCIES: lucide-react
    EXPORTS: TaskCard (default)
    ============================================ */
+// #region Imports
+
 import { CheckCircle, Trash2 } from 'lucide-react';
 import type { Task } from '../types';
 import { PRIORITY_CONFIG, STATUS_CONFIG } from '../../../data/calendarTypes';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   task: Task;
@@ -18,6 +25,12 @@ interface Props {
   compact?: boolean;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** TaskCard component — TaskCard component */
 export default function TaskCard({ task: t, todayStr, onToggle, onDelete, onExpand, compact }: Props) {
   const pr = PRIORITY_CONFIG[t.priority];
   const st = STATUS_CONFIG[t.status];
@@ -92,3 +105,5 @@ export default function TaskCard({ task: t, todayStr, onToggle, onDelete, onExpa
     </div>
   );
 }
+
+// #endregion

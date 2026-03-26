@@ -25,18 +25,15 @@ import StatsBar from './components/StatsBar';
 import ActionBar from './components/ActionBar';
 import CalendarGrid from './components/CalendarGrid';
 import DayDetailPanel from './components/DayDetailPanel';
-import DailyTimeline from './components/DailyTimeline';
 import DailyNotes from './components/DailyNotes';
 import UpcomingMeetings from './components/UpcomingMeetings';
 import AllTasksOverview from './components/AllTasksOverview';
 import CeoFooter from './components/CeoFooter';
-import ProcessLauncher from './components/ProcessLauncher';
 import OverdueAlerts from './components/OverdueAlerts';
-import BrainLearnedBlock from './components/BrainLearnedBlock';
 import DocumentIntake from './components/DocumentIntake';
 import MorningBrief from './components/MorningBrief';
 import DashboardSummaryCards from '../dashboard/components/DashboardSummaryCards';
-import { LayoutDashboard, Calendar, Columns, Zap } from 'lucide-react';
+import { LayoutDashboard, Calendar, Columns } from 'lucide-react';
 
 // Modals
 import AddMeetingModal from './components/modals/AddMeetingModal';
@@ -45,12 +42,13 @@ import ProtocolSyncModal from './components/modals/ProtocolSyncModal';
 import TaskDetailPanel from './components/modals/TaskDetailPanel';
 import MeetingDetailPanel from './components/modals/MeetingDetailPanel';
 
+/** CeoOffice component — CeoOffice component */
 export default function CeoOffice() {
   const today = new Date();
   const todayStr = toDateStr(today);
 
   // State
-  const [activeTab, setActiveTab] = useState<'overview' | 'calendar' | 'kanban' | 'knowledge'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'calendar' | 'kanban'>('overview');
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [selectedDate, setSelectedDate] = useState(todayStr);
@@ -61,24 +59,6 @@ export default function CeoOffice() {
   const [expandedMeeting, setExpandedMeeting] = useState<Meeting | null>(null);
   const navigate = useNavigate();
 
-  // Process launch handler — routes to the correct flowchart/page
-  const handleLaunchProcess = (processId: string) => {
-    const routeMap: Record<string, string> = {
-      attendance: '/flow/attendance',
-      payroll_processing: '/flow/payroll-processing',
-      worklaw: '/flow/worklaw',
-      capital_gains: '/flow/capital-gains',
-      declaration_of_capital: '/flow/declaration-of-capital',
-      war_compensation: '/flow/war-compensation',
-      expert_opinion: '/flow/expert-opinion',
-      guardian_pro: '/flow/guardian-pro',
-      insolvency: '/flow/insolvency',
-      institutional_reports: '/flow/institutional-reports',
-      penalty_cancellation: '/flow/penalty-cancellation',
-    };
-    const path = routeMap[processId] || '/coming-soon';
-    navigate(path);
-  };
 
   // Data hooks
   const { meetings, addMeeting, deleteMeeting } = useMeetings();
@@ -135,7 +115,6 @@ export default function CeoOffice() {
         <TabButton id="overview" label="תקציר מנהלים" icon={<LayoutDashboard size={18} />} activeTab={activeTab} onClick={setActiveTab} />
         <TabButton id="calendar" label="יומן ופגישות" icon={<Calendar size={18} />} activeTab={activeTab} onClick={setActiveTab} />
         <TabButton id="kanban" label="שולחן משימות" icon={<Columns size={18} />} activeTab={activeTab} onClick={setActiveTab} />
-        <TabButton id="knowledge" label="המוח למד" icon={<Zap size={18} />} activeTab={activeTab} onClick={setActiveTab} />
       </div>
 
       <div style={{ flex: 1 }}>
@@ -147,9 +126,6 @@ export default function CeoOffice() {
             <div style={{ padding: '0 20px' }}><MorningBrief /></div>
             <DashboardSummaryCards />
             <div style={{ padding: '0 20px' }}><DocumentIntake /></div>
-            <div style={{ padding: '0 20px' }}>
-              <ProcessLauncher onLaunch={handleLaunchProcess} />
-            </div>
           </div>
         )}
 
@@ -184,7 +160,6 @@ export default function CeoOffice() {
                 onShowTaskModal={() => setShowTaskModal(true)}
                 onClickMeeting={setExpandedMeeting}
               />
-              <DailyTimeline selectedDate={selectedDate} selectedDateLabel={selectedDateLabel} meetings={selectedEvents.meetings} tasks={selectedEvents.tasks} />
               <DailyNotes selectedDate={selectedDate} selectedDateLabel={selectedDateLabel} note={getNote(selectedDate)} onNoteChange={setNote} />
               <UpcomingMeetings meetings={upcomingMeetings} onSelectDate={setSelectedDate} />
             </div>
@@ -210,14 +185,6 @@ export default function CeoOffice() {
           </div>
         )}
 
-        {/* ============================== */}
-        {/* TAB 4: KNOWLEDGE BASE          */}
-        {/* ============================== */}
-        {activeTab === 'knowledge' && (
-          <div style={{ padding: '0 20px' }}>
-            <BrainLearnedBlock />
-          </div>
-        )}
       </div>
 
       <CeoFooter />
@@ -277,7 +244,7 @@ export default function CeoOffice() {
 
 // #region Components
 /** Tab identifier type for CEO Office navigation */
-type TabId = 'overview' | 'calendar' | 'kanban' | 'knowledge';
+type TabId = 'overview' | 'calendar' | 'kanban';
 
 function TabButton({ id, label, icon, activeTab, onClick }: {
   id: TabId, label: string, icon: React.ReactNode, activeTab: string, onClick: (id: TabId) => void

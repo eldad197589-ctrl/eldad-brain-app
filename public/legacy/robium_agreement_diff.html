@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>השוואת הסכמים: מקורי (3.3.26) מול סופי — Robium</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&family=Rubik:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b1222;
+            --surface: #111b2e;
+            --surface2: #162038;
+            --border: #1e3050;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --old-bg: rgba(239, 68, 68, 0.08);
+            --old-border: #7f1d1d;
+            --old-text: #fca5a5;
+            --old-badge: #ef4444;
+            --new-bg: rgba(34, 197, 94, 0.08);
+            --new-border: #14532d;
+            --new-text: #86efac;
+            --new-badge: #22c55e;
+            --accent: #3b82f6;
+            --gold: #f59e0b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 24px 60px;
+        }
+
+        /* Header */
+        .hero {
+            text-align: center;
+            padding: 48px 20px 40px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 32px;
+        }
+        .hero-icon {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, var(--old-badge), var(--new-badge));
+            border-radius: 16px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 32px; margin-bottom: 16px;
+        }
+        .hero h1 {
+            font-family: 'Rubik', sans-serif;
+            font-size: 2em;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .hero p {
+            color: var(--muted);
+            font-size: 1.05em;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Summary Stats */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            text-align: center;
+        }
+        .stat-card .num {
+            font-size: 2em;
+            font-weight: 800;
+            font-family: 'Rubik', sans-serif;
+        }
+        .stat-card .label { color: var(--muted); font-size: 0.85em; }
+        .stat-card.critical .num { color: var(--old-badge); }
+        .stat-card.improved .num { color: var(--new-badge); }
+        .stat-card.neutral .num { color: var(--accent); }
+
+        /* Section */
+        .diff-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .diff-section:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 24px;
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 1px solid transparent;
+        }
+        .diff-section.open .section-header {
+            border-bottom: 1px solid var(--border);
+        }
+        .section-header .icon {
+            font-size: 1.6em;
+            width: 44px; height: 44px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        .section-header .icon.critical { background: rgba(239, 68, 68, 0.15); }
+        .section-header .icon.important { background: rgba(245, 158, 11, 0.15); }
+        .section-header .icon.good { background: rgba(34, 197, 94, 0.15); }
+        .section-header h2 {
+            font-family: 'Rubik', sans-serif;
+            font-size: 1.15em;
+            color: #fff;
+            flex: 1;
+        }
+        .section-header .badge {
+            font-size: 0.75em;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .badge.critical { background: rgba(239, 68, 68, 0.2); color: var(--old-text); }
+        .badge.important { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+        .badge.good { background: rgba(34, 197, 94, 0.2); color: var(--new-text); }
+        .section-header .chevron {
+            color: var(--muted);
+            font-size: 1.2em;
+            transition: transform 0.3s;
+        }
+        .diff-section.open .chevron { transform: rotate(180deg); }
+
+        /* Compare Content */
+        .section-body { display: none; padding: 0; }
+        .diff-section.open .section-body { display: block; }
+
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+        @media (max-width: 768px) {
+            .compare-grid { grid-template-columns: 1fr; }
+        }
+        .compare-col {
+            padding: 20px 24px;
+        }
+        .compare-col.old {
+            background: var(--old-bg);
+            border-left: 1px solid var(--border);
+        }
+        .compare-col.new {
+            background: var(--new-bg);
+        }
+        .col-label {
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+        .old .col-label { background: rgba(239, 68, 68, 0.2); color: var(--old-text); }
+        .new .col-label { background: rgba(34, 197, 94, 0.2); color: var(--new-text); }
+
+        .compare-col p, .compare-col li {
+            font-size: 0.92em;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        .compare-col ul { padding-right: 20px; }
+        .compare-col strong { color: #fff; }
+        .strike { text-decoration: line-through; opacity: 0.7; }
+        .highlight { 
+            background: rgba(251, 191, 36, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #fcd34d;
+            font-weight: 600;
+        }
+
+        /* Explanation */
+        .explanation {
+            padding: 16px 24px;
+            background: var(--surface2);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .explanation .bulb { font-size: 1.2em; flex-shrink: 0; margin-top: 2px; }
+        .explanation p {
+            color: var(--muted);
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        .explanation strong { color: var(--gold); }
+
+        /* Print */
+        .print-btn {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Heebo', sans-serif;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            z-index: 100;
+            display: flex; gap: 8px; align-items: center;
+        }
+        .print-btn:hover { transform: translateY(-2px); }
+
+        .expand-btn {
+            position: fixed;
+            bottom: 24px;
+            left: 170px;
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Heebo', sans-serif;
+            z-index: 100;
+        }
+
+        @media print {
+            body { background: white; color: #1e293b; }
+            .container { max-width: 100%; padding: 10px; }
+            .diff-section { break-inside: avoid; border: 1px solid #e2e8f0; }
+            .diff-section.open .section-body { display: block !important; }
+            .compare-col.old { background: #fef2f2; }
+            .compare-col.new { background: #f0fdf4; }
+            .print-btn, .expand-btn { display: none !important; }
+            .hero { padding: 20px; }
+            .explanation { background: #f8fafc; }
+        }
+    </style>
+</head>
+
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">🖨️ הדפס / PDF</button>
+<button class="expand-btn no-print" onclick="toggleAll()">📂 פתח/סגור הכל</button>
+
+<div class="container">
+    <header class="hero">
+        <div class="hero-icon">⚖️</div>
+        <h1>השוואת הסכמים: מקורי מול סופי</h1>
+        <p>
+            ניתוח סעיף-מול-סעיף בין ההסכם המקורי מיום 3.3.2026 (טיוטה 33%) 
+            לבין ההסכם הסופי שנבנה לאחר פגישות 11.3 ו-22.3
+        </p>
+    </header>
+
+    <div class="stats-bar">
+        <div class="stat-card critical">
+            <div class="num">8</div>
+            <div class="label">שינויים קריטיים</div>
+        </div>
+        <div class="stat-card improved">
+            <div class="num">12</div>
+            <div class="label">סעיפים ששודרגו</div>
+        </div>
+        <div class="stat-card neutral">
+            <div class="num">5</div>
+            <div class="label">סעיפים חדשים</div>
+        </div>
+        <div class="stat-card" style="border-top: 3px solid var(--gold);">
+            <div class="num" style="color: var(--gold);">20</div>
+            <div class="label">סעיפים במקור → 7 בסופי</div>
+        </div>
+    </div>
+
+    <!-- 1. EQUITY / חלוקת אחזקות -->
+    <div class="diff-section open">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon critical">💰</div>
+            <h2>חלוקת אחזקות ודילול</h2>
+            <span class="badge critical">שינוי קריטי</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי</span>
+                    <p><strong>26.66% × 3 מייסדים + 20% מאגר (ESOP + מיעוט)</strong></p>
+                    <ul>
+                        <li>אלדד — 26.66% (CEO)</li>
+                        <li>קיריל — 26.66% (CTO)</li>
+                        <li>אוסנת — 26.66% (CRO/HR)</li>
+                        <li><span class="highlight">20% ESOP + משקיעים</span> — מאגר דילול משותף</li>
+                    </ul>
+                    <p>דילול <strong>Pro-Rata</strong> על כולם. אין Anti-Dilution. Vesting מבוסס KPI.</p>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי (3.3.26)</span>
+                    <p><strong class="strike">33% / 33% / 33%</strong></p>
+                    <ul>
+                        <li class="strike">אלדד — 33%</li>
+                        <li class="strike">קיריל — 33%</li>
+                        <li class="strike">אוסנת — 33%</li>
+                        <li><strong>אין ESOP, אין מאגר לעובדים</strong></li>
+                    </ul>
+                    <p>חלוקה "עיוורת" ללא קשר לתרומה ולסיכון.</p>
+                </div>
+            </div>
+            <div class="explanation">
+                <span class="bulb">💡</span>
+                <p><strong>למה זה שונה:</strong> חלוקה שווה 33/33/33 לא משקפת את ההבדלים בהשקעה ובסיכון. 
+                אלדד וקיריל עבדו 3 חודשים לפני ההסכם. ההסכם הסופי מקצה 20% למאגר עובדים ומשקיעים — 
+                <strong>הכרחי לגיוס</strong>. בלי ESOP, אי אפשר לגייס מתכנתים טובים.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. CEO / מי המנכ"ל -->
+    <div class="diff-section open">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon critical">👑</div>
+            <h2>תפקיד המנכ"ל ומבנה הניהול</h2>
+            <span class="badge critical">שינוי קריטי</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי</span>
+                    <p><strong>אלדד = CEO</strong> (מנכ"ל זמני עד קידום אוסנת או מינוי חיצוני)</p>
+                    <ul>
+                        <li>אלדד — CEO / Product Designer</li>
+                        <li>קיריל — CTO / Lead Developer</li>
+                        <li>אוסנת — <span class="highlight">CRO / HR / מסלול מנכ"לית</span></li>
+                    </ul>
+                    <p>מבנה ברור עם <strong>אחריות מדידה</strong> ו-KPI לכל מייסד.</p>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי (3.3.26)</span>
+                    <p><strong class="strike">אוסנת = מנכ"לית השותפות</strong> (סעיף 4.4)</p>
+                    <ul>
+                        <li>אלדד — ניהול פיננסי בלבד</li>
+                        <li>קיריל — פיתוח טכנולוגי</li>
+                        <li class="strike">אוסנת — מנכ"לית + אסטרטגיה + שיווק + משפט + ראיונות</li>
+                    </ul>
+                    <p>ללא KPI, ללא הגדרת "מסלול מנכ"לית".</p>
+                </div>
+            </div>
+            <div class="explanation">
+                <span class="bulb">💡</span>
+                <p><strong>למה זה שונה:</strong> במקור אוסנת הוגדרה כמנכ"לית מיום 1. בהסכם הסופי, 
+                אלדד משמש מנכ"ל עם אפשרות קידום אוסנת <strong>לאחר הוכחת ביצועים</strong>. 
+                זו גישה מקובלת בסטארט-אפים — המנכ"ל הוא מי שמריץ, לא מי שהביא את הקשרים.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. VETO / זכויות וטו -->
+    <div class="diff-section open">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon critical">🛑</div>
+            <h2>זכויות וטו וזכות הכרעה</h2>
+            <span class="badge critical">שינוי קריטי</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי</span>
+                    <p><strong>וטו תחומי מצומצם + קול מכריע למנכ"ל</strong></p>
+                    <ul>
+                        <li>אלדד — וטו על אסטרטגיה, פיננסים, עסקאות מהותיות</li>
+                        <li>קיריל — וטו על ארכיטקטורה, טכנולוגיה, קליטת עובדים טכניים</li>
+                        <li>אוסנת — וטו על ראיונות עובדים וכשירות רגולטורית</li>
+                    </ul>
+                    <p><strong>אין זכות הכרעה סופית לאף שותף.</strong></p>
+                    <p>שוויון → <span class="highlight">קול מכריע (Casting Vote) למנכ"ל</span></p>
+                    <p>החלטות אסטרטגיות → רוב <strong>75%</strong></p>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי (3.3.26)</span>
+                    <p><strong>וטו גורף + זכות הכרעה סופית לאוסנת</strong></p>
+                    <ul>
+                        <li>אלדד — וטו בלעדי על כל הפיננסים</li>
+                        <li>קיריל — וטו בלעדי על כל הטכנולוגיה</li>
+                        <li class="strike">אוסנת — וטו בלעדי על מסחר, משפט, אסטרטגיה + <strong>זכות הכרעה סופית, בלעדית ומחייבת</strong> (סעיף 4.7)</li>
+                    </ul>
+                    <p><strong>סעיף 4.7:</strong> <em class="strike">"לאוסנת זכות הכרעה סופית, בלעדית ומחייבת"</em></p>
+                    <p><strong>סעיף 4.8:</strong> <em class="strike">"מנגנון ההכרעה גובר על כל מנגנון אחר"</em></p>
+                    <p>רוב: <strong>66%</strong></p>
+                </div>
+            </div>
+            <div class="explanation">
+                <span class="bulb">💡</span>
+                <p><strong>זו הנקודה הקריטית ביותר:</strong> במקור, אוסנת קיבלה <strong>זכות הכרעה סופית ומחייבת</strong> 
+                על כל דבר שאינו בזכות וטו של מישהו אחר — ובנוסף, סעיף 4.8 קבע שזה גובר על כל מנגנון אחר. 
+                זה הפך אותה לבעלת כוח מוחלט. בהסכם הסופי <strong>בוטל מנגנון ההכרעה לחלוטין</strong>, 
+                הוחלף ב-<strong>Casting Vote למנכ"ל בלבד במקרה של שוויון</strong>, עם רוב 75% להחלטות אסטרטגיות.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. BANK / חתימות בנק -->
+    <div class="diff-section">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon critical">🏦</div>
+            <h2>זכויות חתימה בנקאיות</h2>
+            <span class="badge critical">שינוי קריטי</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי</span>
+                    <p><strong>המנכ"ל מנהל הכל תפעולית.</strong></p>
+                    <ul>
+                        <li>הוצאות שוטפות ותשתיות — <span class="highlight">חתימת המנכ"ל בלבד</span></li>
+                        <li>תמרונים אסטרטגיים חריגים — 75% אישורים</li>
+                        <li>אין מגבלת 10,000 ₪ על פעולות יומיות</li>
+                    </ul>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי (3.3.26)</span>
+                    <p><strong>חתימה כפולה/משולשת על הכל</strong></p>
+                    <ul>
+                        <li>עד 10,000 ₪ — <strong>2 חתימות</strong></li>
+                        <li class="strike">מעל 10,000 ₪ — <strong>3 חתימות (כל השותפים)</strong></li>
+                        <li>6 סעיפי פירוט (6.1.1–6.1.7) על מנגנון חתימה</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="explanation">
+                <span class="bulb">💡</span>
+                <p><strong>למה זה שונה:</strong> סטארט-אפ לא יכול לדרוש 3 חתימות כדי לשלם 15,000 ₪ לספק ענן. 
+                זה משתק את הפעילות. מנכ"ל חייב סמכות תפעולית. 
+                ההסכם הסופי נותן למנכ"ל חופש פעולה תחת <strong>תקציב מסודר</strong>,
+                עם פיקוח 75% רק על תמרונים חריגים.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. BACKGROUND IP / השקעת עבר -->
+    <div class="diff-section">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon critical">🧠</div>
+            <h2>הכרה בהשקעת העבר (Background IP)</h2>
+            <span class="badge critical">שינוי קריטי</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי</span>
+                    <p><strong>500,000 ₪ הכרה בשווי</strong> — 250K לאלדד, 250K לקיריל</p>
+                    <ul>
+                        <li>מוחזר מתזרים חיובי ראשון</li>
+                        <li><span class="highlight">קדימות בחלוקה (Liquidation Preference)</span></li>
+                        <li>סכום סופי — <strong>מייתר צורך באקטואר</strong></li>
+                    </ul>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי (3.3.26)</span>
+                    <p><strong class="strike">60,000 ₪ בלבד</strong> — 30K לכל אחד</p>
+                    <ul>
+                        <li class="strike">10,000 ₪ לחודש × 3 חודשים × 2</li>
+                        <li class="strike">אלדד ויתר על 30K/חודש לטובת 10K</li>
+                        <li>סעיף 8.8.2: <em class="strike">"ללא תמורה נוספת"</em></li>
+                        <li>סעיף 8.8.3: <em class="strike">"ויתור בלתי חוזר"</em></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="explanation">
+                <span class="bulb">💡</span>
+                <p><strong>הפער הכי בולט:</strong> במקור, נכסים בשווי חצי מיליון ₪ 
+                (מתמלל, רוביום, אפוטרופוס, תכלס) הועברו "ללא תמורה" + "ויתור בלתי חוזר". 
+                אלדד אפילו ויתר על 30K/חודש עלות חליפה לטובת 10K. 
+                ההסכם הסופי <strong>מכיר ב-500K שווי</strong> עם עדיפות החזר.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. SALARY / מנגנון שכר -->
+    <div class="diff-section">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon important">💼</div>
+            <h2>מנגנון שכר ותגמול</h2>
+            <span class="badge important">שינוי מהותי</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי</span>
+                    <p><strong>שירותי ניהול B2B + מנגנון דו-שלבי</strong></p>
+                    <ul>
+                        <li>כל שותף מפיק <strong>חשבונית מס</strong> (Management Fees)</li>
+                        <li>אלדד + קיריל + אוסנת: <span class="highlight">35,000–45,000 ₪ + מע"מ</span> (שכר מטרה שווה, משרה מלאה)</li>
+                        <li><span class="highlight">רטרו 15K×3 חודשים</span> = 45K לכל אחד (סה"כ 90K) — <strong>אלדד וקיריל בלבד</strong></li>
+                        <li>שלב א': עדיפות שכר לאלדד+קיריל <strong>כל עוד לא הושלם</strong> הרטרו (90K) — עדיפות שכר בלבד, לא השקעה</li>
+                        <li>שלב ב': <strong>אחרי השלמת הרטרו → אין עדיפות, כולם שווים</strong></li>
+                        <li>עדכון שכר: <strong>אחת לשנה בלבד</strong>, בדירקטוריון, אפשרי גם <span class="highlight">הפחתה</span></li>
+                        <li><strong>אין בונוס מייסדים</strong></li>
+                    </ul>
+                    <p>תשלום מותנה ברווח נקי פנוי ≥ <span class="highlight">250–270 אש"ח</span> + הוצאות 2 חודשים (ללא שכר מייסדים).</p>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי (3.3.26)</span>
+                    <p><strong>אין שכר + "שכר מינימום" חד-פעמי לקיריל</strong></p>
+                    <ul>
+                        <li class="strike">בשלב ראשון אין שכר (סעיף 4.10)</li>
+                        <li class="strike">שינוי שכר = הסכמה פה אחד (100%)</li>
+                        <li class="strike">קיריל: <strong>2 חודשי שכר מינימום</strong> חד-פעמי מרווח ראשון (4.12)</li>
+                        <li class="strike">שכר שווה לכולם (סעיף 5.19 בגרסה מעודכנת)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="explanation">
+                <span class="bulb">💡</span>
+                <p><strong>למה זה שונה:</strong> במקור, אין רטרואקטיבי, אין מנגנון הפחתה, ושכר שווה לכולם ללא קשר לתפוקה. 
+                בסופי: <strong>מודל דו-שלבי הוגן</strong> — עדיפות לאלדד וקיריל רק עד שהחובות ההיסטוריים שולמו, 
+                ואחרי זה כולם שווים. עדכון שכר שנתי בלבד עם אפשרות הפחתה בהיעדר רווחים/תפוקה.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. CONTROL TEST / מבחן שליטה -->
+    <div class="diff-section">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon good">⚖️</div>
+            <h2>הגדרת "שליטה" (מבחן מהותי)</h2>
+            <span class="badge good">סעיף חדש</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי (סעיף 4.5)</span>
+                    <p><strong>סעיף ייעודי — המבחן המהותי של "שליטה"</strong></p>
+                    <ul>
+                        <li>שליטה = יכולת <strong>להכווין את פעילות התאגיד</strong></li>
+                        <li>ברוח חוק החברות (התשנ"ט-1999)</li>
+                        <li>ניתוק מכוון בין <strong>אחוזי מניות</strong> לבין <strong>כוח ניהול</strong></li>
+                        <li>שליטה אופרטיבית = <span class="highlight">המנכ"ל</span></li>
+                    </ul>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי (3.3.26)</span>
+                    <p><strong>לא קיים</strong></p>
+                    <ul>
+                        <li>אין בכלל סעיף שמגדיר "שליטה"</li>
+                        <li>הנחה סמויה: 33% = 33% שליטה</li>
+                        <li>גורם ללחץ קבוע על אחוזים</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="explanation">
+                <span class="bulb">💡</span>
+                <p><strong>חדשני ומקצועי:</strong> הסעיף הזה מאפשר למנכ"ל לנהל גם אם ידולל בעתיד. 
+                חברות רבות (כולל Meta, Google) מפרידות בין כוח הצבעה לבעלות. 
+                זה מגן על <strong>יציבות ניהולית</strong> ומרגיע משקיעים.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. LOANS / הלוואות חברה -->
+    <div class="diff-section">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon good">🏦</div>
+            <h2>הלוואות חברה למייסדים</h2>
+            <span class="badge good">סעיף חדש</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי (סעיף 5.2)</span>
+                    <p><strong>25,000 ₪ הלוואה לאלדד + 25,000 ₪ לקיריל</strong></p>
+                    <ul>
+                        <li>מיד עם פתיחת החברה</li>
+                        <li>ריבית רעיונית לפי סעיף 3(ט)</li>
+                        <li>ניתנות לקיזוז כנגד דיבידנד/שכר</li>
+                    </ul>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי (3.3.26)</span>
+                    <p><strong>לא קיים</strong></p>
+                    <ul><li>אין מנגנון הלוואות כלל</li></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. ARM'S LENGTH -->
+    <div class="diff-section">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon good">📋</div>
+            <h2>עקרון Arm's Length — הסרת שירותים חינמיים</h2>
+            <span class="badge good">סעיף חדש</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי (סעיף 5.2)</span>
+                    <p><strong>כל שירות בין ישויות = חשבונית מס</strong></p>
+                    <ul>
+                        <li>הנהלת חשבונות ע"י אהרוני = תשלום מרוביום</li>
+                        <li>משרד עו"ד משתמש במערכות רוביום = תשלום לרוביום</li>
+                        <li>אין צריכה חינמית</li>
+                    </ul>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי (3.3.26)</span>
+                    <p><strong>הנה"ח ע"י משרד אהרוני & דוד</strong> (5.4)</p>
+                    <p>אין הגדרה של תשלום או תמורה. חד כיווני.</p>
+                </div>
+            </div>
+            <div class="explanation">
+                <span class="bulb">💡</span>
+                <p><strong>הגינות:</strong> אם משרד אוסנת משתמש במתמלל — צריך לשלם. 
+                אם משרד אלדד מנהל חשבונות — צריך לקבל. <strong>ללא עקרון Arm's Length, 
+                כל שותף יכול "לספוג" שירותים בלי לשלם.</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 10. EARN-OUT -->
+    <div class="diff-section">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon good">📈</div>
+            <h2>מנגנון Earn-out (הגדלת אחזקות מיעוט)</h2>
+            <span class="badge good">סעיף חדש</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי</span>
+                    <p><strong>אוסנת יכולה להגדיל אחזקות לפי ביצועים:</strong></p>
+                    <ul>
+                        <li>3 פיילוטים מוסדיים ממשרדי רו"ח/עו"ד</li>
+                        <li>יצירת ARR בסכום מוסכם</li>
+                        <li>→ <span class="highlight">Equity Catch-up</span> מדילול שאר המייסדים</li>
+                    </ul>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי (3.3.26)</span>
+                    <p><strong>לא קיים</strong></p>
+                    <p>33% קבועים ללא קשר לביצועים.</p>
+                </div>
+            </div>
+            <div class="explanation">
+                <span class="bulb">💡</span>
+                <p><strong>תמריץ אמיתי:</strong> במקום 33% "חינם", 
+                Earn-out נותן לאוסנת <strong>מוטיבציה אמיתית</strong> להביא עסקאות — 
+                כל פיילוט שתסגור מגדיל את חלקה בחברה.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 11. VESTING -->
+    <div class="diff-section">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon important">⏱️</div>
+            <h2>מנגנון הבשלה (Vesting)</h2>
+            <span class="badge important">שינוי מהותי</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי</span>
+                    <p><strong>Vesting מבוסס KPI (Mile-stones)</strong></p>
+                    <ul>
+                        <li>קיריל — חייב מערכת Beta עובדת</li>
+                        <li>אוסנת — חייבת עסקאות חתומות</li>
+                        <li>ESOP עובדים: Cliff 12 חודשים, הבשלה רבעונית</li>
+                    </ul>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי (3.3.26)</span>
+                    <p><strong>Vesting זמני קלאסי</strong></p>
+                    <ul>
+                        <li>אלדד: <strong>25% מיידי</strong> + 20% ב-3 שנים</li>
+                        <li>קיריל + אוסנת: 4 שנים, Cliff 12 חודשים</li>
+                    </ul>
+                    <p>ההבשלה מבוססת זמן בלבד — <strong>לא ביצועים</strong>.</p>
+                </div>
+            </div>
+            <div class="explanation">
+                <span class="bulb">💡</span>
+                <p><strong>הבדל מהותי:</strong> במקור, מספיק "לשבת" 4 שנים ולקבל מניות. 
+                בסופי, <strong>צריך להוכיח תוצאות</strong>. קיריל חייב להעמיד מוצר, 
+                אוסנת חייבת להביא עסקאות. זה סטנדרט תעשייתי מתקדם.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 12. IP / קניין רוחני -->
+    <div class="diff-section">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon important">🔒</div>
+            <h2>קניין רוחני ומותג</h2>
+            <span class="badge important">שינוי מהותי</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי</span>
+                    <ul>
+                        <li>"המוח של אלדד" — <span class="highlight">יירשם כמותג / IP מסחרי בבעלות החברה</span></li>
+                        <li>תוכן חשבונאי/משפטי מוגן כיצירת אלדד</li>
+                        <li>פיצוי הפרה: <strong>500,000 ₪ + Claw-Back</strong></li>
+                    </ul>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי (3.3.26)</span>
+                    <ul>
+                        <li>IP עובר לשותפות "ללא תמורה" + "ויתור בלתי חוזר"</li>
+                        <li>סעיף 8.4.1: <em class="strike">אישור שימוש מאוסנת</em> (במקום מהשותפות)</li>
+                        <li>סעיף 8.5.1: <em class="strike">קיריל לבד שיפוי</em> (במקום כל שותף)</li>
+                        <li>סעיף 8.6.1: <em class="strike">אישור קוד פתוח מאוסנת</em> (בלבד)</li>
+                        <li>פיצוי הפרה: 500,000 ₪ (ללא Claw-Back)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="explanation">
+                <span class="bulb">💡</span>
+                <p><strong>תיקונים נקודתיים חשובים:</strong> במקור, אישורים רבים דרשו את הסכמת 
+                <strong>אוסנת אישית</strong> במקום השותפות כגוף. זה נותן לאדם אחד שליטה על ה-IP. 
+                בסופי, הכל דורש <strong>אישור השותפות ב-75%</strong>. 
+                גם נוסף <strong>Claw-Back</strong> — מפר מאבד את חלקו לטובת האחרים.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 13. DIVORCE -->
+    <div class="diff-section">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon important">👨‍👩‍👧</div>
+            <h2>סעיף גירושין</h2>
+            <span class="badge important">הוסר בסופי</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי</span>
+                    <p><strong>לא קיים</strong> — נושא זה מטופל ברמת התקנון בע"מ.</p>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי (סעיף 4.15)</span>
+                    <p><em class="strike">"היה ואחד מהשותפים יהא בהליכי גירושין, 
+                    זה לא יוכל להעניק לגרושה זכויות בעסק..."</em></p>
+                    <p>סעיף ספציפי מאוד שנכתב בלשון יחיד כאילו מכוון לאדם מסוים.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 14. STRUCTURE SUMMARY -->
+    <div class="diff-section">
+        <div class="section-header" onclick="toggle(this)">
+            <div class="icon good">📊</div>
+            <h2>סיכום מבנה ההסכם</h2>
+            <span class="badge good">השוואה כללית</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-body">
+            <div class="compare-grid">
+                <div class="compare-col new">
+                    <span class="col-label">✅ הסכם סופי — 7 פרקים</span>
+                    <ul>
+                        <li>1. מטרת ההתאגדות</li>
+                        <li>2. תפקידים + Earn-out</li>
+                        <li>3. הון + Vesting + ESOP</li>
+                        <li>4. ניהול + וטו + שליטה</li>
+                        <li>5. חשבונאות + IP + הלוואות</li>
+                        <li>6. קניין רוחני + Claw-Back</li>
+                        <li>7. תגמול B2B + רטרואקטיב</li>
+                    </ul>
+                    <p><strong>~435 שורות</strong>, ממוקד ומעשי</p>
+                </div>
+                <div class="compare-col old">
+                    <span class="col-label">❌ מקורי — 20 פרקים</span>
+                    <ul>
+                        <li>1. מבוא → 2. הצהרות → 3. הקמה → 4. ניהול → 5. כספים → 6. בנק → 7. חלוקה → 8. IP → 9. סודיות → 10. אי תחרות → 11. ביטוח + סטנדרט → 12. משקיע → 13. BMBY → 14. כפיית מכירה → 15. פירוק → 16. העברת זכויות → 17. יסודיות → 18. גישור → 19. דין → 20. שונות</li>
+                    </ul>
+                    <p><strong>~700+ שורות</strong>, מפורט מדי עד לרעה</p>
+                </div>
+            </div>
+            <div class="explanation">
+                <span class="bulb">💡</span>
+                <p><strong>ההסכם הסופי מכסה את כל הסעיפים הקריטיים בפנים:</strong> 
+                פירוק (סעיף 8), BMBY (סעיף 3.3.3), אי-תחרות (סעיף 9), IP + Claw-Back (סעיף 6), 
+                Reverse Vesting (סעיף 3.3). <strong>כלום קריטי לא נדחה.</strong></p>
+            </div>
+
+            <!-- הערה לגבי תקנון החברה -->
+            <div style="margin-top: 16px; padding: 20px 24px; background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: 12px;">
+                <h3 style="color: #fcd34d; font-family: 'Rubik', sans-serif; font-size: 1.05em; margin: 0 0 12px; display: flex; align-items: center; gap: 8px;">
+                    📋 עניינים שיוסדרו בתקנון החברה (בע"מ) — לאחר רישום
+                </h3>
+                <p style="color: #94a3b8; font-size: 0.9em; margin: 0 0 12px; line-height: 1.7;">
+                    הסעיפים הבאים הם <strong style="color: #fcd34d;">פרוצדורליים בלבד</strong> ואינם קריטיים 
+                    לחתימת הסכם המייסדים. הם ייכללו בתקנון החברה עם רישומה ברשם החברות:
+                </p>
+                <ul style="color: #cbd5e1; font-size: 0.88em; padding-right: 20px; margin: 0; line-height: 1.8;">
+                    <li>🟢 <strong>מנגנון גישור וסכסוכים</strong> — הגדרת מהלך פנייה לגישור/בוררות לפני הליך משפטי</li>
+                    <li>🟢 <strong>נהלי דירקטוריון</strong> — תדירות ישיבות, הזמנות, סדר יום, פרוטוקולים</li>
+                    <li>🟢 <strong>מדיניות חלוקת דיבידנדים</strong> — כללי חלוקה, אישורים, ומועדים</li>
+                    <li>🟢 <strong>אסיפה כללית</strong> — נהלי כינוס, הצבעה, ייפויי כוח</li>
+                    <li>🟢 <strong>סעיף גירושין</strong> — הגנה על מניות מפני חלוקה בהליכי גירושין (הועבר לתקנון)</li>
+                    <li>🟢 <strong>ביטוח נושאי משרה (D&O)</strong> — תנאי פוליסות לאחר פעילות מסחרית</li>
+                    <li>🟢 <strong>כניסת משקיע חיצוני</strong> — מנגנון דילול, Drag/Tag Along, Pre-emptive Rights</li>
+                </ul>
+                <p style="color: #64748b; font-size: 0.82em; margin: 12px 0 0; font-style: italic;">
+                    * כל הסעיפים הקריטיים (פירוק, BMBY, IP, Claw-Back, Non-Compete, Vesting) כלולים בהסכם המייסדים עצמו ולא נדחו.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function toggle(header) {
+        header.closest('.diff-section').classList.toggle('open');
+    }
+    function toggleAll() {
+        const sections = document.querySelectorAll('.diff-section');
+        const allOpen = [...sections].every(s => s.classList.contains('open'));
+        sections.forEach(s => {
+            if (allOpen) s.classList.remove('open');
+            else s.classList.add('open');
+        });
+    }
+</script>
+
+</body>
+</html>

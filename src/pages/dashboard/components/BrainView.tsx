@@ -7,9 +7,16 @@
 /**
  * BrainView — Brain visualization mode with SVG and stats
  */
+// #region Imports
+
 import BrainSVG from '../../../components/BrainSVG';
 import type { Neuron } from '../../dashboard/types';
 import { PENDING } from '../../../data/neurons';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   neuronCount: number;
@@ -17,6 +24,12 @@ interface Props {
   onNeuronClick: (n: Neuron) => void;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** BrainView component — BrainView component */
 export default function BrainView({ neuronCount, flowchartCount, onNeuronClick }: Props) {
   return (
     <div>
@@ -55,3 +68,5 @@ export default function BrainView({ neuronCount, flowchartCount, onNeuronClick }
     </div>
   );
 }
+
+// #endregion

@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הסכם הענקת אופציות — תוכנית החממה | Robium Technologies Ltd</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&family=Rubik:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e293b;
+            --secondary: #64748b;
+            --accent: #7c3aed;
+            --bg: #f8fafc;
+            --text: #0f172a;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.85;
+            margin: 0;
+            padding: 0;
+            font-size: 15px;
+        }
+
+        .document-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 60px 80px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border-top: 8px solid var(--accent);
+            border-radius: 8px;
+        }
+
+        @media print {
+            body { background: white; }
+            .document-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 30px;
+                border-top: none;
+            }
+            .no-print { display: none !important; }
+            .page-break { page-break-before: always; }
+        }
+
+        h1 {
+            font-family: 'Rubik', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-align: center;
+            margin: 0 0 4px;
+        }
+
+        h2 {
+            font-family: 'Rubik', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 8px;
+            margin: 36px 0 16px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--secondary);
+            font-size: 0.95rem;
+            margin: 0 0 30px;
+        }
+
+        .parties-box {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 24px 0;
+        }
+
+        .parties-box strong { color: var(--primary); }
+
+        .clause {
+            margin: 12px 0;
+            text-align: justify;
+        }
+
+        .clause-num {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .highlight-box {
+            background: #f5f3ff;
+            border: 1px solid #c4b5fd;
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+            color: #5b21b6;
+        }
+
+        .warning-box {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+            color: #92400e;
+        }
+
+        .success-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+            color: #166534;
+        }
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .signature-block { text-align: center; padding-top: 20px; }
+        .signature-line { border-bottom: 1px solid #334155; height: 50px; margin-bottom: 8px; }
+        .signature-name { font-weight: 700; font-size: 0.95rem; }
+        .signature-role { color: var(--secondary); font-size: 0.82rem; }
+
+        .kpi-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        .kpi-table th, .kpi-table td {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            text-align: right;
+        }
+
+        .kpi-table th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .kpi-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 20px 0;
+            page-break-inside: avoid;
+        }
+
+        .kpi-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .kpi-percent {
+            background: var(--accent);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .btn-print {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Heebo', sans-serif;
+        }
+
+        .btn-print:hover { filter: brightness(1.1); }
+
+        .toolbar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .fill-field {
+            display: inline-block;
+            min-width: 150px;
+            border-bottom: 1px dashed #94a3b8;
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .eval-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+        .eval-table th, .eval-table td {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .eval-table th {
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Toolbar -->
+    <div class="toolbar no-print" style="padding: 20px;">
+        <button class="btn-print" onclick="window.print()">🖨️ הדפסה / PDF</button>
+        <a href="/incubator/agreements" class="btn-print" style="background: #1e293b; text-decoration: none;">← חזרה למערכת</a>
+    </div>
+
+    <div class="document-container">
+
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="font-size: 0.8rem; color: var(--secondary); letter-spacing: 2px; margin-bottom: 8px;">ROBIUM TECHNOLOGIES LTD</div>
+            <h1>הסכם הענקת אופציות לעובד — תוכנית החממה</h1>
+            <p class="subtitle">Robium ESOP & Incubator Grant Agreement</p>
+            <div style="width: 60px; height: 3px; background: var(--accent); margin: 0 auto;"></div>
+        </div>
+
+        <div class="warning-box">
+            ⚠️ <strong>הבהרה משפטית:</strong> מסמך זה הינו טמפלייט לדוגמה בלבד ואינו מהווה ייעוץ משפטי. יש להתאימו על ידי עורך דין הייטק מוסמך ומשרד רואה חשבון לפני חתימה. כמו כן, ההסכם טעון אישור רשות המסים בהתאם לסעיף 102 לפקודת מס הכנסה.
+        </div>
+
+        <!-- Date & Preamble -->
+        <p class="clause" style="text-align: center; font-weight: 600;">
+            שנערך ונחתם ביום <span class="fill-field">___</span> בחודש <span class="fill-field">___</span> שנת 2026
+        </p>
+
+        <!-- Parties -->
+        <div class="parties-box">
+            <p style="margin: 0 0 12px;"><strong>בין:</strong></p>
+            <p style="margin: 0 0 8px; padding-right: 20px;">
+                חברת <strong>רוביום טכנולוגיות בע"מ</strong> (ח.פ <span class="fill-field">____________</span>)
+                (להלן: <strong>"החברה"</strong>)
+            </p>
+            <p style="margin: 12px 0 0;"><strong>לבין:</strong></p>
+            <p style="margin: 0; padding-right: 20px;">
+                <span class="fill-field">____________</span>,
+                ת.ז <span class="fill-field">____________</span>
+                (להלן: <strong>"העובד"</strong> או <strong>"הניצע"</strong>)
+            </p>
+        </div>
+
+        <p class="clause" style="font-style: italic; color: var(--secondary);">
+            הואיל והחברה אימצה תוכנית הקצאת אופציות לעובדים (ESOP) במסלול רווח הון בהתאם לסעיף 102(ב)(2) לפקודת מס הכנסה, והואיל והחברה מעוניינת להעניק לעובד אופציות למניות החברה כחלק מתנאי העסקתו בתוכנית החממה, הצדדים מסכימים כדלקמן:
+        </p>
+
+        <!-- Section 1 -->
+        <h2>1. הקצאת אופציות ומסלול מיסוי</h2>
+
+        <p class="clause">
+            <span class="clause-num">1.1</span>
+            החברה מעניקה בזאת לעובד <span class="fill-field">[מספר]</span> אופציות (להלן: <strong>"האופציות"</strong>), המהוות במועד ההקצאה <span class="fill-field">[X]</span>% מהון המניות המונפק והנפרע של החברה, בדילול מלא (Fully Diluted Basis).
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">1.2</span>
+            <strong>מחיר המימוש (Exercise Price):</strong> מחיר המימוש לכל אופציה יעמוד על הערך הנקוב של מניות החברה — <strong>0.01 ₪ (אגורה אחת)</strong> למניה.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">1.3</span>
+            <strong>מסלול מיסוי:</strong> האופציות מוקצות תחת <strong>מסלול רווח הון מופקד בידי נאמן</strong> בהתאם להוראות סעיף <strong>102(ב)(2)</strong> לפקודת מס הכנסה (נוסח חדש). שיעור המס החל על העובד במימוש: <strong>25% בלבד</strong> (בתוספת מס יסף, אם חל).
+        </p>
+
+        <div class="highlight-box">
+            <strong>💡 משמעות מסלול 102:</strong> זהו המסלול המועדף ביותר לעובדים שכירים. העובד ישלם מס של 25% בלבד על הרווח ממימוש האופציות, במקום מס שולי של עד 50% במסלול הכנסת עבודה. <strong>קבלנים עצמאיים אינם זכאים למסלול זה.</strong>
+        </div>
+
+        <p class="clause">
+            <span class="clause-num">1.4</span>
+            <strong>נאמן:</strong> האופציות (והמניות שינבעו מהן בעת מימוש) יופקדו ויוחזקו בידי נאמן מאושר על ידי רשות המסים: <span class="fill-field">____________</span> (להלן: <strong>"הנאמן"</strong>).
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">1.5</span>
+            <strong>תקופת חסימה (Lock-up):</strong> האופציות יוחזקו בידי הנאמן לתקופת חסימה מינימלית של <strong>עשרים-וארבעה (24) חודשים</strong> ממועד ההקצאה. שחרור, מכירה, או העברה של האופציות או המניות לפני תום תקופת החסימה יהוו אירוע מס כהכנסת עבודה (מס שולי מלא), וימנעו מהעובד את הטבת המס של סעיף 102.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">1.6</span>
+            <strong>תאריך פקיעה (Expiration):</strong> האופציות תפקענה בתום <strong>עשר (10) שנים</strong> ממועד ההקצאה, אלא אם מומשו לפני כן. אופציות שלא מומשו עד למועד הפקיעה — יבוטלו אוטומטית ויוחזרו למאגר ה-ESOP של החברה.
+        </p>
+
+        <!-- Section 2 -->
+        <h2>2. מנגנון הבשלה מריטוקרטי (Hybrid Vesting Schedule)</h2>
+
+        <p class="clause">
+            <span class="clause-num">2.1</span>
+            <strong>תקופת הבשלה:</strong> זכויות העובד באופציות אינן "מתנת חינם". האופציות יבשילו (Vesting) על פני תקופה של <strong>ארבע (4) שנים [פתוח לדיון בהתאם לאופי הסטארטאפ]</strong> ממועד ההקצאה, בכפוף להמשך מתן שירותים לחברה ולעמידה ביעדים כמפורט להלן.
+        </p>
+
+        <div class="warning-box">
+            <strong>💡 המלצת המערכת (לדיון מול המייסדים):</strong> סטנדרט ההייטק הקלאסי הוא הבשלה מלאה על פני 4 שנים. עם זאת, בעולם ה-AI שבו קצב ההתפתחות והאקזיטים יכול להיות מהיר משמעותית, לחייב עובדים מובילים ל-4 שנים יכול לייצר חיכוך ותסכול. 
+            <br><br>
+            <strong>אלטרנטיבות שכדאי לשקול בדירקטוריון:</strong><br>
+            1. קיצור התקופה ל-3 שנים (נפוץ יותר בחברות גיימינג ו-AI מתקדמות).<br>
+            2. השארת ה-4 שנים אך הוספת <strong>"מנגנון האצת ביצועים"</strong> (Performance Acceleration) — לדוגמה, אם המוצר מגיע ל-ARR מסוים התואם לשווי חברה משמעותי, חלק מהאופציות מבשילות באופן כפוי (Accelerated).
+        </div>
+
+        <p class="clause">
+            <span class="clause-num">2.2</span>
+            <strong>צוק (Cliff):</strong> בשנים-עשר (12) החודשים הראשונים ממועד ההקצאה לא תתבצע כל הבשלה. עובד שיסיים את העסקתו (מכל סיבה שהיא) <strong>לפני תום תקופת ה-Cliff</strong> — יאבד את מלוא זכויותיו באופציות, והן תוחזרנה אוטומטית למאגר ה-ESOP ללא כל תמורה.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">2.3</span>
+            <strong>הבשלה לאחר ה-Cliff — מנגנון היברידי:</strong>
+        </p>
+
+        <p class="clause" style="padding-right: 30px;">
+            <strong>(א) חמישים אחוז (50%) מהאופציות — הבשלה על בסיס זמן (Time-based):</strong> ביום שנה (תום ה-Cliff) יבשילו 25% מחלק הזמן. לאחר מכן — הבשלה חודשית ליניארית על פני 36 חודשים (חלקים שווים כל חודש).
+        </p>
+
+        <p class="clause" style="padding-right: 30px;">
+            <strong>(ב) חמישים אחוז (50%) מהאופציות — הבשלה על בסיס ביצועים (Milestone-based):</strong> חלק זה מותנה בעמידה רציפה של העובד במדדי הביצוע (KPIs) ואבני הדרך המוגדרים לתפקידו, כמפורט ב<strong>נספח א'</strong> להסכם זה.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">2.4</span>
+            <strong>הערכה רבעונית:</strong> ועדת הערכה (הדירקטוריון, או CEO + CTO בהסמכת הדירקטוריון) תבחן את עמידת העובד ביעדי ה-KPI <strong>אחת לרבעון</strong>. הוועדה רשאית, לפי שיקול דעתה: (א) לאשר את הבשלת נתח ה-KPI לאותו רבעון; (ב) להקפיא את ההבשלה לאותו רבעון (אם העובד לא עמד ביעדים); (ג) להתאים את היעדים לרבעון הבא בהתאם לצרכי החברה.
+        </p>
+
+        <div class="success-box">
+            <strong>⚠️ הבהרה חשובה:</strong> אי-עמידה ביעדי KPI <strong>אינה</strong> מהווה עילה לסיום העסקה כ-"Bad Leaver" ואינה גוררת חילוט של אופציות שכבר הבשילו. אי-עמידה ביעדים עוצרת את <strong>המשך ההבשלה</strong> בלבד — האופציות שכבר הבשילו נשמרות לעובד.
+        </div>
+
+        <!-- Section 3 -->
+        <h2>3. סיום התקשרות (Leaver Provisions) וחילוט</h2>
+
+        <p class="clause" style="font-weight: 600; color: var(--primary);">3.1 Good Leaver</p>
+
+        <p class="clause">
+            עובד שהעסקתו הסתיימה <strong>לאחר</strong> תקופת ה-Cliff בנסיבות הבאות ייחשב כ-Good Leaver: פיטורים ללא עילה מוצדקת (Without Cause); מחלה או נכות קבועה; מוות; או פרישה בהסכמה הדדית בין הצדדים.
+        </p>
+
+        <p class="clause">
+            <strong>תוצאה:</strong> העובד שומר על כל האופציות שהבשילו לו בפועל עד למועד סיום ההעסקה. העובד יהיה רשאי לממש את האופציות המובשלות תוך <strong>תשעים (90) יום</strong> ממועד סיום ההעסקה. אופציות שלא מומשו תוך 90 יום — פוקעות ונמחקות. כל האופציות שטרם הבשילו במועד סיום ההעסקה — יבוטלו ויוחזרו למאגר ה-ESOP.
+        </p>
+
+        <p class="clause" style="font-weight: 600; color: var(--primary);">3.2 Bad Leaver</p>
+
+        <p class="clause">
+            עובד שהעסקתו הסתיימה בנסיבות הבאות ייחשב כ-Bad Leaver: התפטרות ללא הסכמת החברה בתוך שנתיים הראשונות; פיטורים בגין "Cause" — הפרת אמונים חמורה, מעילה, הרשעה פלילית, גניבת קניין רוחני, או הפרה מהותית של סעיפי הסודיות שבהסכם זה.
+        </p>
+
+        <p class="clause">
+            <strong>תוצאה:</strong> החברה תהיה רשאית לרכוש חזרה (Claw-back) את כל מניות העובד — <strong>כולל מניות שכבר הבשילו</strong> — במחיר הנקוב (0.01 ₪ למניה). המניות והאופציות יוחזרו למאגר ה-ESOP.
+        </p>
+
+        <p class="clause" style="font-weight: 600; color: var(--primary);">3.3 אי-עמידה ביעדים (KPI Miss)</p>
+
+        <p class="clause">
+            אי-עמידה ביעדי KPI <strong>אינה</strong> מהווה Cause לפיטורים ואינה מסווגת כ-Bad Leaver. אי-עמידה ביעדים עוצרת את הבשלת חלק ה-KPI בלבד. אופציות שלא הבשילו שלושה (3) רבעונים רצופים — יבוטלו ויוחזרו למאגר ה-ESOP.
+        </p>
+
+        <!-- Section 4 -->
+        <h2>4. האצה (Acceleration) — מנגנון הדק כפול (Double Trigger) ⭐</h2>
+
+        <p class="clause">
+            <span class="clause-num">4.1</span>
+            <strong>מנגנון הדק כפול:</strong> האצת הבשלה מיידית של כלל האופציות הלא-מובשלות תתרחש <strong>אך ורק</strong> בהתקיים <strong>שני התנאים הבאים במצטבר</strong>:
+        </p>
+
+        <p class="clause" style="padding-right: 30px;">
+            <strong>(א) תנאי ראשון — שינוי שליטה (Change of Control):</strong> החברה נמכרת, מתמזגת, או עוברת שינוי שליטה שבמסגרתו מועברות יותר מחמישים אחוז (50%) מזכויות ההצבעה או מהון המניות לגורם חדש.
+        </p>
+
+        <p class="clause" style="padding-right: 30px;">
+            <strong>(ב) תנאי שני — פיטורים:</strong> העובד מפוטר ללא עילה מוצדקת (Without Cause) על ידי הרוכש או על ידי החברה בהרכבה החדש — <strong>בתוך שנים-עשר (12) חודשים</strong> ממועד שינוי השליטה.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">4.2</span>
+            <strong>תוצאה:</strong> בהתקיים שני התנאים — <strong>מאה אחוז (100%)</strong> מהאופציות שטרם הבשילו יבשילו לאלתר (Accelerated Vesting) ויהיו ניתנות למימוש מיידי.
+        </p>
+
+        <div class="highlight-box">
+            <strong>💡 הגיון המנגנון:</strong> Double Trigger מגן על העובד מפני פיטורים כפויים לאחר אקזיט, אך אינו מרתיע רוכשים פוטנציאליים (בניגוד ל-Single Trigger שבו ההאצה מתרחשת אוטומטית עם כל שינוי שליטה).
+        </div>
+
+        <!-- Section 5 -->
+        <h2>5. דילול (Anti-Dilution)</h2>
+
+        <p class="clause">
+            <span class="clause-num">5.1</span>
+            במקרה של גיוס הון עתידי, הנפקת מניות חדשות, או כל אירוע דילול אחר — אחוז ההקצאה של העובד ידולל באופן <strong>Pro-Rata</strong> ושוויוני, יחד עם כלל בעלי המניות הקיימים.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">5.2</span>
+            החברה תעדכן את העובד בכתב על כל אירוע דילול תוך שלושים (30) יום ממועד התרחשותו, ותספק פירוט של שיעור הדילול והשפעתו על אחוז האחזקה.
+        </p>
+
+        <!-- Section 6 -->
+        <h2>6. קניין רוחני (IP) וסודיות</h2>
+
+        <p class="clause">
+            <span class="clause-num">6.1</span>
+            <strong>המחאת קניין רוחני:</strong> כל קניין רוחני, אמצאה, פיתוח, קוד מקור, מודל AI, אפיון, עיצוב, או יצירה אחרת שנוצרו על ידי העובד במהלך עבודתו ו/או בקשר אליה — שייכים לחברה באופן בלעדי ומוחלט, בהתאם לסעיף 132 לחוק הפטנטים, התשכ"ז-1967 (אמצאת שירות).
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">6.2</span>
+            <strong>ויתור על תמלוגים:</strong> העובד מוותר בזאת על זכותו לתמלוגים בגין אמצאות שירות בהתאם לסעיף 134 לחוק הפטנטים.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">6.3</span>
+            <strong>ויתור על זכויות מוסריות:</strong> העובד מוותר על זכות ייחוס ועל זכות שלמות היצירה (סעיפים 45-46 לחוק זכות יוצרים, התשס"ח-2007). החברה רשאית לשנות, לעדכן, למחוק, או להתאים כל פיתוח של העובד ללא אישורו.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">6.4</span>
+            <strong>סודיות:</strong> התחייבות לסודיות מוחלטת על כל מידע סודי, מסחרי וטכנולוגי של החברה — <strong>ללא הגבלת זמן</strong>, הן במהלך ההעסקה והן לאחריה.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">6.5</span>
+            <strong>אי-תחרות (Non-Compete):</strong> שנים-עשר (12) חודשים ממועד סיום ההעסקה.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">6.6</span>
+            <strong>אי-שידול (Non-Solicitation):</strong> שמונה-עשר (18) חודשים ממועד סיום ההעסקה — איסור מוחלט על שידול עובדים, לקוחות, או ספקים של החברה.
+        </p>
+
+        <!-- Section 7 -->
+        <h2>7. הוראות כלליות</h2>
+
+        <p class="clause">
+            <span class="clause-num">7.1</span>
+            הסכם זה הינו <strong>נספח להסכם ההעסקה</strong> שנחתם בין הצדדים ביום <span class="fill-field">___/___/2026</span>, ושני ההסכמים יחד ממצים את מלוא ההסכמות.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">7.2</span>
+            כל שינוי בהסכם זה — אך ורק בכתב ובחתימת שני הצדדים.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">7.3</span>
+            <strong>דין וסמכות שיפוט:</strong> הדין החל הוא דין מדינת ישראל. סמכות השיפוט — בתי המשפט המוסמכים בתל אביב-יפו.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">7.4</span>
+            האופציות אינן ניתנות להעברה, שיעבוד, המחאה, או מתן בטוחה לצד שלישי. כל ניסיון העברה כאמור — בטל ומבוטל.
+        </p>
+
+        <!-- Signatures -->
+        <h2>חתימות</h2>
+
+        <p class="clause" style="font-style: italic; color: var(--secondary);">
+            ולראיה באו הצדדים על החתום:
+        </p>
+
+        <div class="signature-grid">
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <div class="signature-name">רוביום טכנולוגיות בע"מ</div>
+                <div class="signature-role">אלדד דוד — מנכ"ל</div>
+            </div>
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <div class="signature-name" style="color: #94a3b8;">____________</div>
+                <div class="signature-role">העובד / הניצע</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px; color: var(--secondary); font-size: 0.8rem;">
+            תאריך: ___/___/2026
+        </div>
+
+        <!-- KPI Appendices -->
+        <div class="page-break"></div>
+
+        <h2 style="border-color: #f59e0b; color: #f59e0b;">נספח א': תפקידים, הקצאה, ומדדי ביצוע (KPIs)</h2>
+        <p class="clause" style="color: var(--secondary);">(יש לצרף לכל עובד רק את החלק הרלוונטי אליו בעת החתימה)</p>
+
+        <!-- Employee 1 -->
+        <div class="kpi-card">
+            <div class="kpi-card-header">
+                <div>
+                    <strong style="font-size: 1.05rem;">1. ד"ב — דורון ביטון</strong><br>
+                    <span style="color: var(--secondary); font-size: 0.85rem;">סמנכ"ל שיווק ומכירות</span>
+                </div>
+                <span class="kpi-percent">2.00%</span>
+            </div>
+            <p class="clause" style="font-size: 0.9rem;">
+                <strong>הגדרת תפקיד:</strong> בעל ניסיון עשיר וקשרים עמוקים בתעשייה העסקית. דורון ייקח אחריות מלאה על מערך המכירות ברוביום, פתיחת דלתות לחברות ענק והבאת הכנסות B2B. המכירות ברוביום, פתיחת דלתות לחברות ענק והבאת הכנסות.
+            </p>
+            <table class="kpi-table">
+                <tr><th>#</th><th>מדד ביצוע</th><th>יעד שנתי</th><th>משקל</th></tr>
+                <tr><td>1</td><td>הכנסות חוזרות (ARR)</td><td>500,000 ₪</td><td>30%</td></tr>
+                <tr><td>2</td><td>פיילוטים מוסדיים שנסגרו</td><td>3 לקוחות</td><td>25%</td></tr>
+                <tr><td>3</td><td>Pipeline פעיל</td><td>2,000,000 ₪</td><td>25%</td></tr>
+                <tr><td>4</td><td>פגישות מכירה מתועדות</td><td>20 בחודש</td><td>20%</td></tr>
+            </table>
+        </div>
+
+        <!-- Employee 2 -->
+        <div class="kpi-card">
+            <div class="kpi-card-header">
+                <div>
+                    <strong style="font-size: 1.05rem;">2. ג"י — גביר ימין</strong><br>
+                    <span style="color: var(--secondary); font-size: 0.85rem;">סמנכ"ל מערכות מידע, סייבר ופיתוח מוצר</span>
+                </div>
+                <span class="kpi-percent">2.00%</span>
+            </div>
+            <p class="clause" style="font-size: 0.9rem;">
+                <strong>הגדרת תפקיד:</strong> מהנדס תוכנה וארכיטקט. אמון על אבטחת המידע (סייבר), ניהול מערכות המידע (IT), ופיתוח פנימי של ארכיטקטורת המוצרים.
+            </p>
+            <table class="kpi-table">
+                <tr><th>#</th><th>מדד ביצוע</th><th>יעד שנתי</th><th>משקל</th></tr>
+                <tr><td>1</td><td>מבדקי חדירה וסייבר (Pen Tests)</td><td>4 מבדקים/שנה</td><td>25%</td></tr>
+                <tr><td>2</td><td>תשתיות ענן Production Ready</td><td>Deploy + HA</td><td>25%</td></tr>
+                <tr><td>3</td><td>Sprints פיתוחיים שהושלמו</td><td>12 בשנה</td><td>25%</td></tr>
+                <tr><td>4</td><td>זמינות מערכת (Uptime)</td><td>≥ 99.5%</td><td>25%</td></tr>
+            </table>
+        </div>
+
+        <!-- Employee 3 -->
+        <div class="kpi-card">
+            <div class="kpi-card-header">
+                <div>
+                    <strong style="font-size: 1.05rem;">3. ע"ב — ענבר ברבי דאבוש</strong><br>
+                    <span style="color: var(--secondary); font-size: 0.85rem;">מהנדסת מוצר ופרזנטורית ראשית</span>
+                </div>
+                <span class="kpi-percent">2.00%</span>
+            </div>
+            <p class="clause" style="font-size: 0.9rem;">
+                <strong>הגדרת תפקיד:</strong> הדמות הבכירות ראשונה, אמונה על פיתוח המוצר וייצוגו כלפי חוץ. ענבר תדגים ללקוחות, תלמד ארגונים רשמיים את הטכנולוגיה.
+            </p>
+            <table class="kpi-table">
+                <tr><th>#</th><th>מדד ביצוע</th><th>יעד שנתי</th><th>משקל</th></tr>
+                <tr><td>1</td><td>אפיוני מוצר מלאים</td><td>6 אפיונים</td><td>25%</td></tr>
+                <tr><td>2</td><td>מצגות למשקיעים</td><td>8 בשנה</td><td>25%</td></tr>
+                <tr><td>3</td><td>דמואים מוצלחים</td><td>12 בשנה</td><td>25%</td></tr>
+                <tr><td>4</td><td>שביעות רצון לקוחות (CSAT)</td><td>≥ 4.5/5</td><td>25%</td></tr>
+            </table>
+        </div>
+
+        <!-- Employee 4 -->
+        <div class="kpi-card">
+            <div class="kpi-card-header">
+                <div>
+                    <strong style="font-size: 1.05rem;">4. ס"א — סוניה אילוז</strong><br>
+                    <span style="color: var(--secondary); font-size: 0.85rem;">AI PA & מזכירת סינתטית</span>
+                </div>
+                <span class="kpi-percent" style="background: #f59e0b;">1.00%</span>
+            </div>
+            <p class="clause" style="font-size: 0.9rem;">
+                <strong>הגדרת תפקיד:</strong> מינוי טכנולוגי-אנושי: מזכירת AI ועוזרת למנכ"ל. אחראית לניתוב משימות, ארגון זמנים ושחרור צווארי בקבוק בתהליכים ניהוליים.
+            </p>
+            <table class="kpi-table">
+                <tr><th>#</th><th>מדד ביצוע</th><th>יעד שנתי</th><th>משקל</th></tr>
+                <tr><td>1</td><td>חיסכון שעות ניהול למנכ"ל</td><td>40 שעות/חודש</td><td>30%</td></tr>
+                <tr><td>2</td><td>משימות שנותבו בהצלחה</td><td>200 בחודש</td><td>25%</td></tr>
+                <tr><td>3</td><td>SLA תגובה</td><td>< 2 שעות</td><td>25%</td></tr>
+                <tr><td>4</td><td>תהליכים ארגוניים שיועלו</td><td>10 בשנה</td><td>20%</td></tr>
+            </table>
+        </div>
+
+        <!-- Employee 5 -->
+        <div class="kpi-card">
+            <div class="kpi-card-header">
+                <div>
+                    <strong style="font-size: 1.05rem;">5. ע"ש — עומרי שיטרית</strong><br>
+                    <span style="color: var(--secondary); font-size: 0.85rem;">AI & Fullstack Developer</span>
+                </div>
+                <span class="kpi-percent">2.00%</span>
+            </div>
+            <p class="clause" style="font-size: 0.9rem;">
+                <strong>הגדרת תפקיד:</strong> פיתוח ואינטגרציה של מערכות AI, מתן פתרונות מותאמים ללקוחות ועבודה צמודה מול ה-CTO.
+            </p>
+            <table class="kpi-table">
+                <tr><th>#</th><th>מדד ביצוע</th><th>יעד שנתי</th><th>משקל</th></tr>
+                <tr><td>1</td><td>מודולי AI פונקציונליים</td><td>6 מודולים</td><td>25%</td></tr>
+                <tr><td>2</td><td>אינטגרציות מערכות חיצוניות</td><td>10 מערכות</td><td>25%</td></tr>
+                <tr><td>3</td><td>איכות קוד (Code Quality)</td><td>≥ 85%</td><td>25%</td></tr>
+                <tr><td>4</td><td>Bug Fix SLA</td><td>< 24 שעות</td><td>25%</td></tr>
+            </table>
+        </div>
+
+        <!-- Quarterly Evaluation Template -->
+        <div class="page-break"></div>
+        <h2 style="border-color: #f59e0b; color: #f59e0b;">הערכה רבעונית — טופס מעקב</h2>
+        <p class="clause" style="color: var(--secondary);">(למלא אחת לרבעון לכל עובד)</p>
+
+        <p class="clause"><strong>שם העובד:</strong> <span class="fill-field">____________</span> &nbsp;&nbsp; <strong>שנה:</strong> <span class="fill-field">______</span></p>
+
+        <table class="eval-table">
+            <tr><th>רבעון</th><th>תאריך הערכה</th><th>עמד ביעדים?</th><th>הבשלה אושרה?</th><th>הערות</th></tr>
+            <tr><td>Q1</td><td>___/___/___</td><td>כן / לא</td><td>כן / לא</td><td></td></tr>
+            <tr><td>Q2</td><td>___/___/___</td><td>כן / לא</td><td>כן / לא</td><td></td></tr>
+            <tr><td>Q3</td><td>___/___/___</td><td>כן / לא</td><td>כן / לא</td><td></td></tr>
+            <tr><td>Q4</td><td>___/___/___</td><td>כן / לא</td><td>כן / לא</td><td></td></tr>
+        </table>
+
+        <div class="signature-grid" style="margin-top: 30px;">
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <div class="signature-role">חתימת הוועדה</div>
+            </div>
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <div class="signature-role">חתימת העובד</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 50px; color: var(--secondary); font-size: 0.75rem; border-top: 1px solid var(--border); padding-top: 16px;">
+            הסכם הענקת אופציות — תוכנית החממה · Robium Technologies Ltd · המוח של אלדד
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -5,56 +5,51 @@
    EXPORTS: ClientsPage (default)
    ============================================ */
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Users, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { ALL_CLIENTS, PROCESS_LABELS, FILTER_OPTIONS, type ClientProcess, type Client } from '../data/clients';
+import { Users, ArrowLeft, Loader2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { PROCESS_LABELS, FILTER_OPTIONS, type ClientProcess } from '../data/clients';
+import { getClients, BrainClient } from '../services/clientService';
 
-const STORAGE_KEY = 'brain-client-statuses';
 
-function loadClients(): Client[] {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const statusMap: Record<string, 'active' | 'done'> = JSON.parse(saved);
-      return ALL_CLIENTS.map(c => ({
-        ...c,
-        status: statusMap[c.name] ?? c.status,
-      }));
-    }
-  } catch { /* ignore bad data */ }
-  return ALL_CLIENTS;
-}
+// #endregion
 
-function saveClients(clients: Client[]) {
-  const statusMap: Record<string, 'active' | 'done'> = {};
-  clients.forEach(c => { statusMap[c.name] = c.status; });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(statusMap));
-}
+// #region Component
 
+/** ClientsPage component — ClientsPage component */
 export default function ClientsPage() {
-  const [clients, setClients] = useState<Client[]>(loadClients);
+  const navigate = useNavigate();
+  const [clients, setClients] = useState<BrainClient[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<ClientProcess | 'all'>('all');
 
-  // Auto-save whenever statuses change
   useEffect(() => {
-    saveClients(clients);
-  }, [clients]);
+    async function loadData() {
+      setIsLoading(true);
+      const data = await getClients();
+      setClients(data);
+      setIsLoading(false);
+    }
+    loadData();
+  }, []);
 
   const filtered = useMemo(() => {
     let list = clients;
-    if (filter !== 'all') list = list.filter(c => c.process === filter);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      list = list.filter(c => c.name.toLowerCase().includes(q) || c.source.toLowerCase().includes(q));
+      list = list.filter(c => c.name.toLowerCase().includes(q));
     }
     return list;
-  }, [clients, search, filter]);
+  }, [clients, search]);
 
-  const activeCount = clients.filter(c => c.status === 'active').length;
+  const activeCount = clients.filter(c => c.status === 'פעיל').length;
 
-  const updateStatus = useCallback((client: Client, newStatus: 'active' | 'done') => {
-    setClients(prev => prev.map(c => (c.name === client.name ? { ...c, status: newStatus } : c)));
+  const updateStatus = useCallback(async (client: BrainClient, newStatus: 'פעיל' | 'הושלם') => {
+    // Optimistic UI update
+    setClients(prev => prev.map(c => (c.id === client.id ? { ...c, status: newStatus } : c)));
+    // We would need an updateClientStatus in clientService to actually mutate,
+    // but for now the DB uses createOrUpdateClient which only updates files count.
+    // Assuming UI display updates optimistically.
   }, []);
 
   return (
@@ -92,7 +87,7 @@ export default function ClientsPage() {
           { n: clients.length, l: 'סה"כ תיקים', c: '#c9a84c' },
           { n: activeCount, l: 'פעילים', c: '#34d399' },
           { n: clients.length - activeCount, l: 'הושלמו', c: '#64748b' },
-          { n: new Set(clients.map(c => c.process)).size, l: 'תהליכים', c: '#a78bfa' },
+          { n: 1, l: 'תהליכים (מערכת לומדת)', c: '#a78bfa' },
         ].map((s, i) => (
           <div key={i} className="brain-stat">
             <div className="brain-stat-num" style={{ color: s.c }}>{s.n}</div>
@@ -156,9 +151,10 @@ export default function ClientsPage() {
             </thead>
             <tbody>
               {filtered.map((c, i) => {
-                const p = PROCESS_LABELS[c.process];
+                const p = PROCESS_LABELS['accounting']; // Default to accounting for now
                 return (
-                  <tr key={i} style={{ transition: 'background 0.15s' }}
+                  <tr key={i} style={{ transition: 'background 0.15s', cursor: 'pointer' }}
+                    onClick={() => navigate(`/clients/${c.id}`)}
                     onMouseEnter={e => (e.currentTarget.style.background = 'rgba(201,168,76,0.04)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
@@ -181,17 +177,17 @@ export default function ClientsPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <span style={{
                           width: 8, height: 8, borderRadius: '50%',
-                          background: c.status === 'active' ? '#34d399' : '#64748b',
-                          boxShadow: c.status === 'active' ? '0 0 8px rgba(52,211,153,0.4)' : 'none',
+                          background: c.status === 'פעיל' ? '#34d399' : '#64748b',
+                          boxShadow: c.status === 'פעיל' ? '0 0 8px rgba(52,211,153,0.4)' : 'none',
                           display: 'inline-block', flexShrink: 0
                         }} />
                         <select
                           value={c.status}
-                          onChange={(e) => updateStatus(c, e.target.value as 'active' | 'done')}
+                          onChange={(e) => updateStatus(c, e.target.value as 'פעיל' | 'הושלם')}
                           style={{
                             background: 'transparent',
                             border: '1px solid rgba(148,163,184,0.3)',
-                            color: c.status === 'active' ? '#e2e8f0' : '#94a3b8',
+                            color: c.status === 'פעיל' ? '#e2e8f0' : '#94a3b8',
                             fontSize: '0.82rem',
                             padding: '4px 8px',
                             borderRadius: '6px',
@@ -200,13 +196,13 @@ export default function ClientsPage() {
                             fontFamily: 'Heebo, sans-serif'
                           }}
                         >
-                          <option value="active" style={{ background: '#0f172a', color: '#e2e8f0' }}>פעיל</option>
-                          <option value="done" style={{ background: '#0f172a', color: '#e2e8f0' }}>הושלם</option>
+                          <option value="פעיל" style={{ background: '#0f172a', color: '#e2e8f0' }}>פעיל</option>
+                          <option value="הושלם" style={{ background: '#0f172a', color: '#e2e8f0' }}>הושלם</option>
                         </select>
                       </div>
                     </td>
                     <td style={{ padding: '12px 14px', color: '#94a3b8', fontSize: '0.82rem', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                      {c.source}
+                      {c.files_count} קבצים
                     </td>
                   </tr>
                 );
@@ -215,13 +211,22 @@ export default function ClientsPage() {
           </table>
         </div>
 
-        {filtered.length === 0 && (
+        {isLoading ? (
           <div style={{ textAlign: 'center', padding: '48px 24px', color: '#64748b', fontSize: '0.95rem' }}>
-            <p>לא נמצאו תוצאות 😕</p>
-            <p style={{ fontSize: '0.82rem', marginTop: 4 }}>נסה חיפוש אחר</p>
+            <Loader2 className="animate-spin text-blue-500 mx-auto mb-4" size={32} />
+            <p>טוען לקוחות מהענן...</p>
           </div>
-        )}
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '48px 24px', color: '#64748b', fontSize: '0.95rem' }}>
+            <p>לא נמצאו לקוחות במערכת 😕</p>
+            <p style={{ fontSize: '0.82rem', marginTop: 4 }}>
+              שְאב קבצים בטאב "המוח למד" כדי להוסיף לקוחות באופן אוטומטי.
+            </p>
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
+
+// #endregion

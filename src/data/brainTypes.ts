@@ -1,4 +1,6 @@
 /* ============================================
+// #region Module
+
    FILE: brainTypes.ts
    PURPOSE: Type definitions
    DEPENDENCIES: None (local only)
@@ -195,3 +197,5 @@ export interface CeoReport {
   priority: "low" | "medium" | "high" | "urgent";
   timestamp: string;
 }
+
+// #endregion

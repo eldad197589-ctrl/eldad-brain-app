@@ -4,8 +4,15 @@
    DEPENDENCIES: react-router-dom, lucide-react
    EXPORTS: CaseHelman (default)
    ============================================ */
+// #region Imports
+
 import { Link } from 'react-router-dom';
 import { Home, CheckCircle, ExternalLink, FileText, Paperclip, Activity } from 'lucide-react';
+
+
+// #endregion
+
+// #region Types
 
 interface Doc {
   title: string;
@@ -15,6 +22,9 @@ interface Doc {
   link: string;
   icon: React.ReactNode;
 }
+
+
+// #endregion
 
 const PREPARED_DOCS: Doc[] = [
   {
@@ -78,6 +88,9 @@ const CHECKLIST = [
   'אסמכתאות שצורפו — מסמכי רכישה, מכירה ושומה',
 ];
 
+// #region Component
+
+/** CaseHelman component — CaseHelman component */
 export default function CaseHelman() {
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto' }}>
@@ -196,3 +209,5 @@ function DocCard({ doc }: { doc: Doc }) {
     </div>
   );
 }
+
+// #endregion

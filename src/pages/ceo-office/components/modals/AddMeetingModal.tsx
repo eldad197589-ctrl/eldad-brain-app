@@ -4,10 +4,17 @@
    DEPENDENCIES: react, lucide-react
    EXPORTS: AddMeetingModal (default)
    ============================================ */
+// #region Imports
+
 import { useState } from 'react';
 import { Calendar } from 'lucide-react';
 import type { Meeting } from '../../types';
 import { MEETING_COLORS } from '../../constants';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   onClose: () => void;
@@ -15,6 +22,12 @@ interface Props {
   defaultDate: string;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** AddMeetingModal component — AddMeetingModal component */
 export default function AddMeetingModal({ onClose, onAdd, defaultDate }: Props) {
   const [form, setForm] = useState({
     title: '',
@@ -110,3 +123,5 @@ export default function AddMeetingModal({ onClose, onAdd, defaultDate }: Props) 
     </div>
   );
 }
+
+// #endregion

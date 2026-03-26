@@ -88,6 +88,7 @@ body {
 
 .sidebar-nav {
   flex: 1;
+  min-height: 0;
   padding: 12px 8px;
   display: flex;
   flex-direction: column;
@@ -129,6 +130,7 @@ body {
 /* ═══ Collapsible Sidebar Sections (core) ═══ */
 .collapsible-section {
   margin-bottom: 2px;
+  flex-shrink: 0;
 }
 
 /* ═══ Sidebar Panels (card-based boards) ═══ */
@@ -139,6 +141,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-right: 3px solid var(--panel-accent, #64748b);
   overflow: hidden;
+  flex-shrink: 0;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -2249,13 +2252,103 @@ body {
   box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
+/* ═══════════════════════════════════════════════ */
+/*  Print Styles — ברגע שמישהו מדפיס / שומר PDF  */
+/* ═══════════════════════════════════════════════ */
 @media print {
+  /* === Page Setup === */
+  @page { size: A4; margin: 15mm; }
+
+  /* === Hide App Chrome === */
+  .sidebar,
+  .top-bar,
+  .breadcrumbs-bar,
+  .brain-chat-widget,
+  .no-print,
+  .flow-nav-btn,
+  .sidebar-footer,
+  button[class*="fixed"] {
+    display: none !important;
+  }
+
+  /* === Layout: full width === */
+  .app-layout {
+    display: block !important;
+  }
+  .main-area {
+    margin: 0 !important;
+    margin-right: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  .main-content {
+    padding: 0 !important;
+  }
+
+  /* === Colors: light mode for paper === */
+  html, body {
+    background: white !important;
+    color: #1e293b !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Glass-card → white card with subtle border */
+  .glass-card {
+    background: white !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Text color overrides — dark text on white paper */
+  h1, h2, h3, h4, h5, h6 {
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    background: none !important;
+  }
+  p, span, div, td, th, li, strong, em, label, a {
+    color: #1e293b !important;
+    -webkit-text-fill-color: #1e293b !important;
+  }
+
+  /* Tables — clear borders */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+  th {
+    color: #374151 !important;
+    -webkit-text-fill-color: #374151 !important;
+    border-bottom: 2px solid #9ca3af !important;
+    font-weight: 700 !important;
+  }
+  td {
+    border-bottom: 1px solid #e5e7eb !important;
+  }
+
+  /* Signature lines — visible on paper */
+  [style*="border-bottom: 1px dashed"] {
+    border-bottom: 1px dashed #6b7280 !important;
+  }
+
+  /* Remove gradients & glows */
+  [style*="linear-gradient"],
+  [style*="radial-gradient"] {
+    background: transparent !important;
+  }
+
+  /* Keep highlight callouts visible but light */
+  [style*="rgba(245,158,11"] {
+    background: #fffbeb !important;
+    border-color: #f59e0b !important;
+  }
+
+  /* === Shareable Setlist (existing) === */
   .shareable-setlist-page {
     background: white;
     padding: 0;
-  }
-  .no-print {
-    display: none !important;
   }
   .shareable-table-wrap {
     box-shadow: none;
@@ -2263,6 +2356,17 @@ body {
   }
   .shareable-table th, .shareable-table td {
     padding: 8px 12px;
+  }
+
+  /* === Quotes Generator === */
+  .print\:block { display: block !important; }
+  .print\:hidden { display: none !important; }
+  .print\:col-span-12 { grid-column: span 12 / span 12 !important; }
+
+  /* Remove background blobs/decorations */
+  [class*="bg-gradient-radial"],
+  [class*="blur-"] {
+    display: none !important;
   }
 }
 

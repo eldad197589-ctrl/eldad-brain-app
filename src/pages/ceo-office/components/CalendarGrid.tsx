@@ -4,9 +4,16 @@
    DEPENDENCIES: lucide-react
    EXPORTS: CalendarGrid (default)
    ============================================ */
+// #region Imports
+
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import type { CalendarDay, DayEvents } from '../types';
 import { DAYS_HE, MONTHS_HE } from '../constants';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   calendarDays: CalendarDay[];
@@ -20,6 +27,12 @@ interface Props {
   onSelectDate: (date: string) => void;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** CalendarGrid component — CalendarGrid component */
 export default function CalendarGrid({
   calendarDays, eventsByDate, currentMonth, currentYear,
   selectedDate, todayStr, onPrevMonth, onNextMonth, onSelectDate,
@@ -86,3 +99,5 @@ export default function CalendarGrid({
     </div>
   );
 }
+
+// #endregion

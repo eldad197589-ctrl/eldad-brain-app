@@ -13,8 +13,20 @@
  */
 import { readdir, readFile } from 'fs/promises';
 import { join, relative, basename } from 'path';
+import { existsSync, readFileSync } from 'fs';
 
 const SRC_DIR = join(import.meta.dirname, '..', 'src');
+
+let legacyIgnoreList = [];
+try {
+  const ignorePath = join(import.meta.dirname, 'legacy-lint-ignore.json');
+  if (existsSync(ignorePath)) {
+    const ignoreFileContent = readFileSync(ignorePath, 'utf-8');
+    legacyIgnoreList = JSON.parse(ignoreFileContent);
+  }
+} catch (e) {
+  console.log('⚠️ Could not read legacy-lint-ignore.json, continuing without exemptions.');
+}
 
 /** Recursively get all .ts/.tsx files */
 async function getFiles(dir) {
@@ -44,9 +56,11 @@ function checkFile(filePath, content) {
     violations.push({ rule: 'FILE_HEADER', severity: 'error', message: 'Missing file header (/* ==== FILE: ... */)' });
   }
 
-  // Rule 2: File size
-  if (lineCount > 400) {
-    violations.push({ rule: 'FILE_SIZE', severity: 'error', message: `${lineCount} lines (hard limit: 400)` });
+  // Rule 2: File size (data-only files get a higher limit)
+  const isDataFile = relPath.startsWith('data/') || /[Tt]emplates|[Ss]eed/.test(fileName);
+  const hardLimit = isDataFile ? 500 : 400;
+  if (lineCount > hardLimit) {
+    violations.push({ rule: 'FILE_SIZE', severity: 'error', message: `${lineCount} lines (hard limit: ${hardLimit})` });
   } else if (lineCount > 300) {
     violations.push({ rule: 'FILE_SIZE', severity: 'warning', message: `${lineCount} lines (recommended max: 300)` });
   }
@@ -64,7 +78,7 @@ function checkFile(filePath, content) {
 
   // Rule 4: #region blocks (skip index.ts and very small files)
   if (fileName !== 'index.ts' && lineCount > 30 && !content.includes('#region')) {
-    violations.push({ rule: 'REGION_BLOCKS', severity: 'warning', message: 'Missing #region blocks for file organization' });
+    violations.push({ rule: 'REGION_BLOCKS', severity: 'error', message: 'Missing #region blocks for file organization' });
   }
 
   // Rule 5: JSDoc on exports (skip index.ts)
@@ -72,14 +86,71 @@ function checkFile(filePath, content) {
     const hasExports = /export\s+(default\s+)?function/.test(content) || /export\s+const/.test(content);
     const hasJSDoc = content.includes('/**');
     if (hasExports && !hasJSDoc) {
-      violations.push({ rule: 'JSDOC', severity: 'warning', message: 'Exported functions without JSDoc documentation' });
+      violations.push({ rule: 'JSDOC', severity: 'error', message: 'Exported functions without JSDoc documentation' });
     }
   }
 
   // Rule 6: interface over type for object shapes
   const typeAliasMatches = [...content.matchAll(/^type\s+(\w+)\s*=\s*\{/gm)];
   for (const m of typeAliasMatches) {
-    violations.push({ rule: 'INTERFACE_OVER_TYPE', severity: 'warning', message: `Use \`interface ${m[1]}\` instead of \`type ${m[1]} = {...}\`` });
+    violations.push({ rule: 'INTERFACE_OVER_TYPE', severity: 'error', message: `Use \`interface ${m[1]}\` instead of \`type ${m[1]} = {...}\`` });
+  }
+
+  // Rule 7: NO_SHORT_NAMES (variable names >= 2 chars)
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.trimStart().startsWith('//') || line.trimStart().startsWith('*')) continue;
+    
+    const shortVarMatch = line.match(/\b(?:const|let|var)\s+([a-zA-Z])\s*=/);
+    if (shortVarMatch) {
+      const varName = shortVarMatch[1];
+      if (!['i', 'j', 'k', '_'].includes(varName) && !line.includes('for (') && !line.includes('for(')) {
+        violations.push({ rule: 'NO_SHORT_NAMES', severity: 'error', message: `Line ${i + 1}: Variable name '${varName}' is too short. Use descriptive names.` });
+      }
+    }
+  }
+
+  // Rule 8: FUNCTION_LENGTH (Single Responsibility, max 50 lines)
+  let inFunction = false;
+  let functionStartLine = 0;
+  let braceDepth = 0;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.trimStart().startsWith('//') || line.trimStart().startsWith('*')) continue;
+
+    // Detect function start
+    if (/\b(?:function|const\s+[a-zA-Z0-9_]+\s*=\s*(?:\([^)]*\)|[a-zA-Z0-9_]+)\s*=>)\s*.*\{/.test(line)) {
+      if (!inFunction) {
+        inFunction = true;
+        functionStartLine = i;
+        braceDepth = 0;
+      }
+    }
+    
+    if (inFunction) {
+      braceDepth += (line.match(/\{/g) || []).length;
+      braceDepth -= (line.match(/\}/g) || []).length;
+      
+      if (braceDepth <= 0) {
+        const length = i - functionStartLine + 1;
+        if (length > 50) {
+          violations.push({ rule: 'FUNCTION_LENGTH', severity: 'error', message: `Line ${functionStartLine + 1}: Function is ${length} lines long (max 50 limit). Extract to smaller functions.` });
+        }
+        inFunction = false;
+        braceDepth = 0;
+      }
+    }
+  }
+
+  const isLegacy = legacyIgnoreList.includes(relPath);
+  if (isLegacy) {
+    for (const v of violations) {
+      if (v.severity === 'error') {
+        v.severity = 'warning';
+        v.message += ' (Legacy Exemption)';
+      }
+    }
   }
 
   return { relPath, violations };

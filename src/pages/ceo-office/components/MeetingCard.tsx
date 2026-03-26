@@ -4,8 +4,15 @@
    DEPENDENCIES: lucide-react
    EXPORTS: MeetingCard (default)
    ============================================ */
-import { Users, Clock, Trash2, Package } from 'lucide-react';
+// #region Imports
+
+import { Users, Clock, Trash2, Package, Link } from 'lucide-react';
 import type { Meeting } from '../types';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   meeting: Meeting;
@@ -15,6 +22,12 @@ interface Props {
   onEditPrep?: (meeting: Meeting) => void;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** MeetingCard component — MeetingCard component */
 export default function MeetingCard({ meeting: m, onDelete, onClick, onEditPrep }: Props) {
   const hasPrepStages = m.prepStages && m.prepStages.length > 0;
 
@@ -45,27 +58,54 @@ export default function MeetingCard({ meeting: m, onDelete, onClick, onEditPrep 
           </div>
         )}
 
-        {/* Direct Prep Access */}
-        {onEditPrep && (
+        {/* Actions Container */}
+        <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+          {/* Direct Prep Access */}
+          {onEditPrep && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onEditPrep(m); }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '6px 12px', borderRadius: 8,
+                background: hasPrepStages ? 'rgba(139,92,246,0.1)' : 'rgba(59,130,246,0.08)',
+                color: hasPrepStages ? '#a78bfa' : '#60a5fa',
+                border: `1px solid ${hasPrepStages ? 'rgba(139,92,246,0.25)' : 'rgba(59,130,246,0.2)'}`,
+                fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer',
+                fontFamily: 'Heebo, sans-serif', transition: 'all 0.2s',
+                width: 'fit-content',
+              }}
+            >
+              <Package size={13} />
+              {hasPrepStages
+                ? `📦 ערוך חומרי הכנה (${m.prepStages!.length} שלבים)`
+                : '+ הוסף חומרי הכנה'}
+            </button>
+          )}
+
+          {/* Share Invitation Link */}
           <button
-            onClick={(e) => { e.stopPropagation(); onEditPrep(m); }}
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              const link = `https://meeting-invite-opal.vercel.app/?title=${encodeURIComponent(m.title)}&time=${encodeURIComponent(m.time)}`;
+              navigator.clipboard.writeText(link).then(() => {
+                alert('קישור לחדר הפגישה הוירטואלי הועתק בהצלחה!\n\nהקישור: ' + link);
+              });
+            }}
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
-              marginTop: 8, padding: '6px 12px', borderRadius: 8,
-              background: hasPrepStages ? 'rgba(139,92,246,0.1)' : 'rgba(59,130,246,0.08)',
-              color: hasPrepStages ? '#a78bfa' : '#60a5fa',
-              border: `1px solid ${hasPrepStages ? 'rgba(139,92,246,0.25)' : 'rgba(59,130,246,0.2)'}`,
+              padding: '6px 12px', borderRadius: 8,
+              background: 'rgba(16,185,129,0.1)',
+              color: '#10b981',
+              border: '1px solid rgba(16,185,129,0.2)',
               fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer',
               fontFamily: 'Heebo, sans-serif', transition: 'all 0.2s',
               width: 'fit-content',
             }}
+            title="העתק קישור לחדר הפגישה הוירטואלי"
           >
-            <Package size={13} />
-            {hasPrepStages
-              ? `📦 ערוך חומרי הכנה (${m.prepStages!.length} שלבים)`
-              : '+ הוסף חומרי הכנה'}
+            <Link size={13} /> הגדר חדר וירטואלי (העתק קישור)
           </button>
-        )}
+        </div>
       </div>
       <button className="delete-btn" onClick={(e) => { e.stopPropagation(); onDelete(m.id); }} title="מחק">
         <Trash2 size={14} />
@@ -73,3 +113,5 @@ export default function MeetingCard({ meeting: m, onDelete, onClick, onEditPrep 
     </div>
   );
 }
+
+// #endregion

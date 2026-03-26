@@ -7,6 +7,23 @@
 
 ---
 
+## 🛡️ Automated Rule Enforcement (כלל ברזל)
+
+> [!CAUTION]
+> **חובת הרצה לפני ואחרי כל שינוי קוד!**
+
+```bash
+cd brain-app && npm run lint:rules
+```
+
+1. **לפני שמתחילים:** `npm run lint:rules` — אם יש errors, קודם מתקנים
+2. **אחרי שמסיימים:** `npm run lint:rules` — ודא שלא נוצרו חריגות
+3. **Build = אכיפה:** `npm run build` כולל `lint:rules` אוטומטית — **אם נכשל, אסור לעשות commit**
+
+**Workflow מחייב:** `/pre-code` — ראה `.agents/workflows/pre-code.md`
+
+---
+
 ## 🏗️ Architecture Rules
 
 ### Feature Folder Pattern (Orchestrator)

@@ -4,7 +4,14 @@
    DEPENDENCIES: lucide-react
    EXPORTS: ActionBar (default)
    ============================================ */
+// #region Imports
+
 import { Plus, RefreshCw, Calendar } from 'lucide-react';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   onAddMeeting: () => void;
@@ -13,6 +20,12 @@ interface Props {
   onGoToday: () => void;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** ActionBar component — ActionBar component */
 export default function ActionBar({ onAddMeeting, onAddTask, onSync, onGoToday }: Props) {
   return (
     <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
@@ -31,3 +44,5 @@ export default function ActionBar({ onAddMeeting, onAddTask, onSync, onGoToday }
     </div>
   );
 }
+
+// #endregion

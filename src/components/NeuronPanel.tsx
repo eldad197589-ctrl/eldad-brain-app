@@ -4,14 +4,24 @@
    DEPENDENCIES: react-router-dom, lucide-react
    EXPORTS: NeuronPanel (default)
    ============================================ */
+// #region Imports
+
 import { Link } from 'react-router-dom';
 import { type Neuron, type NeuronLink } from '../data/neurons';
 import { X } from 'lucide-react';
+
+
+// #endregion
+
+// #region Types
 
 interface NeuronPanelProps {
   neuron: Neuron | null;
   onClose: () => void;
 }
+
+
+// #endregion
 
 const typeIcons: Record<string, string> = { flowchart: '📊', tool: '🛠️', case: '📁' };
 const typeColors: Record<string, string> = {
@@ -20,6 +30,9 @@ const typeColors: Record<string, string> = {
   case: 'rgba(251, 191, 36, 0.13)'
 };
 
+// #region Component
+
+/** NeuronPanel component — NeuronPanel component */
 export default function NeuronPanel({ neuron, onClose }: NeuronPanelProps) {
   const isOpen = neuron !== null;
 
@@ -88,3 +101,5 @@ export default function NeuronPanel({ neuron, onClose }: NeuronPanelProps) {
     </>
   );
 }
+
+// #endregion

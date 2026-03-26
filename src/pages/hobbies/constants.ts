@@ -130,6 +130,7 @@ export const FREQUENCY_COLORS: Record<HobbyFrequency, string> = {
 
 // #region Seed Data
 
+/** SEED_SONGS — Static data and configuration */
 export const SEED_SONGS: Song[] = [
   // Led Zeppelin
   { id: 's_lz1', name: 'Stairway to Heaven', artist: 'Led Zeppelin', category: 'classic', mastery: 3, key: 'Am', tempo: 72, chords: 'Am - E - C - D - F - G - Am', youtubeUrl: 'https://www.youtube.com/watch?v=QkF3oxziUI4', lyricsUrl: 'https://www.azlyrics.com/lyrics/ledzeppelin/stairwaytoheaven.html' },

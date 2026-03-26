@@ -4,17 +4,29 @@
    DEPENDENCIES: react, react-dom, react-router-dom
    EXPORTS: None
    ============================================ */
+// #region Imports
+
 import { StrictMode, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import { initTabSync } from './store/tabSync'
+
+// One-time data refresh — force reseed with v8 meeting data (26/3)
+if (!localStorage.getItem('brain-data-v8')) {
+  localStorage.removeItem('brain-store');
+  localStorage.setItem('brain-data-v8', '1');
+}
+
 import { useBrainStore } from './store/brainStore'
 
 import Layout from './components/Layout'
 import EmbeddedPage from './pages/EmbeddedPage'
 
 // Initialize cross-tab sync
+
+// #endregion
+
 initTabSync(
   useBrainStore.getState as () => unknown,
   useBrainStore.setState as (v: unknown) => void,
@@ -28,9 +40,11 @@ const CeoOffice = lazy(() => import('./pages/ceo-office'))
 const RobiumHub = lazy(() => import('./pages/robium-hub'))
 const FlowchartPage = lazy(() => import('./pages/FlowchartPage'))
 const ClientsPage = lazy(() => import('./pages/ClientsPage'))
+const ClientProfile = lazy(() => import('./pages/ClientProfile'))
 const ProductsPage = lazy(() => import('./pages/products'))
 const FoundersPage = lazy(() => import('./pages/founders'))
 const AgreementPage = lazy(() => import('./pages/agreement'))
+const AgreementDiffPage = lazy(() => import('./pages/agreement/AgreementDiffPage'))
 const CaseHelman = lazy(() => import('./pages/CaseHelman'))
 const LetterPage = lazy(() => import('./pages/LetterPage'))
 const DocumentsPage = lazy(() => import('./pages/documents'))
@@ -40,8 +54,21 @@ const HobbiesPage = lazy(() => import('./pages/hobbies'))
 const ShareableSetlist = lazy(() => import('./pages/hobbies/components/ShareableSetlist'))
 const MusicianSignup = lazy(() => import('./pages/hobbies/MusicianSignup'))
 
+const ComparisonPage = lazy(() => import('./pages/comparison/ComparisonPage'))
+const QuotesGeneratorPage = lazy(() => import('./pages/quotes-generator/QuotesGeneratorPage'))
+const PricingManagerPage = lazy(() => import('./pages/ceo-office/PricingManagerPage'))
+const ClientOnboardingPage = lazy(() => import('./pages/client-onboarding/ClientOnboardingPage'))
+const ClientPortal = lazy(() => import('./pages/portal/ClientPortal'))
+const LeadsManagerPage = lazy(() => import('./pages/leads/LeadsManagerPage'))
+const KirillDisputePage = lazy(() => import('./pages/founders/KirillDisputePage'))
+const IncubatorPage = lazy(() => import('./pages/incubator/IncubatorPage'))
+const IncubatorAgreementsPage = lazy(() => import('./pages/incubator-agreements/IncubatorAgreementsPage'))
+
 // Placeholder for pages we'll build later
 const ComingSoon = lazy(() => import('./pages/ComingSoon'))
+
+// Personal & Home
+const PaymentsPage = lazy(() => import('./pages/personal/payments/PaymentsPage'))
 
 function Loader() {
   return (
@@ -69,15 +96,27 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/hub" element={<RobiumHub />} />
             {/* Clients & Cases */}
             <Route path="/clients" element={<ClientsPage />} />
+            <Route path="/clients/:id" element={<ClientProfile />} />
             <Route path="/case/helman" element={<CaseHelman />} />
             <Route path="/case/guardian" element={<EmbeddedPage title="תיק גרדיאן — אנריקה" src="/legacy/case-guardian-enrique.html" badge="תיק לקוח" badgeColor="#10b981" />} />
             {/* Robium */}
             <Route path="/products" element={<ProductsPage />} />
-            <Route path="/comparison" element={<EmbeddedPage title="ניתוח מתחרים — Robium vs השוק" src="/legacy/robium_comparison.html" badge="אנליזה" badgeColor="#3b82f6" />} />
-            <Route path="/agreement" element={<EmbeddedPage title="הסכם מייסדים — רוביום בע״מ" src="/legacy/robium_final_agreement.html" badge="הסכם רשמי" badgeColor="#10b981" />} />
+            <Route path="/comparison" element={<ComparisonPage />} />
+            <Route path="/quotes-generator" element={<QuotesGeneratorPage />} />
+            <Route path="/pricing-manager" element={<PricingManagerPage />} />
+            <Route path="/onboarding" element={<ClientOnboardingPage />} />
+            <Route path="/leads" element={<LeadsManagerPage />} />
+            <Route path="/agreement" element={<EmbeddedPage title="טיוטת הסכם לדיון — פגישת 25/03" src="/legacy/robium_final_agreement.html" badge="בדיון" badgeColor="#3b82f6" />} />
+            <Route path="/agreement/original" element={<EmbeddedPage title="הסכם מקורי (3.3.26) — היסטורי" src="/legacy/robium_agreement_original.html" badge="מקור (33%)" badgeColor="#ef4444" />} />
+            <Route path="/agreement/legacy" element={<EmbeddedPage title="טיוטה מעודכנת (11/03/26) — ROBIUM L.T.D" src="/legacy/robium_agreement_updated.html" badge="טיוטה ב׳" badgeColor="#f59e0b" />} />
+            <Route path="/agreement/diff" element={<AgreementDiffPage />} />
             <Route path="/agreement/review" element={<AgreementPage />} />
             <Route path="/founders" element={<FoundersPage />} />
-            <Route path="/incubator" element={<EmbeddedPage title="חממה טכנולוגית — Robium" src="/legacy/robium_incubator_team.html" badge="צוות" badgeColor="#f59e0b" />} />
+            <Route path="/founders/kirill-dispute" element={<KirillDisputePage />} />
+            <Route path="/incubator" element={<IncubatorPage />} />
+            <Route path="/incubator/agreements" element={<IncubatorAgreementsPage />} />
+            <Route path="/incubator/employment-agreement" element={<EmbeddedPage title="הסכם העסקה — עובד חממה" src="/legacy/employment_agreement.html" badge="טמפלייט" badgeColor="#10b981" />} />
+            <Route path="/incubator/esop-agreement" element={<EmbeddedPage title="הסכם הענקת אופציות — ESOP" src="/legacy/esop_grant_agreement.html" badge="טמפלייט" badgeColor="#7c3aed" />} />
             {/* Tools */}
             <Route path="/calculator" element={<ComingSoon />} />
             <Route path="/letter" element={<LetterPage />} />
@@ -86,7 +125,11 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/hobbies" element={<HobbiesPage />} />
             {/* Flowcharts */}
             <Route path="/flow/:flowId" element={<FlowchartPage />} />
+            {/* Personal */}
+            <Route path="/personal/payments" element={<PaymentsPage />} />
           </Route>
+          {/* External Client Portal (No Sidebar) */}
+          <Route path="/portal/:token" element={<ClientPortal />} />
           {/* Standalone shareable setlist — no sidebar/layout */}
           <Route path="/setlist/:id" element={<ShareableSetlist />} />
           {/* Standalone musician signup — no sidebar/layout */}

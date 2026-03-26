@@ -1,8 +1,8 @@
 /* ============================================
    FILE: geminiService.ts
-   PURPOSE: geminiService module
-   DEPENDENCIES: @google
-   EXPORTS: ChatMessage, isAIConfigured
+   PURPOSE: Gemini AI engine — chat, embeddings, and Function Calling (tool use)
+   DEPENDENCIES: @google/generative-ai, processRegistry
+   EXPORTS: ChatMessage, ToolCallLog, ToolCallingResult, isAIConfigured, sendBrainMessage, askBrain, getEmbedding, sendWithTools
    ============================================ */
 /**
  * Gemini AI Service — Brain Agent Engine
@@ -87,15 +87,155 @@ ${process.category ? `קטגוריה: ${process.category}` : ''}
  * Generate a text embedding using Gemini's embedding model.
  * Used by the RAG system for semantic search.
  *
+ * Note: Switched from deprecated text-embedding-004 (404 error)
+ * to gemini-embedding-001 (March 2026).
+ *
  * @param text - Text to embed
  * @returns Embedding vector (number array)
  */
 export async function getEmbedding(text: string): Promise<number[]> {
   const ai = getGenAI();
-  const model = ai.getGenerativeModel({ model: 'text-embedding-004' });
+  const model = ai.getGenerativeModel({ model: 'gemini-embedding-001' });
 
-  const result = await model.embedContent(text);
-  return result.embedding.values;
+  // Retry with exponential backoff for rate limiting (429)
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const result = await model.embedContent(text);
+      return result.embedding.values;
+    } catch (err: unknown) {
+      lastError = err;
+      const status = (err as { status?: number })?.status;
+      if (status === 429 || status === 503) {
+        // Rate limit — wait and retry
+        const delay = Math.pow(2, attempt) * 1000;
+        console.warn(`[Embedding] Rate limited (${status}), retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      throw err; // Non-retryable error
+    }
+  }
+  throw lastError;
+}
+
+// #endregion
+
+// #region Function Calling (Tool Use)
+
+/**
+ * Result of a tool call made by Gemini during generation.
+ * Logged by the caller for persistent agent memory.
+ */
+export interface ToolCallLog {
+  /** Tool name */
+  toolName: string;
+  /** Arguments Gemini passed to the tool */
+  toolArgs: Record<string, unknown>;
+  /** Result returned from the tool */
+  toolResult: Record<string, unknown>;
+}
+
+/**
+ * Result from sendWithTools — includes both the final text and tool call logs.
+ */
+export interface ToolCallingResult {
+  /** Final text response from Gemini */
+  text: string;
+  /** All tool calls that were made during generation */
+  toolCalls: ToolCallLog[];
+}
+
+/**
+ * Send a message to Gemini with Function Calling support.
+ * Handles the multi-turn loop: Gemini calls tools → we execute → feed back → repeat.
+ *
+ * @param systemPrompt - System instruction for the model
+ * @param userMessage - The user/agent message
+ * @param tools - Gemini FunctionDeclarationsTool with available functions
+ * @param toolExecutor - Function that executes tool calls and returns results
+ * @param maxIterations - Maximum tool-calling rounds (default: 10)
+ * @returns Final text response and all tool call logs
+ */
+export async function sendWithTools(
+  systemPrompt: string,
+  userMessage: string,
+  tools: import('@google/generative-ai').FunctionDeclarationsTool,
+  toolExecutor: (name: string, args: Record<string, unknown>) => Promise<Record<string, unknown>>,
+  maxIterations = 10,
+): Promise<ToolCallingResult> {
+  const ai = getGenAI();
+  const model = ai.getGenerativeModel({
+    model: 'gemini-2.5-flash',
+    tools: [tools],
+    systemInstruction: { role: 'user', parts: [{ text: systemPrompt }] },
+    generationConfig: {
+      temperature: 0.7,
+      topP: 0.95,
+      topK: 40,
+      maxOutputTokens: 4096,
+    },
+  });
+
+  const toolCallLogs: ToolCallLog[] = [];
+
+  // Start with the user message
+  const contents: import('@google/generative-ai').Content[] = [
+    { role: 'user', parts: [{ text: userMessage }] },
+  ];
+
+  for (let i = 0; i < maxIterations; i++) {
+    const result = await model.generateContent({ contents });
+    const response = result.response;
+    const candidate = response.candidates?.[0];
+
+    if (!candidate) {
+      return { text: 'לא התקבלה תגובה מהמודל', toolCalls: toolCallLogs };
+    }
+
+    // Check if the model wants to call functions
+    const functionCalls = response.functionCalls();
+
+    if (!functionCalls || functionCalls.length === 0) {
+      // No more tool calls — return the final text
+      const text = response.text() || '';
+      return { text, toolCalls: toolCallLogs };
+    }
+
+    // Add the model's response (with function calls) to history
+    contents.push({ role: 'model', parts: candidate.content.parts });
+
+    // Execute each function call and collect responses
+    const functionResponses: import('@google/generative-ai').Part[] = [];
+
+    for (const fc of functionCalls) {
+      console.log(`[Gemini] 🔧 Tool call: ${fc.name}(${JSON.stringify(fc.args).substring(0, 100)})`);
+
+      const toolResult = await toolExecutor(fc.name, fc.args as Record<string, unknown>);
+
+      toolCallLogs.push({
+        toolName: fc.name,
+        toolArgs: fc.args as Record<string, unknown>,
+        toolResult,
+      });
+
+      functionResponses.push({
+        functionResponse: {
+          name: fc.name,
+          response: toolResult,
+        },
+      });
+    }
+
+    // Add function responses to history
+    contents.push({ role: 'user', parts: functionResponses });
+  }
+
+  // If we hit max iterations, return what we have
+  return {
+    text: 'הסוכן הגיע למגבלת הקריאות לכלים. התוצאה האחרונה שנמצאה מוצגת למעלה.',
+    toolCalls: toolCallLogs,
+  };
 }
 
 // #endregion

@@ -8,10 +8,17 @@
  * TaskDetailPanel — Modal for viewing and editing task details.
  * Supports view mode (default) and edit mode.
  */
+// #region Imports
+
 import { useState } from 'react';
 import { ExternalLink, ListChecks, FileText, Check, X, Edit3, Save, Plus, Trash2 } from 'lucide-react';
 import type { Task } from '../../types';
 import { PRIORITY_CONFIG, STATUS_CONFIG } from '../../../../data/calendarTypes';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   task: Task;
@@ -23,6 +30,12 @@ interface Props {
   onUpdateTask?: (id: string, updates: Partial<Omit<Task, 'id'>>) => void;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** TaskDetailPanel component — TaskDetailPanel component */
 export default function TaskDetailPanel({
   task, onClose, onToggle, onDelete, onNavigate, onUpdateSubTask, onUpdateTask,
 }: Props) {
@@ -259,3 +272,5 @@ export default function TaskDetailPanel({
     </div>
   );
 }
+
+// #endregion

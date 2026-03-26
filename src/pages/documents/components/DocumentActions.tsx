@@ -12,10 +12,11 @@
  * DEPENDENCIES: lucide-react, pdfLetterService, officeProfile
  */
 import { useState, useCallback } from 'react';
-import { Printer, Mail, MessageSquare, ArrowRight, Edit, Copy, FileDown } from 'lucide-react';
+import { Printer, Mail, MessageSquare, ArrowRight, Edit, Copy, FileDown, Download } from 'lucide-react';
 import { generateLetterPdf } from '../../../services/pdfLetterService';
 import { downloadBlob } from '../../../services/pdfFormService';
 import { getActiveProfile } from '../../../data/officeProfile';
+import { exportToWord } from '../../../services/wordExportService';
 
 // #region Types
 
@@ -110,6 +111,21 @@ export default function DocumentActions({ documentContent, subject, onBackToEdit
         label={pdfBusy ? 'מייצר...' : 'הפק PDF'}
         color="#a78bfa"
         onClick={handlePdfExport}
+      />
+      <ActionButton
+        icon={<Download size={18} />}
+        label="הורד Word"
+        color="#10b981"
+        onClick={() => {
+          const div = document.createElement('div');
+          div.innerHTML = documentContent;
+          const paragraphs = (div.textContent || '').split('\n').filter(l => l.trim());
+          exportToWord({
+            title: subject || 'מסמך',
+            filename: subject || 'מסמך',
+            sections: [{ paragraphs }],
+          });
+        }}
       />
       <ActionButton
         icon={<Printer size={18} />} label="הדפסה" color="#818cf8"

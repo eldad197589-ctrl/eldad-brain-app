@@ -18,7 +18,9 @@
  * - Filter by status
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { getAgentHistory, type AgentRunRecord } from '../../../services/agentMemory';
+import { getAgentById } from '../../../data/agentRegistry';
 import {
   Activity, Mail, FileUp, Clock, User,
   CheckCircle, Loader2, AlertTriangle, Eye,
@@ -67,9 +69,31 @@ const STATUS_CONFIG: Record<ActivityStatus, { label: string; color: string; bg: 
 
 // #endregion
 
-// #region Demo Data — Simulated Activity (Replace with real triggers later)
+// #region Real Data Conversion
 
-const ACTIVITY_FEED: ActivityItem[] = [
+/** Convert a real AgentRunRecord to an ActivityItem for display */
+function runToActivityItem(run: AgentRunRecord): ActivityItem {
+  const agent = getAgentById(run.agentId);
+  const toolsLabel = run.toolsUsed.length > 0
+    ? ` (${run.toolsUsed.length} כלים: ${run.toolsUsed.join(', ')})`
+    : '';
+
+  return {
+    id: run.id,
+    agentEmoji: agent?.emoji || '🤖',
+    agentName: agent?.name || run.agentId,
+    description: (run.stepDescription || 'שלב ביצוע') + toolsLabel,
+    trigger: 'manual' as TriggerType,
+    triggerDetail: `משימה ${run.missionId} — ${run.durationMs}ms`,
+    status: run.success ? 'done' : 'error',
+    processName: 'משימת סוכנים',
+    timestamp: run.createdAt,
+    output: run.outputText?.substring(0, 120),
+  };
+}
+
+// Demo data — shown when no real runs exist
+const DEMO_ACTIVITY: ActivityItem[] = [
   {
     id: 'AF-001', agentEmoji: '📥', agentName: 'סוכן איסוף',
     description: 'קיבל מייל מפקיד שומה — מכתב תזכורת חוב עבור דוד שמעון',
@@ -101,28 +125,6 @@ const ACTIVITY_FEED: ActivityItem[] = [
     timestamp: new Date(Date.now() - 60 * 60000).toISOString(),
     output: 'צ\'קליסט מלא — 12/12 עברו',
   },
-  {
-    id: 'AF-005', agentEmoji: '📊', agentName: 'סוכן ניתוח',
-    description: 'מנתח דוח רווח הון שהתקבל — חישוב מס אוטומטי',
-    trigger: 'email', triggerDetail: 'broker@ils.co.il',
-    status: 'working', processName: 'רווח הון',
-    timestamp: new Date(Date.now() - 5 * 60000).toISOString(),
-  },
-  {
-    id: 'AF-006', agentEmoji: '📥', agentName: 'סוכן קליטה',
-    description: 'ליד חדש מילא טופס באתר — נפתח תיק אוטומטית',
-    trigger: 'form', triggerDetail: 'טופס יצירת קשר — אתר',
-    status: 'done', clientName: 'ליד חדש', processName: 'קליטת לקוח',
-    timestamp: new Date(Date.now() - 90 * 60000).toISOString(),
-    output: 'תיק ליד נפתח — ממתין לשיחה ראשונית',
-  },
-  {
-    id: 'AF-007', agentEmoji: '✍️', agentName: 'סוכן ניסוח',
-    description: 'מכין מכתב הסבר לפקיד שומה — ביטול קנסות 2023-2024',
-    trigger: 'manual', triggerDetail: 'הוראת CEO',
-    status: 'working', clientName: 'דוד שמעון (אבא)', processName: 'ביטול קנסות',
-    timestamp: new Date(Date.now() - 8 * 60000).toISOString(),
-  },
 ];
 
 // #endregion
@@ -145,22 +147,41 @@ function timeAgo(timestamp: string): string {
 
 type FilterType = 'all' | 'working' | 'waiting_ceo' | 'done';
 
+/** AgentActivityFeed component — Live Agent Activity Dashboard */
 export default function AgentActivityFeed() {
   const [expanded, setExpanded] = useState(true);
   const [filter, setFilter] = useState<FilterType>('all');
+  const [realRuns, setRealRuns] = useState<ActivityItem[]>([]);
+
+  // Load real agent run history on mount
+  useEffect(() => {
+    getAgentHistory({ limit: 20 }).then(runs => {
+      if (runs.length > 0) {
+        setRealRuns(runs.map(runToActivityItem));
+      }
+    }).catch(() => { /* silent fallback */ });
+  }, []);
+
+  // Merge real runs (first) with demo data
+  const allActivity = useMemo(() => {
+    if (realRuns.length > 0) {
+      return [...realRuns, ...DEMO_ACTIVITY];
+    }
+    return DEMO_ACTIVITY;
+  }, [realRuns]);
 
   const filtered = useMemo(() => {
-    if (filter === 'all') return ACTIVITY_FEED;
-    return ACTIVITY_FEED.filter(a => a.status === filter);
-  }, [filter]);
+    if (filter === 'all') return allActivity;
+    return allActivity.filter(a => a.status === filter);
+  }, [filter, allActivity]);
 
   // Stats
   const stats = useMemo(() => ({
-    working: ACTIVITY_FEED.filter(a => a.status === 'working').length,
-    waitingCeo: ACTIVITY_FEED.filter(a => a.status === 'waiting_ceo').length,
-    done: ACTIVITY_FEED.filter(a => a.status === 'done').length,
-    total: ACTIVITY_FEED.length,
-  }), []);
+    working: allActivity.filter(a => a.status === 'working').length,
+    waitingCeo: allActivity.filter(a => a.status === 'waiting_ceo').length,
+    done: allActivity.filter(a => a.status === 'done').length,
+    total: allActivity.length,
+  }), [allActivity]);
 
   return (
     <div className="glass-card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20 }}>

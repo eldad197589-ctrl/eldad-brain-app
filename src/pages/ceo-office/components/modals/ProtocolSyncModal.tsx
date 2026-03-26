@@ -4,10 +4,17 @@
    DEPENDENCIES: react, lucide-react
    EXPORTS: ProtocolSyncModal (default)
    ============================================ */
+// #region Imports
+
 import { useState, useMemo } from 'react';
 import { Calendar, RefreshCw, Check } from 'lucide-react';
 import type { Meeting, Task } from '../../types';
 import { detectCategory } from '../../constants';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   meetings: Meeting[];
@@ -16,6 +23,12 @@ interface Props {
   onClose: () => void;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** ProtocolSyncModal component — ProtocolSyncModal component */
 export default function ProtocolSyncModal({ meetings, tasks, onAdd, onClose }: Props) {
   // Gather all topics from all meetings
   const allTopics = useMemo(() => {
@@ -127,3 +140,5 @@ export default function ProtocolSyncModal({ meetings, tasks, onAdd, onClose }: P
     </div>
   );
 }
+
+// #endregion

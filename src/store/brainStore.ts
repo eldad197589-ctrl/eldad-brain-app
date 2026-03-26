@@ -21,7 +21,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Meeting, Task } from '../data/calendarTypes';
-import { SEED_MEETINGS, SEED_TASKS } from '../data/calendarTypes';
+import { SEED_MEETINGS, SEED_TASKS } from '../data/calendarSeedData';
 import { isSupabaseConfigured } from '../services/supabaseClient';
 import * as db from '../services/supabaseService';
 
@@ -153,10 +153,29 @@ export const useBrainStore = create<BrainState>()(
             await db.bulkUpsertMeetings(currentMeetings);
           }
 
+          // Merge seed meetings into cloud — seed data is authoritative
+          // This ensures that code-level fixes (dates, agenda, etc.) always propagate
+          const seedIds = new Set(SEED_MEETINGS.map(m => m.id));
+          const mergedMeetings = [
+            ...SEED_MEETINGS,
+            ...((meetings as Meeting[]) || []).filter(m => !seedIds.has(m.id)),
+          ];
+
+          // Check if cloud is stale (seed differs from what cloud has)
+          const cloudNeedsUpdate = SEED_MEETINGS.some(seed => {
+            const cloud = (meetings as Meeting[] || []).find(m => m.id === seed.id);
+            return !cloud || cloud.date !== seed.date || cloud.title !== seed.title;
+          });
+
+          if (cloudNeedsUpdate) {
+            console.log('[Brain] 🔄 Seed meetings are newer than cloud — pushing update');
+            await db.bulkUpsertMeetings(mergedMeetings);
+          }
+
           set({
             syncStatus: 'cloud',
             ...(tasks && tasks.length > 0 ? { tasks } : {}),
-            ...(meetings && meetings.length > 0 ? { meetings } : {}),
+            meetings: mergedMeetings,
             ...(dailyNotes ? { dailyNotes } : {}),
             ...(knowledgeLog && knowledgeLog.length > 0 ? { knowledgeLog } : {}),
             ...(documents && documents.length > 0 ? { documents } : {}),
@@ -278,7 +297,7 @@ export const useBrainStore = create<BrainState>()(
     }),
     {
       name: 'brain-store',
-      version: 5,
+      version: 10,
       migrate: (persisted: unknown, version: number) => {
         const state = persisted as Record<string, unknown>;
         // v2 → v3: convert meeting topics from string[] to MeetingTopic[]
@@ -292,37 +311,19 @@ export const useBrainStore = create<BrainState>()(
               : m.topics,
           }));
         }
-        // v3 → v4: inject new signing meeting if missing, refresh register-robium task
-        if (version < 4) {
-          if (Array.isArray(state.meetings)) {
-            const meetings = state.meetings as Array<Record<string, unknown>>;
-            const hasNewMeeting = meetings.some(m => m.id === 'founders-signing-march-25-2026');
-            if (!hasNewMeeting) {
-              const newMeeting = SEED_MEETINGS.find(m => m.id === 'founders-signing-march-25-2026');
-              if (newMeeting) meetings.push(newMeeting as unknown as Record<string, unknown>);
-            }
-          }
-          if (Array.isArray(state.tasks)) {
-            const tasks = state.tasks as Array<Record<string, unknown>>;
-            const idx = tasks.findIndex(t => t.id === 'register-robium-ltd');
-            const updatedTask = SEED_TASKS.find(t => t.id === 'register-robium-ltd');
-            if (idx >= 0 && updatedTask) {
-              tasks[idx] = updatedTask as unknown as Record<string, unknown>;
-            }
-          }
+        // v6 → v7: full refresh — consolidated tasks + updated meetings
+        if (version < 7) {
+          state.tasks = SEED_TASKS as unknown;
+          state.meetings = SEED_MEETINGS as unknown;
         }
-        // v4 → v5: inject prepStages onto founders signing meeting
-        if (version < 5) {
-          if (Array.isArray(state.meetings)) {
-            const meetings = state.meetings as Array<Record<string, unknown>>;
-            const idx = meetings.findIndex(m => m.id === 'founders-signing-march-25-2026');
-            const seedMeeting = SEED_MEETINGS.find(m => m.id === 'founders-signing-march-25-2026');
-            if (idx >= 0 && seedMeeting?.prepStages) {
-              meetings[idx] = { ...meetings[idx], prepStages: seedMeeting.prepStages as unknown };
-            } else if (idx < 0 && seedMeeting) {
-              meetings.push(seedMeeting as unknown as Record<string, unknown>);
-            }
-          }
+        // v7 → v8: meeting date moved from 25/3 to 26/3 + updated agenda
+        if (version < 8) {
+          state.meetings = SEED_MEETINGS as unknown;
+          state.tasks = SEED_TASKS as unknown;
+        }
+        // v8 → v10: force refresh meetings — sync fix + authoritative seed merge
+        if (version < 10) {
+          state.meetings = SEED_MEETINGS as unknown;
         }
         return state;
       },

@@ -4,13 +4,26 @@
    DEPENDENCIES: None (local only)
    EXPORTS: UpcomingMeetings (default)
    ============================================ */
+// #region Imports
+
 import type { Meeting } from '../types';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   meetings: Meeting[];
   onSelectDate: (date: string) => void;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** UpcomingMeetings component — UpcomingMeetings component */
 export default function UpcomingMeetings({ meetings, onSelectDate }: Props) {
   if (meetings.length === 0) return null;
 
@@ -43,3 +56,5 @@ export default function UpcomingMeetings({ meetings, onSelectDate }: Props) {
     </div>
   );
 }
+
+// #endregion

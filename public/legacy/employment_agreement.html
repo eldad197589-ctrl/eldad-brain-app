@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הסכם העסקה — עובד חממה | Robium Technologies Ltd</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&family=Rubik:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e293b;
+            --secondary: #64748b;
+            --accent: #10b981;
+            --bg: #f8fafc;
+            --text: #0f172a;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.85;
+            margin: 0;
+            padding: 0;
+            font-size: 15px;
+        }
+
+        .document-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 60px 80px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border-top: 8px solid var(--accent);
+            border-radius: 8px;
+        }
+
+        @media print {
+            body { background: white; }
+            .document-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 30px;
+                border-top: none;
+            }
+            .no-print { display: none !important; }
+            .page-break { page-break-before: always; }
+        }
+
+        h1 {
+            font-family: 'Rubik', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-align: center;
+            margin: 0 0 4px;
+        }
+
+        h2 {
+            font-family: 'Rubik', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 8px;
+            margin: 36px 0 16px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--secondary);
+            font-size: 0.95rem;
+            margin: 0 0 30px;
+        }
+
+        .parties-box {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 24px 0;
+        }
+
+        .parties-box strong {
+            color: var(--primary);
+        }
+
+        .clause {
+            margin: 12px 0;
+            text-align: justify;
+        }
+
+        .clause-num {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .highlight-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+            color: #166534;
+        }
+
+        .warning-box {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+            color: #92400e;
+        }
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .signature-block {
+            text-align: center;
+            padding-top: 20px;
+        }
+
+        .signature-line {
+            border-bottom: 1px solid #334155;
+            height: 50px;
+            margin-bottom: 8px;
+        }
+
+        .signature-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .signature-role {
+            color: var(--secondary);
+            font-size: 0.82rem;
+        }
+
+        .appendix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        .appendix-table th,
+        .appendix-table td {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            text-align: right;
+        }
+
+        .appendix-table th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .btn-print {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Heebo', sans-serif;
+        }
+
+        .btn-print:hover {
+            filter: brightness(1.1);
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .fill-field {
+            display: inline-block;
+            min-width: 150px;
+            border-bottom: 1px dashed #94a3b8;
+            color: #94a3b8;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Toolbar -->
+    <div class="toolbar no-print" style="padding: 20px;">
+        <button class="btn-print" onclick="window.print()">🖨️ הדפסה / PDF</button>
+        <a href="/incubator/agreements" class="btn-print" style="background: #1e293b; text-decoration: none;">← חזרה למערכת</a>
+    </div>
+
+    <div class="document-container">
+
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="font-size: 0.8rem; color: var(--secondary); letter-spacing: 2px; margin-bottom: 8px;">ROBIUM TECHNOLOGIES LTD</div>
+            <h1>הסכם העסקה — עובד חממה</h1>
+            <p class="subtitle">Incubator Employment Agreement</p>
+            <div style="width: 60px; height: 3px; background: var(--accent); margin: 0 auto;"></div>
+        </div>
+
+        <!-- Date & Preamble -->
+        <p class="clause" style="text-align: center; font-weight: 600;">
+            שנערך ונחתם ביום <span class="fill-field">___</span> בחודש <span class="fill-field">___</span> שנת 2026
+        </p>
+
+        <!-- Parties -->
+        <div class="parties-box">
+            <p style="margin: 0 0 12px;"><strong>בין:</strong></p>
+            <p style="margin: 0 0 8px; padding-right: 20px;">
+                חברת <strong>רוביום טכנולוגיות בע"מ</strong> (ח.פ <span class="fill-field">____________</span>),
+                מרח' <span class="fill-field">____________</span>,
+                <span class="fill-field">____________</span>
+                (להלן: <strong>"החברה"</strong> או <strong>"המעסיק"</strong>)
+            </p>
+            <p style="margin: 12px 0 0;"><strong>לבין:</strong></p>
+            <p style="margin: 0; padding-right: 20px;">
+                <span class="fill-field">____________</span>,
+                ת.ז <span class="fill-field">____________</span>,
+                מרח' <span class="fill-field">____________</span>,
+                <span class="fill-field">____________</span>
+                (להלן: <strong>"העובד"</strong>)
+            </p>
+        </div>
+
+        <p class="clause" style="font-style: italic; color: var(--secondary);">
+            הואיל והחברה עוסקת בפיתוח מערכות בינה מלאכותית עסקיות, והעובד מעוניין להצטרף לתוכנית החממה (Incubator Program) של החברה כעובד שכיר, הצדדים מסכימים כדלקמן:
+        </p>
+
+        <!-- Section 1 -->
+        <h2>1. מבוא</h2>
+
+        <p class="clause">
+            <span class="clause-num">1.1</span>
+            החברה עוסקת בפיתוח מערכות AI עסקיות, ובכלל זה פתרונות אוטומציה, פרוטוקול ישיבות חכם, ומערכות ניהול מבוססות בינה מלאכותית.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">1.2</span>
+            החברה מעוניינת להעסיק את העובד במסגרת <strong>תוכנית החממה (Incubator Program)</strong> של החברה, והעובד מעוניין להיות מועסק כעובד שכיר בחברה, בהתאם לתנאים המפורטים בהסכם זה.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">1.3</span>
+            שני הצדדים מסכימים כי תנאי ההעסקה המפורטים בהסכם זה ממצים את מלוא ההסכמות ביניהם בנוגע לתנאי העבודה. בנוסף לתנאי הסכם זה, העובד זכאי לאופציות למניות החברה בהתאם ל<strong>הסכם הענקת אופציות נפרד</strong> (ESOP Grant Agreement) הנחתם במקביל.
+        </p>
+
+        <!-- Section 2 -->
+        <h2>2. התפקיד</h2>
+
+        <p class="clause">
+            <span class="clause-num">2.1</span>
+            <strong>תואר התפקיד:</strong> <span class="fill-field">____________</span>
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">2.2</span>
+            <strong>תיאור התפקיד:</strong> <span class="fill-field">____________</span>
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">2.3</span>
+            <strong>כפיפות:</strong> העובד יהיה כפוף ישירות ל<span class="fill-field">____________</span>.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">2.4</span>
+            העובד מתחייב להקדיש את מלוא מרצו, זמנו, כישוריו ויכולותיו המקצועיות לתפקידו בחברה, ולפעול לטובתה ולקידום מטרותיה.
+        </p>
+
+        <!-- Section 3 -->
+        <h2>3. תקופת ניסיון, ימי עבודה ומיקום</h2>
+
+        <p class="clause">
+            <span class="clause-num">3.1</span>
+            <strong>תאריך תחילת ההעסקה:</strong> <span class="fill-field">___/___/2026</span>.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">3.2</span>
+            <strong>תקופת ניסיון:</strong> ששת (6) החודשים הראשונים מיום תחילת ההעסקה יהוו תקופת ניסיון. במהלך תקופת הניסיון, כל אחד מהצדדים רשאי לסיים את ההסכם בהודעה מוקדמת בכתב של ארבעה-עשר (14) ימים.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">3.3</span>
+            <strong>היקף משרה:</strong> כמפורט בנספח השכר האישי (נספח ג') המצורף להסכם זה.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">3.4</span>
+            <strong>מסגרת ימי עבודה:</strong> העובד יועסק במתכונת של <strong>5 ימי עבודה בשבוע</strong> (ימים א'-ה'), בתקן של עד 42 שעות שבועיות (למשרה מלאה). ימי המנוחה השבועית נקבעים לימים שישי ושבת.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">3.5</span>
+            <strong>מקום עבודה ומודל היברידי:</strong> העבודה תבוצע ממשרדי החברה ב<span class="fill-field">____________</span>. עם זאת, בהתאם לאופי החממה הטכנולוגית, החברה מאפשרת <strong>עבודה מרחוק (Work From Home)</strong>, בכפוף לתיאום מול הממונה הישיר ובהתאם למדיניות החברה שתתעדכן מעת לעת.
+        </p>
+
+        <!-- Section 4 -->
+        <h2>4. שכר ותמורה</h2>
+
+        <p class="clause">
+            <span class="clause-num">4.1</span>
+            <strong>שכר יסוד (Base Salary):</strong> שכר העובד מורכב משכר יסוד ומרכיבים נוספים, כמפורט ב<strong>נספח השכר האישי</strong> (נספח ג') המצורף להסכם זה ומהווה חלק בלתי נפרד ממנו. מובהר במפורש כי <strong>שכר היסוד כשלעצמו</strong> (לפני כל תוספת, בונוס או תוספת שעות נוספות גלובליות) לא יפחת משכר המינימום הקבוע בחוק שכר מינימום, התשמ"ז-1987 (6,443.85 ₪ למשרה מלאה, החל מיום 01/04/2026), בהתאמה להיקף המשרה שנקבע.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">4.2</span>
+            <strong>מועד תשלום:</strong> השכר ישולם לחשבון הבנק של העובד <strong>עד ליום התשיעי (9)</strong> של כל חודש עבור חודש העבודה הקודם, בהתאם להוראות חוק הגנת השכר, התשי"ח-1958.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">4.3</span>
+            <strong>עדכון שכר:</strong> השכר הקבוע בנספח ג' ניתן לעדכון בכל עת בהסכמת שני הצדדים בכתב. בכל מקרה, שכר העובד ייבחן מחדש לאחר תקופה שלא תעלה על <strong>חודשיים (60 יום)</strong> מתחילת ההעסקה. השכר המעודכן ייקבע בהתחשב בתפקידו ואחריותו של העובד בפועל, ביצועיו ועמידתו ביעדי KPI, יכולת התזרים של החברה, ושכר שוק מקובל לתפקיד דומה.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">4.4</span>
+            <strong>שעות נוספות גלובליות:</strong> מוסכם כי מתוך התחשבות באופי תפקידו של העובד בחברת הייטק ו-AI (הדורש גמישות מירבית, שעות עבודה בלתי שגרתיות ומידה רבה של אמון ועצמאות), חלק מסך השכר הנקוב בנספח ג' מהווה <strong>"תוספת שעות נוספות גלובלית"</strong>. תוספת זו מהווה תמורה מלאה בגין עבודה במשרה מלאה ושעות נוספות, והיא מוסכמת חלף תשלום לפי שעות בפועל בהתאם לחוק שעות עבודה ומנוחה, התשי"א-1951.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">4.5</span>
+            <strong>רכיבי שכר נוספים:</strong> תשלומים נוספים, לרבות בונוסים, עמלות מכירה, ותוספות אחרות — ייקבעו בנספח השכר האישי או בהסכם נפרד.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">4.5</span>
+            <strong>אופציות:</strong> בנוסף לשכר, העובד זכאי לאופציות למניות החברה בהתאם ל<strong>הסכם הענקת אופציות נפרד</strong> (ESOP Grant Agreement) שנחתם במקביל להסכם זה. האופציות אינן מהוות חלק מתנאי ההעסקה ואינן נכללות בשכר הקובע לצורך חישוב הפרשות סוציאליות.
+        </p>
+
+        <div class="highlight-box">
+            <strong>💡 הבהרה:</strong> השכר האישי של כל עובד ייקבע במשא ומתן פרטני ויירשם בנספח ג'. הסכם מסגרת זה קובע את הרצפה החוקית (שכר מינימום) ואת תנאי ההעסקה הזהים לכל עובדי תוכנית החממה.
+        </div>
+
+        <!-- Section 5 -->
+        <h2>5. זכויות סוציאליות</h2>
+
+        <p class="clause">
+            <span class="clause-num">5.1</span>
+            <strong>ביטוח פנסיוני:</strong> החל מיום תחילת ההעסקה, החברה תפריש לביטוח פנסיוני (קרן פנסיה או ביטוח מנהלים, לפי בחירת העובד) בהתאם לצו ההרחבה לפנסיה חובה: הפרשת מעסיק לתגמולים — 6.5% מהשכר; הפרשת מעסיק לפיצויים — 6% מהשכר; ניכוי עובד לתגמולים — 6% מהשכר.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">5.2</span>
+            <strong>פיצויי פיטורים:</strong> הצדדים מסכימים כי הפרשות המעסיק לרכיב פיצויים (6%) יבואו במקום תשלום פיצויי פיטורים, בהתאם לסעיף 14 לחוק פיצויי פיטורים, התשכ"ג-1963. אישור לפי סעיף 14 יצורף כנספח להסכם.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">5.3</span>
+            <strong>ימי חופשה:</strong> העובד יהיה זכאי ל-12 ימי חופשה שנתית בתשלום על פי חוק חופשה שנתית, התשי"א-1951, או יותר — לפי קביעת החברה. ניצול החופשה יהיה בתיאום עם הממונה הישיר.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">5.4</span>
+            <strong>ימי מחלה:</strong> העובד יצבור ימי מחלה בהתאם לחוק דמי מחלה, התשל"ו-1976. הצבירה תהיה בשיעור של 1.5 ימים לחודש עבודה, ועד 18 ימים בשנה.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">5.5</span>
+            <strong>דמי הבראה:</strong> העובד יהיה זכאי לדמי הבראה בהתאם לצו ההרחבה: 7 ימי הבראה בשנה, בשיעור של 418 ₪ ליום (או בהתאם לתעריף המעודכן), אשר ישולמו לאחר השלמת שנת עבודה מלאה.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">5.6</span>
+            <strong>דמי נסיעות:</strong> העובד יהיה זכאי להחזר הוצאות נסיעה מביתו למקום העבודה ובחזרה, בהתאם לתעריף תחבורה ציבורית ועד לתקרה של 22.60 ₪ ליום עבודה.
+        </p>
+
+        <!-- Section 6 -->
+        <h2>6. סודיות (NDA)</h2>
+
+        <p class="clause">
+            <span class="clause-num">6.1</span>
+            העובד מתחייב בזאת לשמור בסודיות מוחלטת כל מידע סודי, מקצועי, מסחרי, טכנולוגי או כלכלי של החברה שהגיע או יגיע לידיעתו במהלך תקופת העסקתו, לרבות: קוד מקור, אלגוריתמי AI, מודלים שפתיים, רשימות לקוחות וספקים, תוכניות עסקיות ושיווקיות, נתונים פיננסיים, ומידע על עסקאות בהליך משא ומתן.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">6.2</span>
+            התחייבות זו תחול <strong>ללא הגבלת זמן</strong> — הן במהלך תקופת ההעסקה והן לאחר סיומה, מכל סיבה שהיא.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">6.3</span>
+            הפרת סעיף סודיות זה תקנה לחברה זכות לפיצויים מוסכמים בסך <strong>50,000 ₪ (חמישים אלף שקלים חדשים)</strong> ללא צורך בהוכחת נזק, ובנוסף לכל תרופה אחרת העומדת לחברה על פי דין.
+        </p>
+
+        <!-- Section 7 -->
+        <h2>7. קניין רוחני (IP)</h2>
+
+        <p class="clause">
+            <span class="clause-num">7.1</span>
+            כל קניין רוחני, אמצאה, פיתוח, קוד מקור, מודל AI, אפיון, עיצוב, או יצירה אחרת שנוצרו על ידי העובד <strong>במהלך עבודתו ו/או בקשר אליה</strong>, בין אם בשעות העבודה ובין אם מחוצה להן — <strong>שייכים לחברה באופן בלעדי ומוחלט</strong>, בהתאם לסעיף 132 לחוק הפטנטים, התשכ"ז-1967 (אמצאת שירות).
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">7.2</span>
+            העובד ממחה (Assign) בזאת לחברה באופן בלתי חוזר את כל זכויות הקניין הרוחני ביצירותיו, מוותר על זכותו לתמלוגים בגין אמצאות שירות (סעיף 134 לחוק הפטנטים), ומוותר על כל <strong>זכות מוסרית</strong> ביצירותיו (סעיפים 45-46 לחוק זכות יוצרים, התשס"ח-2007).
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">7.3</span>
+            העובד מתחייב לשתף פעולה באופן מלא עם החברה בכל הליך של רישום פטנטים, סימני מסחר, או כל קניין רוחני אחר לטובת החברה, הן במהלך ההעסקה והן לאחריה.
+        </p>
+
+        <!-- Section 8 -->
+        <h2>8. אי-תחרות ואי-שידול</h2>
+
+        <p class="clause">
+            <span class="clause-num">8.1</span>
+            <strong>אי-תחרות (Non-Compete):</strong> העובד מתחייב שלא לעסוק, במישרין או בעקיפין, בכל עסק, חברה, או מיזם המתחרים בעיסוקי החברה, למשך תקופה של <strong>שנים-עשר (12) חודשים</strong> ממועד סיום ההעסקה, בכל דרך שתהא.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">8.2</span>
+            <strong>אי-שידול (Non-Solicitation):</strong> העובד מתחייב שלא לשדל, לגייס, או להציע העסקה לכל עובד, יועץ, לקוח, או ספק של החברה, למשך תקופה של <strong>שמונה-עשר (18) חודשים</strong> ממועד סיום ההעסקה.
+        </p>
+
+        <!-- Section 9 -->
+        <h2>9. סיום העסקה</h2>
+
+        <p class="clause">
+            <span class="clause-num">9.1</span>
+            <strong>הודעה מוקדמת:</strong> לאחר תום תקופת הניסיון, סיום ההעסקה על ידי כל אחד מהצדדים יחייב מתן הודעה מוקדמת בכתב, בהתאם לחוק הודעה מוקדמת לפיטורים ולהתפטרות, התשס"א-2001: לעובד חודשי — יום לכל חודש עבודה בששת החודשים הראשונים; 6 ימים בתוספת של 2.5 ימים לכל חודש נוסף מהחודש השביעי ועד השנה; ולאחר שנת עבודה — חודש ימים.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">9.2</span>
+            <strong>פיצויי פיטורים:</strong> בהתאם להסכמת הצדדים בסעיף 5.2 לעיל ולאישור לפי סעיף 14 לחוק פיצויי פיטורים — הפרשות המעסיק לפנסיה יבואו במקום פיצויי פיטורים.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">9.3</span>
+            <strong>השפעה על אופציות:</strong> סיום ההעסקה ישפיע על זכויות העובד באופציות בהתאם לסעיפי Good Leaver ו-Bad Leaver שבהסכם הענקת האופציות הנפרד.
+        </p>
+
+        <!-- Section 10 -->
+        <h2>10. שונות</h2>
+
+        <p class="clause">
+            <span class="clause-num">10.1</span>
+            הסכם זה, יחד עם הסכם הענקת האופציות הנפרד ונספחיו, ממצים את מלוא ההסכמות בין הצדדים ומחליפים כל הסדר, הסכם, או הבנה קודמים, בין בכתב ובין בעל-פה.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">10.2</span>
+            כל שינוי, תיקון, או תוספת להסכם זה — אך ורק בכתב ובחתימת שני הצדדים.
+        </p>
+
+        <p class="clause">
+            <span class="clause-num">10.3</span>
+            <strong>דין וסמכות שיפוט:</strong> הדין החל על הסכם זה הוא דין מדינת ישראל. סמכות השיפוט הייחודית נתונה לבית הדין לעבודה בתל אביב-יפו.
+        </p>
+
+        <!-- Signatures -->
+        <h2>חתימות</h2>
+
+        <p class="clause" style="font-style: italic; color: var(--secondary);">
+            ולראיה באו הצדדים על החתום:
+        </p>
+
+        <div class="signature-grid">
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <div class="signature-name">רוביום טכנולוגיות בע"מ</div>
+                <div class="signature-role">אלדד דוד — מנכ"ל</div>
+            </div>
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <div class="signature-name" style="color: #94a3b8;">____________</div>
+                <div class="signature-role">העובד</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px; color: var(--secondary); font-size: 0.8rem;">
+            תאריך: ___/___/2026
+        </div>
+
+        <!-- Appendix -->
+        <div class="page-break"></div>
+
+        <h2 style="border-color: #f59e0b; color: #f59e0b;">נספח ג': נספח שכר אישי</h2>
+        <p class="clause" style="color: var(--secondary);">(למלא לכל עובד בנפרד — לפני חתימה)</p>
+
+        <table class="appendix-table">
+            <tr>
+                <th style="width: 40%;">שדה</th>
+                <th>ערך</th>
+            </tr>
+            <tr>
+                <td><strong>שם העובד</strong></td>
+                <td class="fill-field" style="min-width: auto;">____________</td>
+            </tr>
+            <tr>
+                <td><strong>מספר תעודת זהות</strong></td>
+                <td class="fill-field" style="min-width: auto;">____________</td>
+            </tr>
+            <tr>
+                <td><strong>תואר תפקיד</strong></td>
+                <td class="fill-field" style="min-width: auto;">____________</td>
+            </tr>
+            <tr>
+                <td><strong>היקף משרה</strong></td>
+                <td><span class="fill-field">____</span>% (100% = משרה מלאה)</td>
+            </tr>
+            <tr>
+                <td><strong>שכר חודשי כולל (ברוטו)</strong></td>
+                <td><span class="fill-field">____________</span> ₪</td>
+            </tr>
+            <tr>
+                <td style="padding-right: 30px; color: var(--secondary); font-size: 0.8rem;">— מתוכו: שכר יסוד משולב</td>
+                <td style="color: var(--secondary); font-size: 0.8rem;"><span class="fill-field">__________</span> ₪ (השכר הקובע לפנסיה)</td>
+            </tr>
+            <tr>
+                <td style="padding-right: 30px; color: var(--secondary); font-size: 0.8rem;">— מתוכו: תוספת שעות נוספות גלובליות</td>
+                <td style="color: var(--secondary); font-size: 0.8rem;"><span class="fill-field">__________</span> ₪</td>
+            </tr>
+            <tr>
+                <td><strong>מובהר: שכר היסוד לא יפחת משכר המינימום (01/04/2026)</strong></td>
+                <td>6,443.85 ₪ (משרה מלאה)</td>
+            </tr>
+            <tr>
+                <td><strong>בונוסים / עמלות</strong></td>
+                <td class="fill-field" style="min-width: auto;">____________</td>
+            </tr>
+            <tr>
+                <td><strong>מועד בחינת שכר מחדש</strong></td>
+                <td>לא יאוחר מ-<span class="fill-field">___/___/2026</span></td>
+            </tr>
+        </table>
+
+        <p class="clause" style="margin-top: 20px;"><strong>הערות נוספות:</strong></p>
+        <div style="border: 1px dashed var(--border); min-height: 60px; border-radius: 6px; padding: 12px;"></div>
+
+        <div class="signature-grid" style="margin-top: 30px;">
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <div class="signature-role">חתימת החברה</div>
+            </div>
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <div class="signature-role">חתימת העובד</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px; color: var(--secondary); font-size: 0.8rem;">
+            תאריך: ___/___/2026
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 50px; color: var(--secondary); font-size: 0.75rem; border-top: 1px solid var(--border); padding-top: 16px;">
+            הסכם העסקה — עובד חממה · Robium Technologies Ltd · המוח של אלדד
+        </div>
+
+    </div>
+
+</body>
+</html>

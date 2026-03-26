@@ -26,6 +26,8 @@ interface BriefItem {
   text: string;
   /** Urgency: 'critical' = red, 'warn' = yellow, 'info' = gray, 'success' = green */
   level: 'critical' | 'warn' | 'info' | 'success';
+  /** Optional pre-composed share message (AGI auto-generated) */
+  shareMessage?: string;
 }
 
 // #endregion
@@ -104,6 +106,45 @@ export default function MorningBrief() {
       }
     }
 
+    // Tomorrow's meeting — auto-prepare materials alert (AGI behavior)
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().slice(0, 10);
+    const tomorrowMeetings = meetings.filter((m) => m.date === tomorrowStr && !m.completed);
+    // Also check today's meetings for same-day reminder
+    const targetMeetings = tomorrowMeetings.length > 0
+      ? tomorrowMeetings
+      : meetings.filter((m) => m.date === todayStr && !m.completed);
+    if (targetMeetings.length > 0) {
+      const mtg = targetMeetings[0];
+      const isToday = mtg.date === todayStr;
+      const whenText = isToday ? 'היום' : 'מחר';
+
+      const shareMessage = [
+        `היי שותפים 👋`,
+        ``,
+        `לקראת הפגישה ${whenText} (${mtg.title}, ${mtg.time}):`,
+        ``,
+        `📋 מצורפת חבילת חומרים הכוללת:`,
+        `  • סדר יום`,
+        `  • טבלת אחזקות (Cap Table)`,
+        `  • סיכום ההסכם + שינויים עיקריים`,
+        `  • משימות אחרי החתימה`,
+        ``,
+        `📑 בנוסף מצורף מסמך "עקוב אחר שינויים" (Track Changes)`,
+        `   — כל מה שהשתנה מהטיוטה של 11/3 עד ההסכם הסופי.`,
+        ``,
+        `⏰ נתראה ב-${mtg.time}! 🚀`,
+      ].join('\n');
+
+      items.push({
+        icon: '📨',
+        text: `חומרים מוכנים לפגישת ${whenText} (${mtg.title}) — לחץ להעתקה`,
+        level: 'warn',
+        shareMessage,
+      });
+    }
+
     // Pending documents
     const pendingDocs = documents.filter((d) => d.status === 'pending');
     if (pendingDocs.length > 0) {
@@ -174,21 +215,37 @@ export default function MorningBrief() {
       <div style={{ padding: '10px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
         {briefItems.map((item, i) => {
           const colors = levelColors[item.level];
+          const isClickable = !!item.shareMessage;
           return (
-            <div key={i} style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: '8px 14px', borderRadius: 10,
-              background: colors.bg,
-              border: `1px solid ${colors.border}`,
-            }}>
+            <div
+              key={i}
+              onClick={() => {
+                if (item.shareMessage) {
+                  navigator.clipboard.writeText(item.shareMessage);
+                  alert('✅ ההודעה הועתקה! הדבק בוואטסאפ או אימייל.');
+                }
+              }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 14px', borderRadius: 10,
+                background: colors.bg,
+                border: `1px solid ${colors.border}`,
+                cursor: isClickable ? 'pointer' : 'default',
+                transition: 'all 0.2s',
+              }}
+            >
               <span style={{ fontSize: '1rem' }}>{item.icon}</span>
               <span style={{
                 fontSize: '0.85rem',
                 fontWeight: item.level === 'critical' ? 700 : 500,
                 color: colors.text,
+                flex: 1,
               }}>
                 {item.text}
               </span>
+              {isClickable && (
+                <span style={{ fontSize: '0.7rem', color: '#fbbf24', fontWeight: 600 }}>📋 העתק</span>
+              )}
             </div>
           );
         })}

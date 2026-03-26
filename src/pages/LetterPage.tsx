@@ -4,9 +4,18 @@
    DEPENDENCIES: react-router-dom, lucide-react
    EXPORTS: LetterPage (default)
    ============================================ */
-import { Link } from 'react-router-dom';
-import { Home, Printer, ArrowRight } from 'lucide-react';
+// #region Imports
 
+import { Link } from 'react-router-dom';
+import { Home, Printer, ArrowRight, Download } from 'lucide-react';
+import { exportToWord } from '../services/wordExportService';
+
+
+// #endregion
+
+// #region Component
+
+/** LetterPage component — LetterPage component */
 export default function LetterPage() {
   const handlePrint = () => window.print();
 
@@ -20,6 +29,34 @@ export default function LetterPage() {
         <Link to="/" className="flow-nav-btn"><Home size={16} /> דשבורד</Link>
         <button onClick={handlePrint} className="flow-nav-btn" style={{ border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
           <Printer size={16} /> הדפסה
+        </button>
+        <button onClick={() => {
+          exportToWord({
+            title: 'שחרור כספים בגין מכירת נכס בחו"ל',
+            subtitle: 'הלמן רבקה ואברהם יוסף',
+            filename: 'מכתב_הלמן_בנק_מרכנתיל',
+            sections: [
+              {
+                paragraphs: [
+                  'לכבוד',
+                  'הנהלת בנק מרכנתיל דיסקונט, סניף 686',
+                  'הנדון: שחרור כספים בגין מכירת נכס בחו"ל – הלמן רבקה ואברהם יוסף',
+                  'שלום רב,',
+                  'הננו פונים אליכם בשם מרשינו, רבקה הלמן (ת.ז. 058259326) ואברהם יוסף הלמן (ת.ז. 054254370), בנוגע לכספים שהתקבלו בחשבונם שמקורם במכירת דירה בחוץ לארץ.',
+                  'נמסר לנו כי כרגע נמנע מן הלקוחות לקבל את הכספים עד להנפקת דיווח ספציפי לרשות המסים.',
+                  '1. מדובר בעסקת מכירה של דירה בחו"ל (ארצות הברית).',
+                  '2. המס בגין העסקה שולם כדין בארצות הברית (ניכוי FIRPTA במקור).',
+                  '3. הנושא טופל מול רשויות המס בישראל.',
+                  'בהתאם לחוקי המס בישראל ולאור התחשבנות המס שבוצעה, מרשינו אינם נמצאים בחבות מס נוספת.',
+                  'אנו מבקשים לשחרר את הכספים לזכות הלקוחות לאלתר.',
+                  'בכבוד רב,',
+                  'ניהול דוד אלדד רו"ח',
+                ],
+              },
+            ],
+          });
+        }} className="flow-nav-btn" style={{ border: 'none', cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(16,185,129,0.15)', color: '#10b981' }}>
+          <Download size={16} /> הורד Word
         </button>
       </div>
 
@@ -158,3 +195,5 @@ export default function LetterPage() {
     </div>
   );
 }
+
+// #endregion

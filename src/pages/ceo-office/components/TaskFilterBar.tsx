@@ -33,11 +33,13 @@ const PRIORITY_PILLS = [
 ];
 
 const STATUS_PILLS = [
+  { value: 'not-done', label: '📂 פתוחות', color: '#c9a84c' },
   { value: 'todo', label: 'לביצוע', color: '#94a3b8' },
   { value: 'in-progress', label: 'בעבודה', color: '#3b82f6' },
   { value: 'done', label: 'הושלם', color: '#10b981' },
 ];
 
+/** TaskFilterBar component — TaskFilterBar component */
 export default function TaskFilterBar({
   categories, activeCategory, activePriority, activeStatus,
   searchQuery, onCategoryChange, onPriorityChange, onStatusChange, onSearchChange,

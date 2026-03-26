@@ -1,79 +1,46 @@
-/* ============================================
+/* ====================================================
    FILE: EldadSection.tsx
-   PURPOSE: EldadSection component
-   DEPENDENCIES: lucide-react
-   EXPORTS: EldadSection (default)
-   ============================================ */
-/**
- * EldadSection — CEO negotiation playbook (private)
- */
-import { Shield } from 'lucide-react';
+   PURPOSE: Founders portal section displaying Eldad's role, equity, and KPIs
+   DEPENDENCIES: ClauseCard, constants, agreementData
+   ==================================================== */
 
+// #region Imports
+import ClauseCardComponent from './ClauseCard';
+import { ELDAD_CLAUSES } from '../constants';
+import { EQUITY_TABLE } from '../../agreement/agreementData';
+import { Shield, ShieldAlert } from 'lucide-react';
+// #endregion
+
+// #region Component
+/**
+ * EldadSection — Displays Eldad's founder profile, equity stake, and KPI clause cards.
+ */
 export default function EldadSection() {
   return (
-    <div>
+    <div className="tab-pane animate-fade-in" style={{ padding: '20px 0' }}>
       <div style={{
-        background: 'var(--surface, #111827)', border: '1px solid rgba(255,255,255,0.06)',
-        borderRadius: 16, padding: '24px 28px', marginBottom: 24, borderTop: '4px solid #94a3b8',
+        background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(37,99,235,0.05))',
+        border: '1px solid rgba(59,130,246,0.2)',
+        borderRadius: 16, padding: '24px', marginBottom: 32
       }}>
-        <div style={{ display: 'flex', gap: 16 }}>
-          <div style={{ padding: 12, background: 'rgba(148,163,184,0.1)', borderRadius: 10, flexShrink: 0, height: 'fit-content' }}>
-            <Shield size={28} color="#94a3b8" />
-          </div>
-          <div>
-            <h2 style={{ margin: '0 0 8px', fontSize: '1.3rem', fontWeight: 700 }}>מערך שיחה למנכ"ל (לקראת הפגישה)</h2>
-            <p style={{ color: '#94a3b8', lineHeight: 1.7, margin: 0, fontSize: '0.9rem' }}>
-              אזור זה מיועד לעיניך בלבד (אלדד). זהו התסריט שלך לפתיחת פורטל העימות מבלי לייצר אנטגוניזם.
-            </p>
-          </div>
-        </div>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '0 0 16px', color: '#93c5fd' }}>
+          <Shield /> מנכ"ל זמני (Interim CEO), אדריכל הליבה העסקית — {EQUITY_TABLE[0].percent}
+        </h2>
+        <p style={{ color: '#bfdbfe', lineHeight: 1.6, margin: 0 }}>
+          "המוח" של החברה. הידע המקצועי, המומחיות במס ומשפט של 22 שנה והאלגוריתמיקה הקוגניטיבית הם
+          ה-IP החיוני ביותר ברוביום. ללא הידע הדומייני (Domain Oracle), המערכת היא טכנולוגיית כלי שרת נטולת יתרון יחסי אמיתי להציע לשוק העסקי.
+        </p>
       </div>
 
-      <div style={{
-        background: 'rgba(0,0,0,0.3)', borderRadius: 14, padding: 28,
-        border: '1px solid rgba(255,255,255,0.06)', borderLeft: '4px solid #f59e0b', marginBottom: 24,
-      }}>
-        <h3 style={{ color: '#fbbf24', fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '0.9rem' }}>
-          פתיח מומלץ למשא ומתן:
-        </h3>
-        <div style={{
-          background: 'rgba(0,0,0,0.3)', padding: 24, borderRadius: 10,
-          border: '1px solid rgba(255,255,255,0.04)', fontStyle: 'italic',
-          color: '#cbd5e1', fontSize: '0.95rem', lineHeight: 1.9, marginBottom: 24,
-        }}>
-          "חברים, אנחנו נכנסים לליגה של הגדולים. כדי שלא ניפול על משברי אמון או ציפיות בעוד חצי שנה,
-          פירקתי את ההסכם לחובות וזכויות מעשיות. זה לא מסמך 'יהיה בסדר'. כל אחד צריך להוכיח לעצמו ולשותפיו
-          שהוא מסוגל לעמוד באחריות שלו מול ההסכם.
-          <br /><br />
-          הכנתי לכם פורטל הערות אישי – המטרה היא שכל אחד מאיתנו פשוט יעבור על סעיפי הליבה שלו, יסתכל להסכם
-          בעיניים, ויאשרר את יכולתו לעמוד באופן מדיד ושקוף ביעדים ובאחריות שחלים עליו."
-        </div>
-
-        <h3 style={{ color: '#fbbf24', fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '0.9rem' }}>
-          אסטרטגיה מול הפוליטיקה:
-        </h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <span style={{ color: '#f59e0b', fontWeight: 800, fontSize: '1.3rem', flexShrink: 0 }}>1</span>
-            <div>
-              <strong style={{ color: '#f8fafc', display: 'block', marginBottom: 4 }}>אל תשמש "שוטר רע" במקום קיריל</strong>
-              <span style={{ color: '#94a3b8', fontSize: '0.88rem', lineHeight: 1.7 }}>
-                צילומי המסך חושפים את פילוסופיית הפעולה של קיריל: הוא רוצה ששותף ג' יעזוב/ירד ל-3%,
-                ומשתמש בך לבצע את ה-"חיסול" כי הוא מזהה שחיקה רגשית מצידך.
-              </span>
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <span style={{ color: '#f59e0b', fontWeight: 800, fontSize: '1.3rem', flexShrink: 0 }}>2</span>
-            <div>
-              <strong style={{ color: '#f8fafc', display: 'block', marginBottom: 4 }}>השתמש ב"מראה החוזית"</strong>
-              <span style={{ color: '#94a3b8', fontSize: '0.88rem', lineHeight: 1.7 }}>
-                במקום להגיד "את לא עושה כלום", תציג את הנספחים הנ"ל בצורה קרה ואובייקטיבית. אם השותף לא
-                תוכל להתחייב להכנסת מערכות מוסדיות או מכסות AI – ההסכם עצמו ידחוף אותה החוצה.
-              </span>
-            </div>
-          </div>
-        </div>
+      <h3 style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: 12, marginBottom: 24, color: '#f8fafc' }}>
+        <ShieldAlert size={20} style={{ verticalAlign: 'middle', marginLeft: 8 }} />
+        יעדי ביצוע וסמכויות (KPIs)
+      </h3>
+      
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
+        {ELDAD_CLAUSES.map(clause => (
+          <ClauseCardComponent key={clause.title} clause={clause} />
+        ))}
       </div>
     </div>
   );

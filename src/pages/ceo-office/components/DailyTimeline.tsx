@@ -8,7 +8,14 @@
  * DailyTimeline — Vertical timeline view showing meetings as time blocks
  * and undated tasks at the top.
  */
+// #region Imports
+
 import type { Meeting, Task } from '../types';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   selectedDate: string;
@@ -18,6 +25,9 @@ interface Props {
 }
 
 /** Hours displayed in the timeline (8AM to 8PM) */
+
+// #endregion
+
 const HOURS = Array.from({ length: 13 }, (_, i) => i + 8); // 8..20
 
 /** Convert HH:mm to pixel offset (60px per hour) */
@@ -26,6 +36,9 @@ function timeToOffset(time: string): number {
   return (h - 8) * 60 + m;
 }
 
+// #region Component
+
+/** DailyTimeline component — DailyTimeline component */
 export default function DailyTimeline({ selectedDate: _selectedDate, selectedDateLabel, meetings, tasks }: Props) {
   const pendingTasks = tasks.filter(t => t.status !== 'done');
   const totalHeight = 12 * 60; // 12 hours * 60px
@@ -153,3 +166,5 @@ export default function DailyTimeline({ selectedDate: _selectedDate, selectedDat
     </div>
   );
 }
+
+// #endregion

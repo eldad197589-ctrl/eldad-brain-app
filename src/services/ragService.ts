@@ -19,15 +19,12 @@
 import type { KnowledgeChunk } from './knowledgeChunker';
 import { chunkMarkdown, KNOWLEDGE_FILES } from './knowledgeChunker';
 import { getEmbedding, isAIConfigured, sendBrainMessage } from './geminiService';
-import { getSupabase, isSupabaseConfigured } from './supabaseClient';
+import { isSupabaseConfigured } from './supabaseClient';
+import type { IndexedChunk } from './ragPersistence';
+import { loadEmbeddingsFromSupabase, saveEmbeddingsToSupabase } from './ragPersistence';
+import { extractFlowchartKnowledge, FLOWCHART_FILES } from './flowchartExtractor';
 
 // #region Types
-
-/** A chunk with its embedding vector */
-interface IndexedChunk extends KnowledgeChunk {
-  /** Embedding vector (from Gemini text-embedding-004) */
-  embedding: number[];
-}
 
 /** RAG initialization status */
 export type RAGStatus = 'idle' | 'indexing' | 'ready' | 'error' | 'fallback';
@@ -86,6 +83,43 @@ async function loadKnowledgeFiles(): Promise<Record<string, string>> {
 
 // #endregion
 
+// #region Flowchart Loading
+
+/**
+ * Load all flowchart HTML files and extract knowledge as markdown.
+ * Uses Vite import.meta.glob for dynamic loading at build time.
+ *
+ * @returns Map of filename → extracted markdown content
+ */
+async function loadFlowchartFiles(): Promise<Record<string, string>> {
+  const modules = import.meta.glob('/../flowchart-*.html', {
+    query: '?raw',
+    import: 'default',
+  });
+
+  const result: Record<string, string> = {};
+
+  for (const [path, loader] of Object.entries(modules)) {
+    const filename = path.split('/').pop() || '';
+    if (FLOWCHART_FILES.includes(filename as typeof FLOWCHART_FILES[number])) {
+      try {
+        const htmlContent = await loader() as string;
+        const markdown = extractFlowchartKnowledge(htmlContent, filename);
+        if (markdown.length > 50) {
+          result[filename] = markdown;
+        }
+      } catch (err) {
+        console.warn(`[RAG] Failed to load flowchart ${filename}:`, err);
+      }
+    }
+  }
+
+  console.log(`[RAG] 📊 Loaded ${Object.keys(result).length} flowchart files`);
+  return result;
+}
+
+// #endregion
+
 // #region Initialization
 
 /**
@@ -101,7 +135,7 @@ export async function initializeRAG(): Promise<RAGStatus> {
   console.log('[RAG] 🔄 Initializing knowledge index...');
 
   try {
-    // Step 1: Load and chunk all knowledge files
+    // Step 1a: Load and chunk all knowledge markdown files
     const files = await loadKnowledgeFiles();
     rawChunks = [];
 
@@ -110,7 +144,15 @@ export async function initializeRAG(): Promise<RAGStatus> {
       rawChunks.push(...chunks);
     }
 
-    console.log(`[RAG] 📄 Chunked ${Object.keys(files).length} files → ${rawChunks.length} chunks`);
+    // Step 1b: Load and chunk flowchart HTML files (extracted to markdown)
+    const flowchartFiles = await loadFlowchartFiles();
+    for (const [filename, markdownContent] of Object.entries(flowchartFiles)) {
+      const chunks = chunkMarkdown(markdownContent, filename);
+      rawChunks.push(...chunks);
+    }
+
+    const totalSources = Object.keys(files).length + Object.keys(flowchartFiles).length;
+    console.log(`[RAG] 📄 Chunked ${totalSources} files (${Object.keys(files).length} md + ${Object.keys(flowchartFiles).length} flowcharts) → ${rawChunks.length} chunks`);
 
     // Step 2: Try to load embeddings from Supabase cache
     if (isSupabaseConfigured()) {
@@ -158,6 +200,63 @@ export async function initializeRAG(): Promise<RAGStatus> {
     ragStatus = 'error';
     return ragStatus;
   }
+}
+
+// #endregion
+
+
+// #region Local File Ingestion
+
+/**
+ * Ingest new chunks dynamically (e.g., from a user uploading local PDFs/Docx).
+ * Generates embeddings and saves to Supabase.
+ *
+ * @param newChunks - The newly extracted chunks
+ * @returns Number of successfully ingested chunks
+ */
+export async function ingestLocalRawText(newChunks: KnowledgeChunk[]): Promise<number> {
+  if (ragStatus !== 'ready') {
+    throw new Error('RAG system must be ready before ingesting local files.');
+  }
+
+  console.log(`[RAG] 📥 Ingesting ${newChunks.length} new chunks from local files...`);
+  
+  const newIndexed: IndexedChunk[] = [];
+  
+  // Generate embeddings for the new chunks
+  for (let i = 0; i < newChunks.length; i++) {
+    const chunk = newChunks[i];
+    
+    // Create a deterministic ID
+    const id = `local_${Date.now()}_${i}_${Math.random().toString(36).substring(7)}`;
+    
+    // Combine text for embedding
+    const textForEmbedding = `${chunk.sourceFile}\n${chunk.parentTitle}\n${chunk.sectionTitle}\n${chunk.content}`;
+    
+    try {
+      const vector = await getEmbedding(textForEmbedding);
+      newIndexed.push({
+        ...chunk,
+        id,
+        embedding: vector
+      });
+    } catch (err) {
+      console.warn(`[RAG] Failed to embed local chunk ${i + 1}/${newChunks.length}`, err);
+    }
+  }
+
+  if (newIndexed.length > 0) {
+    // Add to memory
+    indexedChunks = [...indexedChunks, ...newIndexed];
+    
+    // Save to Supabase
+    if (isSupabaseConfigured()) {
+      await saveEmbeddingsToSupabase(indexedChunks);
+      console.log(`[RAG] 💾 Saved ${newIndexed.length} new embeddings to Supabase.`);
+    }
+  }
+
+  return newIndexed.length;
 }
 
 // #endregion
@@ -233,172 +332,24 @@ export function getChunkCount(): number {
 
 // #endregion
 
-// #region Semantic Search
+// #region Search (delegated to ragSearch.ts)
+
+import { semanticSearch as _semanticSearch, keywordSearch as _keywordSearch } from './ragSearch';
 
 /**
  * Search using cosine similarity on embedding vectors.
- *
- * @param question - Query text
- * @param topK - Number of results
- * @returns Top-K most similar chunks
+ * Delegates to ragSearch.ts, passing in-memory state.
  */
 async function semanticSearch(question: string, topK: number): Promise<KnowledgeChunk[]> {
-  try {
-    const questionEmb = await getEmbedding(question);
-    if (questionEmb.length === 0) return keywordSearch(question, topK);
-
-    // Calculate cosine similarity for each chunk
-    const scored = indexedChunks
-      .filter(chunk => chunk.embedding.length > 0)
-      .map(chunk => ({
-        chunk,
-        score: cosineSimilarity(questionEmb, chunk.embedding),
-      }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, topK);
-
-    return scored.map(s => s.chunk);
-  } catch {
-    return keywordSearch(question, topK);
-  }
+  return _semanticSearch(question, topK, indexedChunks);
 }
 
 /**
- * Cosine similarity between two vectors.
- *
- * @param vecA - First vector
- * @param vecB - Second vector
- * @returns Similarity score between -1 and 1
- */
-function cosineSimilarity(vecA: number[], vecB: number[]): number {
-  if (vecA.length !== vecB.length || vecA.length === 0) return 0;
-
-  let dotProduct = 0;
-  let normA = 0;
-  let normB = 0;
-
-  for (let i = 0; i < vecA.length; i++) {
-    dotProduct += vecA[i] * vecB[i];
-    normA += vecA[i] * vecA[i];
-    normB += vecB[i] * vecB[i];
-  }
-
-  const denominator = Math.sqrt(normA) * Math.sqrt(normB);
-  return denominator === 0 ? 0 : dotProduct / denominator;
-}
-
-// #endregion
-
-// #region Keyword Fallback
-
-/**
- * Simple keyword-based search fallback when embeddings are unavailable.
- *
- * @param question - Query text
- * @param topK - Number of results
- * @returns Top-K matching chunks by keyword overlap
+ * Keyword-based search fallback.
+ * Delegates to ragSearch.ts, passing in-memory state.
  */
 function keywordSearch(question: string, topK: number): KnowledgeChunk[] {
-  const queryTokens = tokenize(question);
-  if (queryTokens.length === 0) return [];
-
-  const scored = rawChunks.map(chunk => {
-    const chunkTokens = new Set(tokenize(chunk.content));
-    const matchCount = queryTokens.filter(t => chunkTokens.has(t)).length;
-    return { chunk, score: matchCount / queryTokens.length };
-  });
-
-  return scored
-    .filter(s => s.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topK)
-    .map(s => s.chunk);
-}
-
-/**
- * Tokenize text into lowercase words, filtering out short/common words.
- *
- * @param text - Input text
- * @returns Array of meaningful tokens
- */
-function tokenize(text: string): string[] {
-  return text
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
-    .split(/\s+/)
-    .filter(word => word.length > 2);
-}
-
-// #endregion
-
-// #region Supabase Persistence
-
-/**
- * Load cached embeddings from Supabase.
- *
- * @returns Indexed chunks from DB, or null if unavailable
- */
-async function loadEmbeddingsFromSupabase(): Promise<IndexedChunk[] | null> {
-  const sb = getSupabase();
-  if (!sb) return null;
-
-  try {
-    const { data, error } = await sb
-      .from('knowledge_embeddings')
-      .select('*')
-      .order('chunk_index');
-
-    if (error || !data) return null;
-
-    return data.map(row => ({
-      id: `${row.source_file}-${row.chunk_index}`,
-      content: row.content as string,
-      sourceFile: row.source_file as string,
-      chunkIndex: row.chunk_index as number,
-      sectionTitle: (row.metadata as Record<string, string>)?.sectionTitle || '',
-      parentTitle: (row.metadata as Record<string, string>)?.parentTitle || '',
-      embedding: row.embedding as number[],
-    }));
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Save embeddings to Supabase for caching.
- *
- * @param chunks - Indexed chunks with embeddings
- */
-async function saveEmbeddingsToSupabase(chunks: IndexedChunk[]): Promise<void> {
-  const sb = getSupabase();
-  if (!sb) return;
-
-  try {
-    // Clear existing embeddings
-    await sb.from('knowledge_embeddings').delete().neq('id', 0);
-
-    // Insert new ones in batches
-    const batchSize = 50;
-    for (let i = 0; i < chunks.length; i += batchSize) {
-      const batch = chunks.slice(i, i + batchSize).map(chunk => ({
-        content: chunk.content,
-        source_file: chunk.sourceFile,
-        chunk_index: chunk.chunkIndex,
-        embedding: chunk.embedding,
-        metadata: {
-          sectionTitle: chunk.sectionTitle,
-          parentTitle: chunk.parentTitle,
-        },
-      }));
-
-      const { error } = await sb.from('knowledge_embeddings').insert(batch);
-      if (error) console.warn('[RAG] Supabase save error:', error.message);
-    }
-
-    console.log(`[RAG] ☁️ Saved ${chunks.length} embeddings to Supabase`);
-  } catch (err) {
-    console.warn('[RAG] Failed to save embeddings to Supabase:', err);
-  }
+  return _keywordSearch(question, topK, rawChunks);
 }
 
 // #endregion

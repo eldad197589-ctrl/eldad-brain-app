@@ -16,6 +16,7 @@ import { X, Users, Clock, Calendar, ExternalLink, CheckCircle2, ChevronLeft, Plu
 import type { Meeting, Task } from '../../types';
 import MeetingPrepView from '../MeetingPrepView';
 import EditPrepModal from './EditPrepModal';
+import DynamicWorkspace from './DynamicWorkspace';
 import { useBrainStore } from '../../../../store/brainStore';
 // #endregion
 
@@ -181,7 +182,14 @@ export default function MeetingDetailPanel({ meeting, tasks, onClose, onNavigate
           </div>
         </div>
 
-        {/* Preparation Stages (War Room) */}
+        {/* Dynamic Workspace — Real tasks, auto-links, notes */}
+        <DynamicWorkspace
+          meeting={liveMeeting}
+          onNavigate={onNavigate}
+          onClose={onClose}
+        />
+
+        {/* Static Preparation Stages (legacy — messages, templates) */}
         {liveMeeting.prepStages && liveMeeting.prepStages.length > 0 && (
           <MeetingPrepView
             meetingId={liveMeeting.id}

@@ -4,16 +4,29 @@
    DEPENDENCIES: react, lucide-react
    EXPORTS: QuickAddTask (default)
    ============================================ */
+// #region Imports
+
 import { useState, useEffect, useRef } from 'react';
 import { Zap, Plus } from 'lucide-react';
 import type { Task } from '../types';
 import { detectCategory } from '../constants';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   onAdd: (t: Omit<Task, 'id'>) => void;
   defaultDate: string;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** QuickAddTask component — QuickAddTask component */
 export default function QuickAddTask({ onAdd, defaultDate }: Props) {
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState<Task['priority']>('medium');
@@ -68,3 +81,5 @@ export default function QuickAddTask({ onAdd, defaultDate }: Props) {
     </div>
   );
 }
+
+// #endregion

@@ -7,13 +7,26 @@
 /**
  * ViewToggle — Dashboard view mode selector (brain / categories / list)
  */
+// #region Imports
+
 import type { ViewMode } from '../types';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   view: ViewMode;
   onViewChange: (v: ViewMode) => void;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** ViewToggle component — ViewToggle component */
 export default function ViewToggle({ view, onViewChange }: Props) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
@@ -31,3 +44,5 @@ export default function ViewToggle({ view, onViewChange }: Props) {
     </div>
   );
 }
+
+// #endregion

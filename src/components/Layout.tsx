@@ -16,6 +16,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X, Calendar, Search, Eye, EyeOff } from 'lucide-react';
 import CollapsibleSection from './CollapsibleSection';
 import CommandPalette from './CommandPalette';
+import BrainChat from './BrainChat';
 import Breadcrumbs from './Breadcrumbs';
 import { useRecentPages } from '../hooks/useRecentPages';
 import { SIDEBAR_SECTIONS } from '../data/sidebarNav';
@@ -61,6 +62,23 @@ export default function Layout() {
         <div key={`divider-${item.label}`} className="sidebar-divider">
           {item.label}
         </div>
+      );
+    }
+
+    if (item.to.startsWith('http') || item.to.startsWith('/legacy/')) {
+      return (
+        <a
+          key={item.to + item.label}
+          href={item.to}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="nav-item"
+          style={item.dim ? { opacity: 0.45, fontSize: '0.82rem' } : undefined}
+          onClick={() => setSidebarOpen(false)}
+        >
+          <span style={{ fontSize: '1.1rem', width: 20, textAlign: 'center' }}>{item.emoji}</span>
+          {item.label}
+        </a>
       );
     }
 
@@ -178,6 +196,7 @@ export default function Layout() {
         />
       )}
 
+      <BrainChat />
       <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </div>
   );

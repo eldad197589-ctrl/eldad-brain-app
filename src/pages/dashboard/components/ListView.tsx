@@ -15,6 +15,7 @@ interface Props {
   flowchartCount: number;
 }
 
+/** ListView component — ListView component */
 export default function ListView({ neuronCount, flowchartCount }: Props) {
   return (
     <div>
@@ -25,6 +26,10 @@ export default function ListView({ neuronCount, flowchartCount }: Props) {
         <StatCard icon={<FolderOpen size={28} />} number={String(neuronCount)} label="תהליכים מתועדים" color="#fbbf24" />
         <StatCard icon={<CheckCircle size={28} />} number="22+" label="שנות ניסיון" color="#34d399" />
       </div>
+
+      <ProcessSection title="💰 קליטת לקוחות ותמחור">
+        <CaseCard href="/quotes-generator" badge="כלי AI" badgeType="tool" title='מחולל הצעות מחיר (Smart Bareau)' subtitle='הפקת הצעת מחיר אוטומטית מבוססת מחירון משרד' />
+      </ProcessSection>
 
       <ProcessSection title="💰 רווח הון — מכירת נכס בחו״ל">
         <CaseCard href="/flow/capital-gains" badge="תרשים" badgeType="ready" title='תרשים זרימה — חישוב רווח הון סעיף 91' subtitle='7 שלבים · פורמולות · טופס 1399 · שע"ח' num="#1" />

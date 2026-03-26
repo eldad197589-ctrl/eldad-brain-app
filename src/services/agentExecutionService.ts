@@ -1,22 +1,26 @@
 /* ============================================
    FILE: agentExecutionService.ts
-   PURPOSE: agentExecutionService module
-   DEPENDENCIES: None (local only)
-   EXPORTS: StepExecutionResult
+   PURPOSE: Real AI execution engine with dual mode — legacy (text-only) + tool mode (Function Calling)
+   DEPENDENCIES: geminiService.ts, agentRegistry.ts, ragService.ts, agentTools.ts, agentMemory.ts
+   EXPORTS: StepExecutionResult, executeAgentStep, runFullMission
    ============================================ */
 /**
- * FILE: agentExecutionService.ts
- * PURPOSE: Real AI execution engine for agent mission steps
- * DEPENDENCIES: geminiService.ts, agentRegistry.ts, ragService.ts
+ * Agent Execution Service — The Engine That Runs Agents
  *
- * Executes agent steps by building agent-specific prompts,
- * injecting mission context and previous step outputs (handoff),
- * and calling Gemini for real AI responses.
+ * Two execution modes:
+ * 1. **Legacy Mode** — Agent gets a prompt, returns text (original behavior)
+ * 2. **Tool Mode** — Agent can call tools via Gemini Function Calling (AGI mode)
+ *
+ * Tool Mode is used when available; Legacy Mode is the fallback.
+ * Every execution is recorded in AgentMemory for persistent history.
  */
 
-import { sendBrainMessage, isAIConfigured, type ChatMessage } from './geminiService';
+import { sendBrainMessage, sendWithTools, isAIConfigured, type ChatMessage } from './geminiService';
 import { queryKnowledge, getRAGStatus } from './ragService';
 import { AGENTS, type Mission, type MissionStep } from '../data/agentRegistry';
+import { getToolsForAgent, getToolDeclarations, executeToolCall } from './agentTools';
+import { saveAgentRun, saveToolResult } from './agentMemory';
+import { buildAgentPrompt, parseHandoffPayload, type HandoffPayload } from './agentPromptBuilder';
 
 // #region Types
 
@@ -30,103 +34,138 @@ export interface StepExecutionResult {
   error?: string;
   /** Execution duration in ms */
   durationMs: number;
+  /** Names of tools used (if tool mode) */
+  toolsUsed?: string[];
+  /** Execution mode that was used */
+  mode?: 'legacy' | 'tool';
+  /** Structured handoff payload parsed from output */
+  handoff?: HandoffPayload;
 }
 
 // #endregion
 
-// #region Prompt Building
+// #region Tool Mode Execution
 
 /**
- * Build an agent-specific system prompt for step execution.
+ * Execute a step using Gemini Function Calling (Tool Mode).
+ * The agent can call tools autonomously during generation.
  *
  * @param mission - The parent mission
  * @param step - The step to execute
- * @param previousOutputs - Outputs from completed previous steps (handoff)
- * @returns Formatted prompt for Gemini
+ * @param agentPrompt - Pre-built agent system prompt
+ * @returns Execution result with tool usage details
  */
-function buildAgentPrompt(
+async function executeWithTools(
   mission: Mission,
   step: MissionStep,
-  previousOutputs: string[],
-): string {
-  const agent = AGENTS.find(a => a.id === step.agentId);
-  const agentName = agent?.name || step.agentId;
-  const agentEmoji = agent?.emoji || '🤖';
-  const capabilities = agent?.capabilities.join(', ') || 'כללי';
-
-  let prompt = `אתה סוכן AI בשם "${agentEmoji} ${agentName}".
-
-═══ תפקידך ═══
-${agent?.description || 'סוכן AI במערכת המוח של אלדד'}
-
-═══ יכולות ═══
-${capabilities}
-
-═══ משימה ═══
-שם המערכת: ${mission.systemName}
-מצב: ${mission.mode === 'build' ? 'בנייה חדשה' : 'ביקורת ותיקון'}
-הוראת CEO: ${mission.instruction}
-
-═══ השלב שלך ═══
-${step.description}
-
-═══ כללים ═══
-1. ענה בעברית מקצועית
-2. היה ממוקד ומעשי — לא תיאורטי
-3. אם אתה לא בטוח — אמור שאתה לא בטוח
-4. תן פלט מובנה וברור (רשימות, טבלאות, שלבים)
-5. אל תמציא נתונים — עבוד רק עם מה שיש`;
-
-  // Add handoff from previous steps
-  if (previousOutputs.length > 0) {
-    prompt += '\n\n═══ ממצאי סוכנים קודמים ═══';
-    previousOutputs.forEach((output, i) => {
-      const prevStep = mission.steps[i];
-      const prevAgent = AGENTS.find(a => a.id === prevStep?.agentId);
-      prompt += `\n\n--- ${prevAgent?.emoji || '📋'} ${prevAgent?.name || `שלב ${i + 1}`} ---\n${output}`;
-    });
-    prompt += '\n═══ סוף ממצאים קודמים ═══';
-    prompt += '\n\nהשתמש בממצאים שלמעלה כבסיס לעבודתך. המשך מאיפה שהסוכן הקודם הפסיק.';
-  }
-
-  return prompt;
-}
-
-// #endregion
-
-// #region Execution
-
-/**
- * Execute a single agent step with AI.
- *
- * @param mission - The parent mission
- * @param step - The step to execute
- * @returns Execution result with output text
- */
-export async function executeAgentStep(
-  mission: Mission,
-  step: MissionStep,
+  agentPrompt: string,
 ): Promise<StepExecutionResult> {
   const startTime = Date.now();
+  const agent = AGENTS.find(a => a.id === step.agentId);
+  const agentLayer = agent?.layer || 'command';
+  const tools = getToolsForAgent(agentLayer);
 
-  if (!isAIConfigured()) {
+  if (tools.length === 0) {
+    return executeLegacy(mission, step, agentPrompt);
+  }
+
+  const toolDeclarations = getToolDeclarations(tools);
+  const toolCallNames: string[] = [];
+
+  try {
+    const result = await sendWithTools(
+      agentPrompt,
+      `בצע את השלב: ${step.description}`,
+      toolDeclarations,
+      async (name, args) => {
+        toolCallNames.push(name);
+        const toolResult = await executeToolCall(name, args);
+
+        // Save tool result to memory
+        await saveToolResult({
+          runId: `${mission.id}_${step.id}`,
+          toolName: name,
+          toolInput: args,
+          toolOutput: toolResult,
+          success: (toolResult.success as boolean) !== false,
+        });
+
+        return toolResult;
+      },
+    );
+
+    const durationMs = Date.now() - startTime;
+
+    // Save run to memory
+    await saveAgentRun({
+      missionId: mission.id,
+      agentId: step.agentId,
+      stepId: step.id,
+      stepDescription: step.description,
+      inputPrompt: agentPrompt.substring(0, 2000),
+      outputText: result.text.substring(0, 5000),
+      toolsUsed: toolCallNames,
+      durationMs,
+      success: true,
+    });
+
+    console.log(`[Agent] ✅ Step ${step.id} (tool mode) — ${toolCallNames.length} tool calls, ${durationMs}ms`);
+
+    return {
+      output: result.text,
+      success: true,
+      durationMs,
+      toolsUsed: toolCallNames,
+      mode: 'tool',
+      handoff: parseHandoffPayload(result.text),
+    };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'שגיאה לא ידועה';
+    console.error(`[Agent] ❌ Step ${step.id} (tool mode) failed:`, err);
+
+    await saveAgentRun({
+      missionId: mission.id,
+      agentId: step.agentId,
+      stepId: step.id,
+      stepDescription: step.description,
+      toolsUsed: toolCallNames,
+      durationMs: Date.now() - startTime,
+      success: false,
+      errorMessage,
+    });
+
     return {
       output: '',
       success: false,
-      error: 'מפתח ה-API של Gemini לא מוגדר. לא ניתן להריץ סוכנים.',
+      error: errorMessage,
       durationMs: Date.now() - startTime,
+      toolsUsed: toolCallNames,
+      mode: 'tool',
     };
   }
+}
+
+// #endregion
+
+// #region Legacy Mode Execution
+
+/**
+ * Execute a step in legacy mode (text-only, no tools).
+ * Original behavior preserved for backward compatibility.
+ *
+ * @param mission - The parent mission
+ * @param step - The step to execute
+ * @param agentPrompt - Pre-built agent system prompt
+ * @returns Execution result
+ */
+async function executeLegacy(
+  mission: Mission,
+  step: MissionStep,
+  agentPrompt: string,
+): Promise<StepExecutionResult> {
+  const startTime = Date.now();
 
   try {
-    // Collect previous step outputs (handoff chain)
-    const previousOutputs = mission.steps
-      .filter(s => s.status === 'done' && s.output)
-      .map(s => s.output as string);
-
-    // Build agent-specific prompt
-    const agentPrompt = buildAgentPrompt(mission, step, previousOutputs);
-
     // Optionally enrich with RAG knowledge
     let knowledgeContext: string | undefined;
     if (getRAGStatus() === 'ready' || getRAGStatus() === 'fallback') {
@@ -141,7 +180,6 @@ export async function executeAgentStep(
       }
     }
 
-    // Send to Gemini with agent prompt as "history"
     const history: ChatMessage[] = [{
       role: 'user',
       content: agentPrompt,
@@ -155,22 +193,101 @@ export async function executeAgentStep(
       knowledgeContext,
     );
 
+    const durationMs = Date.now() - startTime;
+
+    // Save run to memory
+    await saveAgentRun({
+      missionId: mission.id,
+      agentId: step.agentId,
+      stepId: step.id,
+      stepDescription: step.description,
+      inputPrompt: agentPrompt.substring(0, 2000),
+      outputText: output.substring(0, 5000),
+      toolsUsed: [],
+      durationMs,
+      success: true,
+    });
+
     return {
       output,
       success: true,
-      durationMs: Date.now() - startTime,
+      durationMs,
+      toolsUsed: [],
+      mode: 'legacy',
+      handoff: parseHandoffPayload(output),
     };
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'שגיאה לא ידועה';
-    console.error(`[Agent] ❌ Step ${step.id} failed:`, err);
+    console.error(`[Agent] ❌ Step ${step.id} (legacy) failed:`, err);
+
+    await saveAgentRun({
+      missionId: mission.id,
+      agentId: step.agentId,
+      stepId: step.id,
+      stepDescription: step.description,
+      toolsUsed: [],
+      durationMs: Date.now() - startTime,
+      success: false,
+      errorMessage,
+    });
 
     return {
       output: '',
       success: false,
       error: errorMessage,
       durationMs: Date.now() - startTime,
+      mode: 'legacy',
     };
   }
+}
+
+// #endregion
+
+// #region Public API
+
+/**
+ * Execute a single agent step with AI.
+ * Automatically selects Tool Mode or Legacy Mode based on agent capabilities.
+ *
+ * @param mission - The parent mission
+ * @param step - The step to execute
+ * @returns Execution result with output text
+ */
+export async function executeAgentStep(
+  mission: Mission,
+  step: MissionStep,
+): Promise<StepExecutionResult> {
+  if (!isAIConfigured()) {
+    return {
+      output: '',
+      success: false,
+      error: 'מפתח ה-API של Gemini לא מוגדר. לא ניתן להריץ סוכנים.',
+      durationMs: 0,
+    };
+  }
+
+  // Collect previous step outputs (handoff chain)
+  const previousOutputs = mission.steps
+    .filter(s => s.status === 'done' && s.output)
+    .map(s => s.output as string);
+
+  // Check if agent has tools available
+  const agent = AGENTS.find(a => a.id === step.agentId);
+  const agentLayer = agent?.layer || 'command';
+  const availableTools = getToolsForAgent(agentLayer);
+  const hasTools = availableTools.length > 0;
+
+  // Build prompt (with tool instructions if applicable)
+  const agentPrompt = buildAgentPrompt(mission, step, previousOutputs, hasTools);
+
+  // Execute in the appropriate mode
+  if (hasTools) {
+    console.log(`[Agent] 🔧 Executing ${step.id} in TOOL MODE (${availableTools.length} tools)`);
+    return executeWithTools(mission, step, agentPrompt);
+  }
+
+  console.log(`[Agent] 📝 Executing ${step.id} in LEGACY MODE`);
+  return executeLegacy(mission, step, agentPrompt);
 }
 
 /**
@@ -188,14 +305,12 @@ export async function runFullMission(
   const updatedMission: Mission = { ...mission, status: 'executing' };
 
   for (const step of updatedMission.steps) {
-    if (step.status === 'done') continue; // Skip already completed
-    if (step.status === 'error') continue; // Skip errored steps
+    if (step.status === 'done') continue;
+    if (step.status === 'error') continue;
 
-    // Mark as working
     step.status = 'working';
     step.startedAt = new Date().toISOString();
 
-    // Execute
     const result = await executeAgentStep(updatedMission, step);
 
     if (result.success) {
@@ -207,22 +322,18 @@ export async function runFullMission(
       step.output = result.error || 'ביצוע נכשל';
     }
 
-    // Notify caller
     if (onStepComplete) {
       onStepComplete(step, result);
     }
 
-    // Small delay between steps to avoid rate limiting
+    // Rate limiting delay between steps
     await new Promise(r => setTimeout(r, 500));
   }
 
-  // Update mission status
   const allDone = updatedMission.steps.every(s => s.status === 'done');
   const hasErrors = updatedMission.steps.some(s => s.status === 'error');
 
-  if (allDone) {
-    updatedMission.status = 'review';
-  } else if (hasErrors) {
+  if (allDone || hasErrors) {
     updatedMission.status = 'review';
   }
 

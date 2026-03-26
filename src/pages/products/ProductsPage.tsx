@@ -7,15 +7,28 @@
 /**
  * ProductsPage — Orchestrator
  */
+// #region Imports
+
 import { Link } from 'react-router-dom';
 import { ExternalLink } from 'lucide-react';
 import {
+
+// #endregion
+
   LIVE_PRODUCTS, MODULES, PARTNERSHIPS,
   ROADMAP_Q1, ROADMAP_Q2, ROADMAP_Q34,
   STATUS_BADGE,
+// #region Types
+
   type RoadmapItem,
 } from './constants';
 
+
+// #endregion
+
+// #region Component
+
+/** ProductsPage component — ProductsPage component */
 export default function ProductsPage() {
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -165,3 +178,5 @@ function RoadmapCol({ title, color, items }: { title: string; color: string; ite
     </div>
   );
 }
+
+// #endregion

@@ -18,7 +18,12 @@
  * @see AGENTS.md for architecture rules
  */
 
+// #region Imports
+
 import type {
+
+// #endregion
+
   BrainDomain,
   BrainProcessRegistryItem,
 } from './brainTypes';
@@ -27,6 +32,9 @@ import type {
 // 📋 Process Registry
 // ═══════════════════════════════════════
 
+// #region Constants
+
+/** PROCESS_REGISTRY — processRegistry module */
 export const PROCESS_REGISTRY: BrainProcessRegistryItem[] = [
 
   // ─── Employee Domain ───────────────────────
@@ -238,3 +246,5 @@ export function getDomainStats(): Record<BrainDomain, number> {
   }
   return stats as Record<BrainDomain, number>;
 }
+
+// #endregion

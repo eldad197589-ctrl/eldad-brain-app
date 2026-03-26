@@ -1,8 +1,8 @@
 /* ============================================
    FILE: flowcharts-tax.ts
-   PURPOSE: Tax-related flowchart data (capital gains, war compensation, penalties, declaration of capital)
+   PURPOSE: Tax-related flowchart data (capital gains, war compensation, declaration of capital, penalty cancellation)
    DEPENDENCIES: flowchartTypes.ts
-   EXPORTS: capitalGains, warCompensation, penaltyCancellation, declarationOfCapital
+   EXPORTS: capitalGains, warCompensation, declarationOfCapital, penaltyCancellation
    ============================================ */
 import type { FlowchartData } from './flowchartTypes';
 
@@ -136,7 +136,7 @@ export const capitalGains: FlowchartData = {
 
 // #region War Compensation
 
-/** תרשים #8 — פיצויי מלחמה — מס רכוש ונזקי מלחמה */
+/** תרשים #8 — פיצויי מלחמה */
 export const warCompensation: FlowchartData = {
   id: 'war-compensation',
   flowNum: 8,
@@ -247,7 +247,7 @@ export const warCompensation: FlowchartData = {
 
 // #region Declaration of Capital
 
-/** תרשים #12 — הצהרת הון — תהליך מלא */
+/** תרשים #12 — הצהרת הון */
 export const declarationOfCapital: FlowchartData = {
   id: 'declaration-of-capital',
   flowNum: 12,
@@ -379,7 +379,7 @@ export const declarationOfCapital: FlowchartData = {
 
 // #region Penalty Cancellation
 
-/** תרשים #14 — ביטול קנסות מס הכנסה */
+/** תרשים #14 — ביטול קנסות */
 export const penaltyCancellation: FlowchartData = {
   id: 'penalty-cancellation',
   flowNum: 14,

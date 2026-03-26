@@ -4,17 +4,30 @@
    DEPENDENCIES: react, lucide-react
    EXPORTS: QuickAddMeeting (default)
    ============================================ */
+// #region Imports
+
 import { useState, useRef } from 'react';
 import { Calendar, Plus } from 'lucide-react';
 import type { Meeting } from '../types';
 
+
+// #endregion
+
 const COLORS = ['#f59e0b', '#7C3AED', '#3b82f6', '#10b981', '#ef4444', '#06b6d4'];
+
+// #region Types
 
 interface Props {
   onAdd: (m: Omit<Meeting, 'id'>) => void;
   defaultDate: string;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** QuickAddMeeting component — QuickAddMeeting component */
 export default function QuickAddMeeting({ onAdd, defaultDate }: Props) {
   const [title, setTitle] = useState('');
   const [time, setTime] = useState('10:00');
@@ -71,3 +84,5 @@ export default function QuickAddMeeting({ onAdd, defaultDate }: Props) {
     </div>
   );
 }
+
+// #endregion

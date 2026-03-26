@@ -17,6 +17,7 @@ import { Link } from 'react-router-dom';
 // #endregion
 
 // #region Component
+/** DashboardSummaryCards component — DashboardSummaryCards component */
 export default function DashboardSummaryCards() {
   const { tasks, meetings, documents, toggleTask } = useBrainStore();
 
@@ -148,7 +149,7 @@ export default function DashboardSummaryCards() {
               background: 'rgba(16,185,129,0.1)', color: '#34d399',
               textDecoration: 'none', fontWeight: 600, fontSize: '0.85rem',
               border: '1px solid rgba(16,185,129,0.25)',
-              marginTop: 'auto', transition: 'background 0.2s',
+              transition: 'background 0.2s',
             }}
             onMouseEnter={e => e.currentTarget.style.background = 'rgba(16,185,129,0.2)'}
             onMouseLeave={e => e.currentTarget.style.background = 'rgba(16,185,129,0.1)'}
@@ -156,6 +157,24 @@ export default function DashboardSummaryCards() {
             <FileText size={16} />
             הסכם מייסדים (מעודכן)
           </Link>
+          <a
+            href="/legacy/robium_osnat_track_changes.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              padding: '10px 16px', borderRadius: 8,
+              background: 'rgba(14,165,233,0.1)', color: '#38bdf8',
+              textDecoration: 'none', fontWeight: 600, fontSize: '0.85rem',
+              border: '1px solid rgba(14,165,233,0.25)',
+              transition: 'background 0.2s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,165,233,0.2)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(14,165,233,0.1)'}
+          >
+            <FileText size={16} />
+            📑 עקוב אחר שינויים (לאוסנת)
+          </a>
         </div>
       </div>
     </div>

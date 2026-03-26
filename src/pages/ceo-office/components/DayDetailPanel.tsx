@@ -4,6 +4,8 @@
    DEPENDENCIES: react, lucide-react
    EXPORTS: DayDetailPanel (default)
    ============================================ */
+// #region Imports
+
 import { useState } from 'react';
 import { Calendar } from 'lucide-react';
 import type { Meeting, Task } from '../types';
@@ -14,6 +16,11 @@ import QuickAddTask from './QuickAddTask';
 import QuickAddMeeting from './QuickAddMeeting';
 import EditPrepModal from './modals/EditPrepModal';
 import { useBrainStore } from '../../../store/brainStore';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   selectedDate: string;
@@ -29,6 +36,12 @@ interface Props {
   onClickMeeting?: (meeting: Meeting) => void;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** DayDetailPanel component — DayDetailPanel component */
 export default function DayDetailPanel({
   selectedDate, selectedDateLabel, events,
   onAddTask, onAddMeeting, onToggleTask,
@@ -111,3 +124,5 @@ export default function DayDetailPanel({
     </div>
   );
 }
+
+// #endregion

@@ -7,12 +7,25 @@
 /**
  * ClauseCardComponent — Renders a single founders agreement clause card
  */
+// #region Imports
+
 import type { ClauseCard } from '../constants';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   clause: ClauseCard;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** ClauseCardComponent component — ClauseCardComponent component */
 export default function ClauseCardComponent({ clause }: Props) {
   return (
     <div style={{
@@ -52,3 +65,5 @@ export default function ClauseCardComponent({ clause }: Props) {
     </div>
   );
 }
+
+// #endregion

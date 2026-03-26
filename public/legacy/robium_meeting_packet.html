@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>חבילת חומרים לפגישת מייסדים — 26/03/2026</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=David+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    @page {
+      size: A4; margin: 20mm 18mm;
+    }
+
+    body {
+      font-family: 'David Libre', 'Times New Roman', serif;
+      font-size: 13pt; line-height: 1.7; color: #1a1a1a;
+      background: #f5f5f5; direction: rtl;
+    }
+
+    .page {
+      max-width: 210mm; margin: 20px auto;
+      background: white; padding: 25mm 22mm;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+      page-break-after: always;
+    }
+
+    .page:last-child { page-break-after: auto; }
+
+    .header-bar {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white; padding: 18px 24px; border-radius: 8px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px;
+    }
+    .header-bar h1 { font-family: 'Heebo', sans-serif; font-size: 18pt; font-weight: 800; }
+    .header-bar .meta { font-family: 'Heebo', sans-serif; font-size: 10pt; color: #94a3b8; text-align: left; }
+
+    h2 {
+      font-family: 'Heebo', sans-serif; font-size: 14pt; font-weight: 700;
+      color: #0f172a; border-bottom: 2px solid #3b82f6;
+      padding-bottom: 6px; margin: 28px 0 14px;
+    }
+
+    h3 {
+      font-family: 'Heebo', sans-serif; font-size: 12pt; font-weight: 600;
+      color: #334155; margin: 18px 0 8px;
+    }
+
+    p, li { margin-bottom: 6px; }
+
+    .agenda { list-style: none; padding: 0; counter-reset: agenda; }
+    .agenda li {
+      counter-increment: agenda; padding: 10px 16px; margin-bottom: 6px;
+      background: #f8fafc; border-right: 3px solid #3b82f6; border-radius: 4px;
+    }
+    .agenda li::before {
+      content: counter(agenda) ". ";
+      font-weight: 700; color: #3b82f6;
+    }
+
+    table {
+      width: 100%; border-collapse: collapse; margin: 14px 0;
+      font-size: 12pt;
+    }
+    th {
+      background: #0f172a; color: white; padding: 10px 14px;
+      font-family: 'Heebo', sans-serif; font-weight: 600; text-align: right;
+    }
+    td {
+      padding: 8px 14px; border-bottom: 1px solid #e2e8f0;
+    }
+    tr:nth-child(even) td { background: #f8fafc; }
+    .total-row td { font-weight: 700; border-top: 2px solid #0f172a; background: #f1f5f9; }
+
+    .highlight-box {
+      background: linear-gradient(135deg, #eff6ff, #f0f9ff);
+      border: 1px solid #bfdbfe; border-right: 4px solid #3b82f6;
+      padding: 14px 18px; border-radius: 6px; margin: 14px 0;
+      font-size: 11pt;
+    }
+
+    .task-section {
+      background: #fffbeb; border: 1px solid #fde68a;
+      border-right: 4px solid #f59e0b; padding: 14px 18px;
+      border-radius: 6px; margin: 14px 0;
+    }
+    .task-section h4 {
+      font-family: 'Heebo', sans-serif; font-size: 11pt;
+      font-weight: 700; color: #92400e; margin-bottom: 8px;
+    }
+    .task-section ul { list-style: none; padding: 0; }
+    .task-section li {
+      padding: 4px 0; border-bottom: 1px dashed #fde68a;
+      font-size: 11pt;
+    }
+    .task-section li::before { content: "☐ "; color: #f59e0b; }
+
+    .sig-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+      margin-top: 30px;
+    }
+    .sig-box {
+      text-align: center; padding-top: 40px;
+      border-top: 1px solid #334155;
+    }
+    .sig-box .name { font-weight: 700; font-size: 12pt; }
+    .sig-box .role { font-size: 10pt; color: #64748b; }
+
+    .print-btn {
+      position: fixed; bottom: 20px; left: 20px;
+      background: #3b82f6; color: white; border: none;
+      padding: 14px 28px; border-radius: 8px; cursor: pointer;
+      font-family: 'Heebo', sans-serif; font-size: 14pt; font-weight: 700;
+      box-shadow: 0 4px 15px rgba(59,130,246,0.4);
+      z-index: 100;
+    }
+    .print-btn:hover { background: #2563eb; }
+
+    @media print {
+      body { background: white; }
+      .page { box-shadow: none; margin: 0; padding: 0; max-width: none; }
+      .print-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ עמוד 1: סדר יום + טבלת אחזקות ═══ -->
+<div class="page">
+  <div class="header-bar">
+    <div>
+      <h1>📋 חבילת חומרים — פגישת מייסדים</h1>
+      <div style="font-size: 11pt; margin-top: 4px; color: #c9a84c;">
+        רוביום טכנולוגיות בע"מ — Robium Ltd
+      </div>
+    </div>
+    <div class="meta">
+      <div>📅 יום חמישי, 26 מרץ 2026</div>
+      <div>⏰ 10:00 | 120 דקות</div>
+      <div>👥 אלדד, אוסנת, קיריל</div>
+    </div>
+  </div>
+
+  <h2>📌 סדר יום</h2>
+  <ol class="agenda">
+    <li>הסכם מייסדים לחתימה</li>
+    <li>דוח לאוסנת</li>
+    <li>הסכמי חממה — הסכם העסקה + הסכם אופציות</li>
+    <li>הצגת הצוות לאוסנת</li>
+    <li>הצגת תיק מוצרים</li>
+  </ol>
+
+  <h2>📊 טבלת אחזקות (Cap Table)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>שם</th>
+        <th>אחוז אחזקה</th>
+        <th>תפקיד</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>אלדד דוד</td><td>26.66%</td><td>Interim CEO (מנכ"ל זמני)</td></tr>
+      <tr><td>קיריל יאקימנקו</td><td>26.66%</td><td>CTO (מנהל טכנולוגיות)</td></tr>
+      <tr><td>אוסנת שלחון</td><td>26.66%</td><td>CRO / HR (מסלול מנכ"לית)</td></tr>
+      <tr><td>ESOP ומיעוט</td><td>20.00%</td><td>מאגר דילול משותף</td></tr>
+      <tr class="total-row"><td><strong>סה"כ</strong></td><td><strong>100%</strong></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <div class="highlight-box">
+    <strong>📝 Reverse Vesting:</strong> 4 שנים, Cliff שנה. אחרי הצוק — 1/48 מדי חודש רטרואקטיבית מיום החתימה.<br>
+    <strong>📝 ESOP:</strong> 20% מוקצים לעובדי חממה במודל היברידי (Time + Milestone) דרך סעיף 102 רווח הון.
+  </div>
+</div>
+
+<!-- ═══ עמוד 2: סיכום ההסכם + שינויים עיקריים ═══ -->
+<div class="page">
+  <h2>📄 סיכום ההסכם — נקודות עיקריות</h2>
+
+  <h3>1. מטרת ההתאגדות</h3>
+  <p>הקמת חברה פרטית בע"מ בשם "רוביום בע"מ" לפיתוח מערכות AI עסקיות. מוצרי ליבה: המוח של אלדד, Robium Smart Attendance, Robium Capital Gains, Robium Protocol Transcription.</p>
+
+  <h3>2. תפקידי המייסדים</h3>
+  <ul>
+    <li><strong>אלדד:</strong> Interim CEO — לוגיקה עסקית, עיצוב מוצר, כספים</li>
+    <li><strong>קיריל:</strong> CTO — ארכיטקטורה, קוד AI, חממה טכנולוגית</li>
+    <li><strong>אוסנת:</strong> CRO / HR — רגולציה, משפטים, לקוחות מוסדיים, מסלול מנכ"לית</li>
+  </ul>
+
+  <h3>3. שכר B2B ותשלום רטרואקטיבי</h3>
+  <p>שכר B2B מותנה בתזרים חיובי. תשלום רטרואקטיבי: 15,000 ₪/חודש × 3 חודשים לאלדד וקיריל (סה"כ 90,000 ₪). החזר השקעת עבר: 500,000 ₪ שווה בשווה.</p>
+
+  <h3>4. שינויים עיקריים מטיוטת 11/3</h3>
+  <div class="highlight-box">
+    <ul style="list-style: none; padding: 0;">
+      <li>🔵 <strong>הוספה:</strong> סעיף Background IP — קניין רוחני קודם נשאר בבעלות המייסד</li>
+      <li>🔵 <strong>הוספה:</strong> רפורמת הוטו — 75% רוב במקום וטו בודד</li>
+      <li>🔵 <strong>הוספה:</strong> ESOP Pro-Rata — דילול שווה לכולם</li>
+      <li>🔵 <strong>הוספה:</strong> מנגנון Earn-out לאוסנת</li>
+      <li>🔵 <strong>הוספה:</strong> Drag-Along / Tag-Along + Double Trigger Acceleration</li>
+      <li>🔴 <strong>שינוי:</strong> Bad Leaver מוגדר בצמצום — רק הפרת אמונים/פלילים</li>
+    </ul>
+  </div>
+
+  <h2>✅ משימות אחרי החתימה</h2>
+
+  <div class="task-section">
+    <h4>🔴 אוסנת — מיידי</h4>
+    <ul>
+      <li>פתיחת חברה ברשם החברות (3 שמות: Robium / רוביום טכנולוגיות / ...)</li>
+      <li>פתיחת חשבון בנק לחברה</li>
+      <li>רישום במע"מ ומס הכנסה</li>
+    </ul>
+  </div>
+
+  <div class="task-section">
+    <h4>🔴 קיריל — מיידי</h4>
+    <ul>
+      <li>הכנת NDA לגביר וענבר</li>
+      <li>חוזי חממה לעובדים</li>
+    </ul>
+  </div>
+
+  <div class="task-section">
+    <h4>🔴 אלדד — מיידי</h4>
+    <ul>
+      <li>הגשת דוחות מס + רישום מע"מ</li>
+      <li>רישום קניין רוחני — "המוח של אלדד"</li>
+      <li>מינוי נאמן ESOP — סעיף 102</li>
+    </ul>
+  </div>
+
+  <h2 style="margin-top: 40px;">חתימות</h2>
+  <div class="sig-grid">
+    <div class="sig-box">
+      <div class="name">אלדד דוד</div>
+      <div class="role">Interim CEO / M.Partner</div>
+    </div>
+    <div class="sig-box">
+      <div class="name">קיריל יאקימנקו</div>
+      <div class="role">CTO</div>
+    </div>
+    <div class="sig-box">
+      <div class="name">אוסנת שלחון</div>
+      <div class="role">CRO / HR</div>
+    </div>
+  </div>
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨️ שמור כ-PDF / הדפס</button>
+
+</body>
+</html>

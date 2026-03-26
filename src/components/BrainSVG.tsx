@@ -4,13 +4,23 @@
    DEPENDENCIES: None (local only)
    EXPORTS: BrainSVG (default)
    ============================================ */
+// #region Imports
+
 import { NEURONS, SYNAPSES, PENDING, CATEGORIES, type Neuron } from '../data/neurons';
+
+
+// #endregion
+
+// #region Types
 
 interface BrainSVGProps {
   onNeuronClick: (neuron: Neuron) => void;
 }
 
 /* Auto-layout neurons in category clusters */
+
+// #endregion
+
 function computePositions(neurons: typeof NEURONS) {
   const catNeurons: Record<string, typeof NEURONS> = {};
   CATEGORIES.forEach(c => catNeurons[c.id] = []);
@@ -43,6 +53,9 @@ function computePositions(neurons: typeof NEURONS) {
   return positions;
 }
 
+// #region Component
+
+/** BrainSVG component — BrainSVG component */
 export default function BrainSVG({ onNeuronClick }: BrainSVGProps) {
   const positions = computePositions(NEURONS);
   const neuronMap: Record<string, Neuron> = {};
@@ -169,3 +182,5 @@ export default function BrainSVG({ onNeuronClick }: BrainSVGProps) {
     </div>
   );
 }
+
+// #endregion

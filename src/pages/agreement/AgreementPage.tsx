@@ -13,7 +13,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Home, FileText, CheckCircle, AlertTriangle, XCircle,
-  ChevronDown, ChevronUp, Printer, ClipboardList,
+  ChevronDown, ChevronUp, Printer, ClipboardList, Download,
 } from 'lucide-react';
 import {
   AGREEMENT_CLAUSES, EQUITY_TABLE, SIGNATURES,
@@ -21,6 +21,8 @@ import {
 } from './agreementData';
 import type { ClauseStatus } from './agreementData';
 import AgreementClauseCard from './AgreementClause';
+import { printAgreement } from './printService';
+import { exportAgreementToWord } from './exportToWord';
 
 // #region Helpers
 
@@ -36,6 +38,7 @@ function loadRecord<T>(key: string, fallback: T): T {
 
 // #region Component
 
+/** AgreementPage component — AgreementPage component */
 export default function AgreementPage() {
   // State: clause statuses & notes
   const [statuses, setStatuses] = useState<Record<string, ClauseStatus>>(
@@ -109,14 +112,23 @@ export default function AgreementPage() {
       </header>
 
       {/* Nav */}
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 28, flexWrap: 'wrap' }}>
+      <div className="no-print" style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 28, flexWrap: 'wrap' }}>
         <Link to="/" className="flow-nav-btn"><Home size={16} /> דשבורד</Link>
         <Link to="/hub" className="flow-nav-btn"><ClipboardList size={16} /> מרכז שליטה</Link>
         <Link to="/founders" className="flow-nav-btn"><FileText size={16} /> פורטל עימות</Link>
+        <a href="/legacy/robium_osnat_track_changes.html" target="_blank" rel="noopener noreferrer" className="flow-nav-btn" style={{ background: 'rgba(14, 165, 233, 0.15)', borderColor: '#0284c7', color: '#6be7ff', fontWeight: 'bold' }}>
+          <FileText size={16} /> Track Changes (גרסת הצגה לאוסנת)
+        </a>
+        <button onClick={() => { printAgreement(); }} className="flow-nav-btn" style={{ border: 'none', cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(201,168,76,0.15)', color: '#c9a84c' }}>
+          <Printer size={16} /> שמור כ-PDF / הדפס
+        </button>
+        <button onClick={() => { exportAgreementToWord(); }} className="flow-nav-btn" style={{ border: 'none', cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(16,185,129,0.15)', color: '#10b981' }}>
+          <Download size={16} /> הורד כ-Word
+        </button>
       </div>
 
       {/* Progress Bar + Stats */}
-      <div className="glass-card" style={{ padding: '18px 22px', marginBottom: 24 }}>
+      <div className="glass-card no-print" style={{ padding: '18px 22px', marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>📋 סטטוס סקירת הסכם</span>
           <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#c9a84c', fontSize: '0.85rem' }}>
@@ -214,7 +226,7 @@ export default function AgreementPage() {
       </div>
 
       {/* General Notes / Instructions */}
-      <div className="glass-card" style={{ padding: '18px 22px', marginBottom: 32 }}>
+      <div className="glass-card no-print" style={{ padding: '18px 22px', marginBottom: 32 }}>
         <div
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
           onClick={() => setShowGeneralNotes(!showGeneralNotes)}

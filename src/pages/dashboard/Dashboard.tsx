@@ -9,6 +9,8 @@
  *
  * Composes BrainView, CategoriesView, and ListView into a tabbed layout.
  */
+// #region Imports
+
 import { useState } from 'react';
 import NeuronPanel from '../../components/NeuronPanel';
 import type { ViewMode, Neuron } from './types';
@@ -20,6 +22,12 @@ import CategoriesView from './components/CategoriesView';
 import ListView from './components/ListView';
 import LiveStatsBar from './components/LiveStatsBar';
 
+
+// #endregion
+
+// #region Component
+
+/** Dashboard component — Dashboard component */
 export default function Dashboard() {
   const [view, setView] = useState<ViewMode>('categories');
   const [selectedNeuron, setSelectedNeuron] = useState<Neuron | null>(null);
@@ -66,3 +74,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+// #endregion

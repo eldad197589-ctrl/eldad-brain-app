@@ -12,13 +12,14 @@
  */
 
 import { sendBrainMessage, isAIConfigured, type ChatMessage } from './geminiService';
-import { AGENTS, type Mission, type MissionStep, type Form4Report } from '../data/agentRegistry';
+import { type Mission, type MissionStep, type Form4Report } from '../data/agentRegistry';
 import {
   executeAgentStep,
   runFullMission as runAllSteps,
   type StepExecutionResult,
 } from './agentExecutionService';
 import { getSupabase, isSupabaseConfigured } from './supabaseClient';
+import { PLAN_SYSTEM_PROMPT } from './missionPrompts';
 
 // #region Mission Management
 
@@ -46,38 +47,15 @@ function genId(): string {
 
 // #region AI-Powered Mission Planning
 
-const PLAN_SYSTEM_PROMPT = `אתה "המוח של המערכת" — מערכת ניהול סוכני AI.
-
-תפקידך: לקבל הוראה מאלדד (CEO) ולפרק אותה לשלבי ביצוע, כשכל שלב מוקצה לסוכן AI מתאים.
-
-רשימת הסוכנים הזמינים:
-${AGENTS.map(a => `- ${a.id}: ${a.emoji} ${a.name} — ${a.description}`).join('\n')}
-
-כללים:
-1. תמיד תחזיר JSON בלבד (בלי markdown, בלי הסבר)
-2. כל שלב חייב להיות מוקצה לסוכן ספציפי מהרשימה (לפי id)
-3. סדר את השלבים בסדר הגיוני
-4. השלב האחרון תמיד יהיה סוכן בדיקות (tester)
-5. אל תמציא סוכנים שלא ברשימה
-
-פורמט התשובה (JSON בלבד):
-{
-  "title": "כותרת המשימה",
-  "steps": [
-    { "agentId": "research", "description": "מה הסוכן צריך לעשות" },
-    { "agentId": "builder", "description": "מה הסוכן צריך לעשות" }
-  ]
-}`;
-
-/** Ask AI to plan a mission from an instruction */
+/** Ask AI to plan a mission from an instruction, using fallbacks if AI is unavailable */
 export async function planMission(
   instruction: string,
-  mode: 'build' | 'audit',
+  mode: 'process' | 'filing' | 'build' | 'audit',
   systemName: string,
 ): Promise<Mission> {
-  const modeContext = mode === 'build'
-    ? 'זו משימת בנייה חדשה — המערכת נבנית מאפס.'
-    : 'זו משימת ביקורת — המערכת קיימת וצריך לבדוק ולתקן.';
+  const modeContext = mode === 'filing'
+    ? 'זו משימת תיוק בלבד — רק לקלוט ולתייק.'
+    : 'זו משימת תהליך מלא — קליטה, אימות, ניתוח, הפקה, שליחה.';;
 
   let steps: MissionStep[] = [];
   let title = systemName;
@@ -110,25 +88,10 @@ export async function planMission(
     }
   }
 
-  // Fallback if AI didn't work
   if (steps.length === 0) {
-    steps = mode === 'build'
-      ? [
-          { id: 'S-1', agentId: 'research', description: 'מחקר ראשוני — מה קיים? מה נדרש?', status: 'idle' },
-          { id: 'S-2', agentId: 'architecture', description: 'תכנון ארכיטקטורה — מבנה, API, DB', status: 'idle' },
-          { id: 'S-3', agentId: 'builder', description: 'בנייה — כתיבת קוד ויצירת קומפוננטות', status: 'idle' },
-          { id: 'S-4', agentId: 'design', description: 'עיצוב — UI/UX, צבעים, אנימציות', status: 'idle' },
-          { id: 'S-5', agentId: 'responsive', description: 'רספונסיביות — מובייל, טאבלט, דסקטופ', status: 'idle' },
-          { id: 'S-6', agentId: 'tester', description: 'בדיקות מקיפות — כל הפיצ\'רים עובדים?', status: 'idle' },
-          { id: 'S-7', agentId: 'code_review', description: 'קוד ריוויו — איכות, תקנים, best practices', status: 'idle' },
-        ]
-      : [
-          { id: 'S-1', agentId: 'research', description: 'סריקה — מיפוי כל הרכיבים הקיימים', status: 'idle' },
-          { id: 'S-2', agentId: 'debugger', description: 'דיבאג — זיהוי ותיקון באגים', status: 'idle' },
-          { id: 'S-3', agentId: 'responsive', description: 'בדיקת רספונסיביות — מובייל ודסקטופ', status: 'idle' },
-          { id: 'S-4', agentId: 'tester', description: 'בדיקות — כל הפיצ\'רים עובדים?', status: 'idle' },
-          { id: 'S-5', agentId: 'code_review', description: 'קוד ריוויו — איכות ותקנים', status: 'idle' },
-        ];
+    const { PROCESS_FALLBACK_STEPS, FILING_FALLBACK_STEPS } = await import('./missionPrompts');
+    steps = (mode === 'filing' ? FILING_FALLBACK_STEPS : PROCESS_FALLBACK_STEPS)
+      .map(s => ({ ...s }));
   }
 
   const mission: Mission = {

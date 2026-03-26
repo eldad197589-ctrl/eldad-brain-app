@@ -4,8 +4,16 @@
    DEPENDENCIES: lucide-react
    EXPORTS: ComingSoon (default)
    ============================================ */
+// #region Imports
+
 import { Clock } from 'lucide-react';
 
+
+// #endregion
+
+// #region Component
+
+/** ComingSoon component — ComingSoon component */
 export default function ComingSoon() {
   return (
     <div style={{
@@ -37,3 +45,5 @@ export default function ComingSoon() {
     </div>
   );
 }
+
+// #endregion

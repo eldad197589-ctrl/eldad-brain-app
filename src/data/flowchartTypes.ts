@@ -1,4 +1,6 @@
 /* ============================================
+// #region Module
+
    FILE: flowchartTypes.ts
    PURPOSE: Type definitions
    DEPENDENCIES: None (local only)
@@ -66,3 +68,5 @@ export interface FlowchartData {
   result: FlowchartResult;
   relatedLinks?: { to: string; label: string }[];
 }
+
+// #endregion

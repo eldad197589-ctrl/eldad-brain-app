@@ -4,9 +4,16 @@
    DEPENDENCIES: react, lucide-react
    EXPORTS: AddTaskModal (default)
    ============================================ */
+// #region Imports
+
 import { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import type { Task } from '../../types';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   onClose: () => void;
@@ -14,6 +21,12 @@ interface Props {
   defaultDate: string;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** AddTaskModal component — AddTaskModal component */
 export default function AddTaskModal({ onClose, onAdd, defaultDate }: Props) {
   const [form, setForm] = useState({
     title: '',
@@ -89,3 +102,5 @@ export default function AddTaskModal({ onClose, onAdd, defaultDate }: Props) {
     </div>
   );
 }
+
+// #endregion

@@ -96,7 +96,7 @@ export const SIDEBAR_SECTIONS: NavSection[] = [
       { to: '#', emoji: '⚖️', label: 'דיני עבודה', isDivider: true },
       { to: '/flow/worklaw', emoji: '⚖️', label: 'דיני עבודה' },
       { to: '/flow/expert-opinion', emoji: '📝', label: 'חוות דעת כלכלית' },
-      { to: '/letter', emoji: '✉️', label: 'מכתבים (20+ סוגים)' },
+      { to: '/letter', emoji: '✉️', label: 'מרכז מכתבים' },
     ],
   },
 
@@ -111,9 +111,9 @@ export const SIDEBAR_SECTIONS: NavSection[] = [
     items: [
       // לקוחות
       { to: '#', emoji: '👥', label: 'לקוחות', isDivider: true },
-      { to: '/clients', emoji: '👥', label: 'כל הלקוחות (147)' },
-      { to: '/coming-soon', emoji: '👤', label: 'קליטת לקוח חדש', dim: true },
-      { to: '/coming-soon', emoji: '💰', label: 'הצעות מחיר', dim: true },
+      { to: '/clients', emoji: '👥', label: 'כל הלקוחות' },
+      { to: '/onboarding', emoji: '👤', label: 'קליטת לקוח חדש' },
+      { to: '/quotes-generator', emoji: '💰', label: 'הצעות מחיר' },
       // קליטת מסמכים
       { to: '#', emoji: '📥', label: 'קליטת מסמכים', isDivider: true },
       { to: '/coming-soon', emoji: '📥', label: 'קליטת חשבונית ספק', dim: true },
@@ -214,11 +214,38 @@ export const SIDEBAR_SECTIONS: NavSection[] = [
     id: 'robium',
     emoji: '🚀',
     label: 'רוביום',
-    description: 'תיק מוצרים · מייסדים · חממה',
+    description: 'עסקים · הסכמים · חממה',
     accentColor: '#ec4899',
     defaultOpen: false,
     items: [
-      { to: '/products', emoji: '📦', label: 'תיק מוצרים' },
+      // ליבה עסקית — הדברים שמשתמשים בהם יום-יום
+      { to: '#', emoji: '🎯', label: 'ליבה עסקית', isDivider: true },
+      { to: '/founders', emoji: '📋', label: 'ניהול יעדים ועימות' },
+      { to: 'https://protokol-invite-murex.vercel.app/business-plan', emoji: '📈', label: 'תוכנית עסקית Pitch' },
+      { to: '/products', emoji: '📦', label: 'תיק מוצרי הליבה' },
+      { to: '/comparison', emoji: '📊', label: 'ניתוח מתחרים' },
+      { to: '/pricing-manager', emoji: '💰', label: 'ניהול מחירון B2B' },
+
+      // הסכם מייסדים — כלי עבודה פעילים
+      { to: '#', emoji: '⚖️', label: 'הסכם מייסדים', isDivider: true },
+      { to: '/agreement/review', emoji: '🤝', label: 'סקירת ההסכם הסופי' },
+      { to: '/agreement/diff', emoji: '📊', label: 'השוואת סעיפים' },
+      { to: '/legacy/robium_osnat_track_changes.html', emoji: '📑', label: 'עקוב אחר שינויים (לאוסנת)' },
+      { to: '/founders/kirill-dispute', emoji: '⚠️', label: 'עימות משפטי — קירילאנו' },
+
+      // ארכיון הסכמים — גרסאות קודמות (תמיד נגישות)
+      { to: '#', emoji: '📜', label: 'ארכיון גרסאות', isDivider: true },
+      { to: '/agreement', emoji: '📄', label: 'טיוטה סופית (25/03)' },
+      { to: '/legacy/robium_meeting_packet.html', emoji: '📋', label: 'חבילת חומרים לפגישה' },
+      { to: '/agreement/legacy', emoji: '📝', label: 'טיוטה מעודכנת (11/03)' },
+      { to: '/agreement/original', emoji: '📜', label: 'הסכם מקורי (3.3.26)' },
+
+      // חממה טכנולוגית
+      { to: '#', emoji: '🧪', label: 'חממה טכנולוגית', isDivider: true },
+      { to: '/incubator', emoji: '🧑‍💻', label: 'צוות ומתמחים' },
+      { to: '/incubator/agreements', emoji: '📑', label: 'הסכמי חממה (ESOP)' },
+      { to: '/incubator/employment-agreement', emoji: '📋', label: 'הסכם העסקה — להדפסה' },
+      { to: '/incubator/esop-agreement', emoji: '📈', label: 'הסכם אופציות — להדפסה' },
     ],
   },
 
@@ -227,12 +254,16 @@ export const SIDEBAR_SECTIONS: NavSection[] = [
     id: 'personal',
     emoji: '🎤',
     label: 'אישי ומערכת',
-    description: 'מוזיקה · הגדרות',
+    description: 'מוזיקה · תשלומי בית · הגדרות',
     accentColor: '#06b6d4',
     defaultOpen: false,
     items: [
+      { to: '#', emoji: '🏠', label: 'ניהול בית', isDivider: true },
+      { to: '/personal/payments', emoji: '💳', label: 'תשלומי בית' },
+      { to: '#', emoji: '🎨', label: 'תחביבים', isDivider: true },
       { to: '/hobbies', emoji: '🎵', label: 'זמר ומוזיקה' },
-      { to: '/settings', emoji: '⚙️', label: 'הגדרות' },
+      { to: '#', emoji: '⚙️', label: 'הגדרות', isDivider: true },
+      { to: '/settings', emoji: '⚙️', label: 'הגדרות מערכת' },
     ],
   },
 ];

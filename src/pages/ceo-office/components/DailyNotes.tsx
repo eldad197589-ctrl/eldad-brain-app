@@ -8,7 +8,14 @@
  * DailyNotes — Quick notes pad for the selected day.
  * Auto-saves to localStorage via the useDailyNotes hook.
  */
+// #region Imports
+
 import { FileText } from 'lucide-react';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   selectedDate: string;
@@ -17,6 +24,12 @@ interface Props {
   onNoteChange: (date: string, text: string) => void;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** DailyNotes component — DailyNotes component */
 export default function DailyNotes({ selectedDate, selectedDateLabel, note, onNoteChange }: Props) {
   return (
     <div className="glass-card" style={{ padding: '16px 18px' }}>
@@ -55,3 +68,5 @@ export default function DailyNotes({ selectedDate, selectedDateLabel, note, onNo
     </div>
   );
 }
+
+// #endregion

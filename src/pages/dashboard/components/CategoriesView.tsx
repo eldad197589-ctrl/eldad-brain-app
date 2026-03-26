@@ -7,9 +7,16 @@
 /**
  * CategoriesView — Category grid with progress and neuron items
  */
+// #region Imports
+
 import { ChevronLeft, Clock } from 'lucide-react';
 import { NEURONS, CATEGORIES, PENDING } from '../../../data/neurons';
 import type { Neuron } from '../types';
+
+
+// #endregion
+
+// #region Types
 
 interface Props {
   neuronCount: number;
@@ -20,6 +27,12 @@ interface Props {
   onNeuronClick: (n: Neuron) => void;
 }
 
+
+// #endregion
+
+// #region Component
+
+/** CategoriesView component — CategoriesView component */
 export default function CategoriesView({
   neuronCount, flowchartCount, builtCount, inProgressCount, pendingCount, onNeuronClick,
 }: Props) {
@@ -222,3 +235,5 @@ export default function CategoriesView({
     </div>
   );
 }
+
+// #endregion

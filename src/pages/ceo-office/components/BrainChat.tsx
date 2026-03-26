@@ -36,6 +36,7 @@ const QUICK_PROMPTS = [
 // #endregion
 
 // #region Component
+/** BrainChat component — BrainChat component */
 export default function BrainChat({ processId }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);

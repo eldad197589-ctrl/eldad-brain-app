@@ -1,38 +1,48 @@
-/* ============================================
+/* ====================================================
    FILE: KirillSection.tsx
-   PURPOSE: KirillSection component
-   DEPENDENCIES: lucide-react
-   EXPORTS: KirillSection (default)
-   ============================================ */
-/**
- * KirillSection — Confrontation zone for Kirill (CTO)
- */
-import { Code } from 'lucide-react';
+   PURPOSE: Founders portal section analyzing Kirill's CTO equity position and KPIs
+   DEPENDENCIES: ClauseCard, constants, agreementData
+   ==================================================== */
+
+// #region Imports
 import ClauseCardComponent from './ClauseCard';
 import { KIRILL_CLAUSES } from '../constants';
+import { EQUITY_TABLE } from '../../agreement/agreementData';
+import { Code, TerminalSquare } from 'lucide-react';
+// #endregion
 
+// #region Component
+/**
+ * KirillSection — Displays Kirill's CTO role, equity claim analysis, and KPI clause cards.
+ */
 export default function KirillSection() {
   return (
-    <div>
+    <div className="tab-pane animate-fade-in" style={{ padding: '20px 0' }}>
       <div style={{
-        background: 'var(--surface, #111827)', border: '1px solid rgba(255,255,255,0.06)',
-        borderRadius: 16, padding: '24px 28px', marginBottom: 24, borderTop: '4px solid #06b6d4',
+        background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(5,150,105,0.05))',
+        border: '1px solid rgba(16,185,129,0.2)',
+        borderRadius: 16, padding: '24px', marginBottom: 32
       }}>
-        <div style={{ display: 'flex', gap: 16 }}>
-          <div style={{ padding: 12, background: 'rgba(6,182,212,0.1)', borderRadius: 10, flexShrink: 0, height: 'fit-content' }}>
-            <Code size={28} color="#06b6d4" />
-          </div>
-          <div>
-            <h2 style={{ margin: '0 0 8px', fontSize: '1.3rem', fontWeight: 700 }}>אזור עימות: קיריל יאקימנקו</h2>
-            <p style={{ color: '#94a3b8', lineHeight: 1.7, margin: 0, fontSize: '0.9rem' }}>
-              מטרת האזור: להזכיר לקיריל שאתה המנכ"ל ואתה רואה את התמונה כולה.
-              לנטרל את ההילה של "אני כותב את הקוד אז הכל שלי", ולעמת אותו מול הניהול האסטרטגי שלך.
-            </p>
-          </div>
-        </div>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '0 0 16px', color: '#6ee7b7' }}>
+          <Code /> ניתוח דרישת אקוויטי וריבונות IP (CTO) — 60.00% / {EQUITY_TABLE[1].percent}
+        </h2>
+        <p style={{ color: '#a7f3d0', lineHeight: 1.6, margin: 0 }}>
+          קיריל מציע חלוקה של 60% לטובתו בתוספת החזקת ה-IP בחברת Holding נפרדת. 
+          <strong>הסכנה:</strong> מבנה כזה הופך את רשת הפצת הידע והלוגיקה העסקית (22 שנות ניסיון של אלדד) 
+          לפיצ'ר שולי של כלי טכנולוגי גנרי. Robium לעולם לא תוכל לגייס הון ממשקיעים (VC) אם הליבה הטכנולוגית 
+          שלה נמצאת מחוץ לחברה בידיים של המפתח הראשי בלבד.
+        </p>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-        {KIRILL_CLAUSES.map((c, i) => <ClauseCardComponent key={i} clause={c} />)}
+
+      <h3 style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: 12, marginBottom: 24, color: '#f8fafc' }}>
+        <TerminalSquare size={20} style={{ verticalAlign: 'middle', marginLeft: 8 }} />
+        יעדי ביצוע חוזיים (KPIs)
+      </h3>
+      
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
+        {KIRILL_CLAUSES.map(clause => (
+          <ClauseCardComponent key={clause.title} clause={clause} />
+        ))}
       </div>
     </div>
   );

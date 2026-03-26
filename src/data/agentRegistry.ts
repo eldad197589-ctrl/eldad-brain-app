@@ -14,12 +14,11 @@
 // #region Types
 
 export type AgentLayer =
-  | 'command'      // 🧠 פיקוד
-  | 'construction' // 🏗️ בנייה
-  | 'design'       // 🎨 נראות
-  | 'quality'      // 🧪 בקרה
-  | 'infrastructure'// 📦 תשתית
-  | 'knowledge';   // 📚 ידע
+  | 'command'    // 🧠 פיקוד ותכנון
+  | 'intake'     // 📥 קליטה וזיהוי
+  | 'processing' // ⚙️ עיבוד וניתוח
+  | 'output'     // 📄 הפקה ושליחה
+  | 'support';   // 🔧 תמיכה ותיוק
 
 export type AgentStatus = 'idle' | 'working' | 'done' | 'error' | 'waiting';
 
@@ -46,10 +45,12 @@ export interface MissionStep {
 
 export interface Mission {
   id: string;
-  mode: 'build' | 'audit';
+  mode: 'process' | 'filing' | 'build' | 'audit';
   title: string;
   instruction: string;
   systemName: string;
+  processId?: string;
+  clientId?: string;
   steps: MissionStep[];
   status: 'planning' | 'executing' | 'review' | 'completed';
   form4?: Form4Report;
@@ -71,168 +72,69 @@ export interface Form4Report {
 
 // #region Layer Config
 
+/** LAYER_CONFIG — business process layers */
 export const LAYER_CONFIG: Record<AgentLayer, { name: string; emoji: string; color: string }> = {
-  command:        { name: 'פיקוד',  emoji: '🧠', color: '#c9a84c' },
-  construction:   { name: 'בנייה',  emoji: '🏗️', color: '#3b82f6' },
-  design:         { name: 'נראות',  emoji: '🎨', color: '#a78bfa' },
-  quality:        { name: 'בקרה',   emoji: '🧪', color: '#ef4444' },
-  infrastructure: { name: 'תשתית', emoji: '📦', color: '#f59e0b' },
-  knowledge:      { name: 'ידע',    emoji: '📚', color: '#10b981' },
+  command:    { name: 'פיקוד',    emoji: '🧠', color: '#c9a84c' },
+  intake:     { name: 'קליטה',    emoji: '📥', color: '#3b82f6' },
+  processing: { name: 'עיבוד',    emoji: '⚙️', color: '#a78bfa' },
+  output:     { name: 'הפקה',     emoji: '📄', color: '#10b981' },
+  support:    { name: 'תמיכה',    emoji: '🔧', color: '#f59e0b' },
 };
 
 // #endregion
 
-// #region Agent Registry — 23 Agents
+// #region Agent Registry — 7 Business Agents
 
+/** AGENTS — 7 business process agents matching AgentRole from brainTypes */
 export const AGENTS: Agent[] = [
-  // ═══ 🧠 Layer 1: Command ═══
+  // ═══ 🧠 פיקוד ═══
   {
     id: 'system_brain', name: 'מוח המערכת', nameEn: 'System Brain',
     emoji: '🧠', layer: 'command', status: 'idle',
-    description: 'מנהל את כל הסוכנים, בונה תוכנית, מקצה משימות',
-    capabilities: ['תכנון', 'הקצאת סוכנים', 'ניהול pipeline', 'דיווח ל-CEO'],
-  },
-  {
-    id: 'research', name: 'סוכן מחקר', nameEn: 'Research Agent',
-    emoji: '🔬', layer: 'command', status: 'idle',
-    description: 'חוקר טכנולוגיות, מתחרים, שוק — לפני שמתחילים',
-    capabilities: ['מחקר שוק', 'ניתוח מתחרים', 'סקירת טכנולוגיות', 'דוח מחקר'],
+    description: 'מנהל תהליכים, מפענח בקשות, מקצה סוכנים, מדווח לאלדד',
+    capabilities: ['ניתוב תהליכים', 'הקצאת סוכנים', 'ניהול pipeline', 'דיווח למנכ"ל'],
   },
 
-  // ═══ 🏗️ Layer 2: Construction ═══
+  // ═══ 📥 קליטה ═══
   {
-    id: 'architecture', name: 'סוכן ארכיטקטורה', nameEn: 'Architecture Agent',
-    emoji: '📐', layer: 'construction', status: 'idle',
-    description: 'מתכנן מבנה המערכת — DB, API, קומפוננטות',
-    capabilities: ['תכנון מבנה', 'הגדרת API', 'ניתוח תלויות', 'תרשים ארכיטקטורה'],
+    id: 'intake_agent', name: 'סוכן קליטה', nameEn: 'Intake Agent',
+    emoji: '📥', layer: 'intake', status: 'idle',
+    description: 'קולט מסמכים, מזהה סוג (ביטול קנסות, מכתב, חשבונית), מוצא לקוח, פותח תיק',
+    capabilities: ['זיהוי מסמכים', 'חיפוש לקוח', 'פתיחת תיק', 'OCR', 'סיווג אוטומטי'],
   },
   {
-    id: 'builder', name: 'סוכן בנייה', nameEn: 'Builder Agent',
-    emoji: '🏗️', layer: 'construction', status: 'idle',
-    description: 'בונה את הקוד בפועל',
-    capabilities: ['כתיבת קוד', 'יצירת קומפוננטות', 'אינטגרציות', 'בניית פיצ\'רים'],
-  },
-  {
-    id: 'refactor', name: 'סוכן שיפוץ', nameEn: 'Refactoring Agent',
-    emoji: '🔄', layer: 'construction', status: 'idle',
-    description: 'מסדר קוד ישן, מפשט, מייעל — בלי לשבור',
-    capabilities: ['ריפקטורינג', 'אופטימיזציה', 'הסרת קוד מת', 'שיפור קריאות'],
+    id: 'validation_agent', name: 'סוכן אימות', nameEn: 'Validation Agent',
+    emoji: '✅', layer: 'intake', status: 'idle',
+    description: 'בודק שהנתונים שלמים — חסר ת.ז? חסר כתובת? חסר אסמכתא?',
+    capabilities: ['בדיקת שלמות', 'אימות נתונים', 'דרישת השלמות', 'בדיקת תנאי סף'],
   },
 
-  // ═══ 🎨 Layer 3: Design ═══
+  // ═══ ⚙️ עיבוד ═══
   {
-    id: 'design', name: 'סוכן עיצוב', nameEn: 'Design Agent',
-    emoji: '🎨', layer: 'design', status: 'idle',
-    description: 'UI/UX, צבעים, טיפוגרפיה, אנימציות',
-    capabilities: ['עיצוב ממשק', 'פלטת צבעים', 'אנימציות', 'dark mode'],
+    id: 'analysis_agent', name: 'סוכן ניתוח', nameEn: 'Analysis Agent',
+    emoji: '🔍', layer: 'processing', status: 'idle',
+    description: 'מנתח מצב, מחשב סכומים, משווה, מפיק תובנות',
+    capabilities: ['ניתוח פיננסי', 'חישוב מס', 'השוואת תקופות', 'הערכת סיכונים'],
   },
   {
-    id: 'localization', name: 'סוכן שפה ולוקליזציה', nameEn: 'Localization Agent',
-    emoji: '🌍', layer: 'design', status: 'idle',
-    description: 'RTL, עברית נכונה, תרגומים',
-    capabilities: ['RTL', 'תרגום', 'בדיקת שפה', 'ניקוד'],
-  },
-  {
-    id: 'accessibility', name: 'סוכן נגישות', nameEn: 'Accessibility Agent',
-    emoji: '♿', layer: 'design', status: 'idle',
-    description: 'נגישות — WCAG, קורא מסך, ניגודיות',
-    capabilities: ['WCAG', 'aria labels', 'ניגודיות', 'ניווט מקלדת'],
-  },
-  {
-    id: 'responsive', name: 'סוכן רספונסיביות', nameEn: 'Responsive Agent',
-    emoji: '📱', layer: 'design', status: 'idle',
-    description: 'מובייל, טאבלט, דסקטופ — הכל עובד',
-    capabilities: ['media queries', 'מובייל', 'טאבלט', 'breakpoints'],
+    id: 'decision_support_agent', name: 'סוכן החלטות', nameEn: 'Decision Support Agent',
+    emoji: '👔', layer: 'processing', status: 'idle',
+    description: 'מציג אפשרויות לאלדד, ממליץ, ממתין לאישור על פעולות רגישות',
+    capabilities: ['הצגת חלופות', 'המלצה', 'בקשת אישור', 'הכנת חומרי החלטה'],
   },
 
-  // ═══ 🧪 Layer 4: Quality ═══
+  // ═══ 📄 הפקה ═══
   {
-    id: 'tester', name: 'סוכן בדיקות', nameEn: 'Tester Agent',
-    emoji: '🧪', layer: 'quality', status: 'idle',
-    description: 'בודק שהפיצ\'רים עובדים — unit + integration',
-    capabilities: ['בדיקות פונקציונליות', 'edge cases', 'regression', 'smoke tests'],
+    id: 'document_agent', name: 'סוכן מסמכים', nameEn: 'Document Agent',
+    emoji: '📄', layer: 'output', status: 'idle',
+    description: 'כותב מכתבים, ממלא טפסים, מייצר דוחות, מכין חומרים לפגישות',
+    capabilities: ['כתיבת מכתבים', 'מילוי טפסים', 'יצירת דוחות', 'הכנת חומרי פגישה', 'PDF'],
   },
   {
-    id: 'security', name: 'סוכן אבטחה', nameEn: 'Security Agent',
-    emoji: '🔒', layer: 'quality', status: 'idle',
-    description: 'סורק פרצות — XSS, injection, הרשאות',
-    capabilities: ['XSS scan', 'SQL injection', 'CORS', 'הרשאות', 'API security'],
-  },
-  {
-    id: 'performance', name: 'סוכן ביצועים', nameEn: 'Performance Agent',
-    emoji: '⚡', layer: 'quality', status: 'idle',
-    description: 'מהירות, זיכרון, זמני טעינה',
-    capabilities: ['Lighthouse', 'bundle size', 'lazy loading', 'caching'],
-  },
-  {
-    id: 'debugger', name: 'סוכן דיבאג', nameEn: 'Debugger Agent',
-    emoji: '🐛', layer: 'quality', status: 'idle',
-    description: 'מזהה ומתקן באגים',
-    capabilities: ['stack trace', 'console errors', 'network issues', 'state bugs'],
-  },
-  {
-    id: 'code_review', name: 'סוכן קוד ריוויו', nameEn: 'Code Review Agent',
-    emoji: '🔎', layer: 'quality', status: 'idle',
-    description: 'בודק איכות קוד, תקנים, best practices',
-    capabilities: ['lint', 'naming', 'complexity', 'DRY', 'SOLID'],
-  },
-
-  // ═══ 📦 Layer 5: Infrastructure ═══
-  {
-    id: 'deploy', name: 'סוכן פריסה', nameEn: 'Deploy Agent',
-    emoji: '🚀', layer: 'infrastructure', status: 'idle',
-    description: 'מעלה למערכת — שרת, דומיין, SSL',
-    capabilities: ['build', 'deploy', 'SSL', 'DNS', 'CI/CD'],
-  },
-  {
-    id: 'monitor', name: 'סוכן ניטור', nameEn: 'Monitor Agent',
-    emoji: '📡', layer: 'infrastructure', status: 'idle',
-    description: 'עוקב 24/7 — דיווח על נפילות ובעיות',
-    capabilities: ['uptime', 'error tracking', 'alerts', 'health checks'],
-  },
-  {
-    id: 'dependencies', name: 'סוכן תלויות', nameEn: 'Dependencies Agent',
-    emoji: '📦', layer: 'infrastructure', status: 'idle',
-    description: 'ספריות, עדכוני אבטחה, גרסאות',
-    capabilities: ['npm audit', 'version updates', 'vulnerability scan', 'lock files'],
-  },
-  {
-    id: 'migration', name: 'סוכן מיגרציה', nameEn: 'Migration Agent',
-    emoji: '💾', layer: 'infrastructure', status: 'idle',
-    description: 'מעביר נתונים ממערכת ישנה לחדשה',
-    capabilities: ['data mapping', 'ETL', 'validation', 'rollback'],
-  },
-
-  // ═══ 📚 Layer 6: Knowledge ═══
-  {
-    id: 'docs', name: 'סוכן תיעוד', nameEn: 'Documentation Agent',
-    emoji: '📝', layer: 'knowledge', status: 'idle',
-    description: 'README, הנחיות, תיעוד API',
-    capabilities: ['README', 'API docs', 'changelog', 'JSDoc'],
-  },
-  {
-    id: 'training', name: 'סוכן הדרכה', nameEn: 'Training Agent',
-    emoji: '🎓', layer: 'knowledge', status: 'idle',
-    description: 'מדריכים למשתמש, FAQ, onboarding',
-    capabilities: ['user guide', 'FAQ', 'video scripts', 'onboarding flow'],
-  },
-  {
-    id: 'integrations', name: 'סוכן אינטגרציות', nameEn: 'Integrations Agent',
-    emoji: '🔗', layer: 'knowledge', status: 'idle',
-    description: 'מחבר בין מערכות — API, webhooks, Gmail',
-    capabilities: ['REST API', 'webhooks', 'Gmail', 'Google Drive', 'CRM'],
-  },
-  {
-    id: 'analytics', name: 'סוכן אנליטיקס', nameEn: 'Analytics Agent',
-    emoji: '📊', layer: 'knowledge', status: 'idle',
-    description: 'עוקב אחרי שימוש — מה לוחצים? מה מתעלמים?',
-    capabilities: ['event tracking', 'heatmaps', 'user flows', 'conversion'],
-  },
-  {
-    id: 'print', name: 'סוכן הדפסה', nameEn: 'Print Agent',
-    emoji: '🖨️', layer: 'knowledge', status: 'idle',
-    description: 'מעצב מסמכים להדפסה — שוליים, PDF, חתימות',
-    capabilities: ['PDF generation', 'print CSS', 'page breaks', 'headers/footers'],
+    id: 'submission_agent', name: 'סוכן שליחה ותיוק', nameEn: 'Submission Agent',
+    emoji: '📮', layer: 'output', status: 'idle',
+    description: 'שולח מסמכים, מתעד, מעדכן סטטוס, שומר בתיק — גם לדברים שצריכים רק תיוק',
+    capabilities: ['שליחה', 'תיעוד', 'תיוק', 'עדכון סטטוס', 'התראה למנכ"ל'],
   },
 ];
 
@@ -240,16 +142,19 @@ export const AGENTS: Agent[] = [
 
 // #region Helpers
 
+/** getAgentById — agentRegistry module */
 export function getAgentById(id: string): Agent | undefined {
   return AGENTS.find(a => a.id === id);
 }
 
+/** getAgentsByLayer — agentRegistry module */
 export function getAgentsByLayer(layer: AgentLayer): Agent[] {
   return AGENTS.filter(a => a.layer === layer);
 }
 
+/** getLayerOrder — business process layer order */
 export function getLayerOrder(): AgentLayer[] {
-  return ['command', 'construction', 'design', 'quality', 'infrastructure', 'knowledge'];
+  return ['command', 'intake', 'processing', 'output', 'support'];
 }
 
 // #endregion

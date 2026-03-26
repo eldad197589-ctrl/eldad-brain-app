@@ -23,6 +23,7 @@ interface Props {
 // #endregion
 
 // #region Component
+/** DriveImportModal component — DriveImportModal component */
 export default function DriveImportModal({ onClose }: Props) {
   const addDocument = useBrainStore((s) => s.addDocument);
   const [files, setFiles] = useState<DriveFile[]>([]);

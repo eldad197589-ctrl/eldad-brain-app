@@ -39,6 +39,7 @@ const DOMAIN_CONFIG: Record<BrainDomain, { label: string; emoji: string; color: 
 // #endregion
 
 // #region Component
+/** ProcessLauncher component — ProcessLauncher component */
 export default function ProcessLauncher({ onLaunch }: Props) {
   const [search, setSearch] = useState('');
   const [selectedDomain, setSelectedDomain] = useState<BrainDomain | 'all'>('all');

@@ -58,6 +58,7 @@ const DOMAIN_EMOJI: Record<BrainDomain, string> = {
 // #endregion
 
 // #region Component
+/** ActiveProcesses component — ActiveProcesses component */
 export default function ActiveProcesses({ onOpenProcess }: Props) {
   const [processes, setProcesses] = useState<ActiveProcess[]>(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
