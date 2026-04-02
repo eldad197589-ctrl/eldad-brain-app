@@ -10,7 +10,8 @@
 // #region Imports
 
 import { ChevronLeft, Clock } from 'lucide-react';
-import { NEURONS, CATEGORIES, PENDING } from '../../../data/neurons';
+import { CATEGORIES, PENDING } from '../../../data/neurons';
+import { resolveNeurons } from '../../../data/neuronsResolver';
 import type { Neuron } from '../types';
 
 
@@ -36,6 +37,7 @@ interface Props {
 export default function CategoriesView({
   neuronCount, flowchartCount, builtCount, inProgressCount, pendingCount, onNeuronClick,
 }: Props) {
+  const RESOLVED_NEURONS = resolveNeurons();
   return (
     <div>
       <div style={{ textAlign: 'center', marginBottom: 24 }}>
@@ -76,7 +78,7 @@ export default function CategoriesView({
       {/* Category Cards Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 16 }}>
         {CATEGORIES.map(cat => {
-          const catNeurons = NEURONS.filter(n => n.category === cat.id);
+          const catNeurons = RESOLVED_NEURONS.filter(n => n.category === cat.id);
           if (catNeurons.length === 0) return (
             <div key={cat.id} style={{
               background: 'rgba(30,45,66,0.5)', border: '1px dashed rgba(160,174,192,0.15)',

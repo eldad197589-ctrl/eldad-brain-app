@@ -20,8 +20,10 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, ArrowLeft, Clock, Compass, Zap } from 'lucide-react';
-import { SIDEBAR_SECTIONS, type NavItem } from '../data/sidebarNav';
+import { resolveSidebarSections } from '../data/sidebarResolver';
+import type { NavItem } from '../data/sidebarNav';
 import { useRecentPagesStatic } from '../hooks/useRecentPages';
+import { PROCESS_DEFINITIONS } from '../system/processSeed';
 // #endregion
 
 // #region Types
@@ -39,6 +41,8 @@ interface CommandItem {
   keywords: string;
   /** Optional subtitle hint */
   hint?: string;
+  /** Route path — used for unique key generation */
+  _to?: string;
 }
 
 interface CommandPaletteProps {
@@ -77,18 +81,30 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
       });
     });
 
-    // 2. Navigation from sidebar
-    SIDEBAR_SECTIONS.forEach((section) => {
+    // 2. Navigation from sidebar (Registry-derived)
+    const sections = resolveSidebarSections();
+
+    // Build route → brainKeywords map for enhanced search
+    const keywordsMap = new Map<string, string>();
+    for (const p of PROCESS_DEFINITIONS) {
+      if (p.route && p.brainKeywords?.length) {
+        keywordsMap.set(p.route, p.brainKeywords.join(' '));
+      }
+    }
+
+    sections.forEach((section) => {
       section.items.forEach((item: NavItem) => {
-        // Skip items that already appear in recent
+        if (item.isDivider) return;
         if (recentPages.some(r => r.path === item.to)) return;
+        const extraKw = keywordsMap.get(item.to) || '';
         allCommands.push({
           label: item.label,
           emoji: item.emoji || '📄',
           action: () => { navigate(item.to); onClose(); },
           category: 'navigate' as const,
-          keywords: `${item.label} ${section.label}`,
+          keywords: `${item.label} ${section.label} ${extraKw}`,
           hint: section.label,
+          _to: item.to,
         });
       });
     });
@@ -301,7 +317,7 @@ function renderCommandItem(
   const isSelected = globalIdx === selectedIndex;
   return (
     <button
-      key={`${item.category}-${item.label}`}
+      key={`${item.category}-${item._to || ''}-${item.label}`}
       onClick={item.action}
       style={{
         width: '100%', display: 'flex', alignItems: 'center', gap: 10,

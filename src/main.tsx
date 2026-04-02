@@ -12,12 +12,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import { initTabSync } from './store/tabSync'
 
-// One-time data refresh — force reseed with v8 meeting data (26/3)
-if (!localStorage.getItem('brain-data-v8')) {
-  localStorage.removeItem('brain-store');
-  localStorage.setItem('brain-data-v8', '1');
-}
-
 import { useBrainStore } from './store/brainStore'
 
 import Layout from './components/Layout'
@@ -35,10 +29,14 @@ initTabSync(
 // Initialize Supabase sync (loads from cloud DB if configured, falls back to localStorage)
 useBrainStore.getState().initializeFromSupabase();
 
+// Initialize Process Registry — single source of truth for all processes
+import { seedAllProcesses } from './system/processSeed';
+seedAllProcesses();
+
 const Dashboard = lazy(() => import('./pages/dashboard'))
 const CeoOffice = lazy(() => import('./pages/ceo-office'))
 const RobiumHub = lazy(() => import('./pages/robium-hub'))
-const FlowchartPage = lazy(() => import('./pages/FlowchartPage'))
+const FlowchartPageWrapper = lazy(() => import('./pages/flowchart/FlowchartPageWrapper'))
 const ClientsPage = lazy(() => import('./pages/ClientsPage'))
 const ClientProfile = lazy(() => import('./pages/ClientProfile'))
 const ProductsPage = lazy(() => import('./pages/products'))
@@ -60,9 +58,13 @@ const PricingManagerPage = lazy(() => import('./pages/ceo-office/PricingManagerP
 const ClientOnboardingPage = lazy(() => import('./pages/client-onboarding/ClientOnboardingPage'))
 const ClientPortal = lazy(() => import('./pages/portal/ClientPortal'))
 const LeadsManagerPage = lazy(() => import('./pages/leads/LeadsManagerPage'))
+const MessagingPage = lazy(() => import('./pages/messaging/MessagingPage'))
+const PesachCardPage = lazy(() => import('./pages/messaging/PesachCardPage'))
 const KirillDisputePage = lazy(() => import('./pages/founders/KirillDisputePage'))
+const PesachExodusHero = lazy(() => import('./pages/messaging/PesachExodusHero'))
 const IncubatorPage = lazy(() => import('./pages/incubator/IncubatorPage'))
 const IncubatorAgreementsPage = lazy(() => import('./pages/incubator-agreements/IncubatorAgreementsPage'))
+const CaseViewPage = lazy(() => import('./pages/case-view/CaseViewPage'))
 
 // Placeholder for pages we'll build later
 const ComingSoon = lazy(() => import('./pages/ComingSoon'))
@@ -98,6 +100,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/clients" element={<ClientsPage />} />
             <Route path="/clients/:id" element={<ClientProfile />} />
             <Route path="/case/helman" element={<CaseHelman />} />
+            <Route path="/case/:caseId" element={<CaseViewPage />} />
             <Route path="/case/guardian" element={<EmbeddedPage title="תיק גרדיאן — אנריקה" src="/legacy/case-guardian-enrique.html" badge="תיק לקוח" badgeColor="#10b981" />} />
             {/* Robium */}
             <Route path="/products" element={<ProductsPage />} />
@@ -106,6 +109,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/pricing-manager" element={<PricingManagerPage />} />
             <Route path="/onboarding" element={<ClientOnboardingPage />} />
             <Route path="/leads" element={<LeadsManagerPage />} />
+            <Route path="/messaging" element={<MessagingPage />} />
+            <Route path="/messaging/pesach" element={<PesachCardPage />} />
             <Route path="/agreement" element={<EmbeddedPage title="טיוטת הסכם לדיון — פגישת 25/03" src="/legacy/robium_final_agreement.html" badge="בדיון" badgeColor="#3b82f6" />} />
             <Route path="/agreement/original" element={<EmbeddedPage title="הסכם מקורי (3.3.26) — היסטורי" src="/legacy/robium_agreement_original.html" badge="מקור (33%)" badgeColor="#ef4444" />} />
             <Route path="/agreement/legacy" element={<EmbeddedPage title="טיוטה מעודכנת (11/03/26) — ROBIUM L.T.D" src="/legacy/robium_agreement_updated.html" badge="טיוטה ב׳" badgeColor="#f59e0b" />} />
@@ -124,7 +129,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/hobbies" element={<HobbiesPage />} />
             {/* Flowcharts */}
-            <Route path="/flow/:flowId" element={<FlowchartPage />} />
+            <Route path="/flow/:flowId" element={<FlowchartPageWrapper />} />
             {/* Personal */}
             <Route path="/personal/payments" element={<PaymentsPage />} />
           </Route>
@@ -134,6 +139,8 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/setlist/:id" element={<ShareableSetlist />} />
           {/* Standalone musician signup — no sidebar/layout */}
           <Route path="/signup/musician" element={<MusicianSignup />} />
+          {/* Standalone Pesach Exodus experience — fullscreen, no layout */}
+          <Route path="/exodus" element={<PesachExodusHero />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

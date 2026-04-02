@@ -1,9 +1,11 @@
 /* ============================================
    FILE: emailClassifier.ts
-   PURPOSE: emailClassifier module
-   DEPENDENCIES: None (local only)
+   PURPOSE: Smart classification of emails — work vs personal, including war compensation
+   DEPENDENCIES: ../system/processSeed (Registry), classificationTypes, extractors,
+                 ../system/knowledge/warCompensationKnowledge (Knowledge Layer)
    EXPORTS: EmailClassification, classifyEmail, extractIsraelDomainOrEntity
    ============================================ */
+import { WAR_COMP_SENDER_DOMAINS } from '../system/knowledge/warCompensationKnowledge';
 /**
  * FILE: emailClassifier.ts
  * PURPOSE: Smart classification of emails — work vs personal
@@ -44,6 +46,15 @@ const WORK_DOMAINS: Record<string, { category: EmailClassification['category']; 
   'btl.gov.il': { category: 'government', label: 'ביטוח לאומי' },
   'justice.gov.il': { category: 'legal', label: 'משרד המשפטים' },
   'nevo.co.il': { category: 'legal', label: 'נבו' },
+  'mas-rechush.gov.il': { category: 'legal', label: 'מס רכוש — פיצויי מלחמה' },
+  'rfrp.gov.il': { category: 'legal', label: 'קרן הפיצויים — מס רכוש' },
+  'boi.org.il': { category: 'government', label: 'בנק ישראל' },
+  // Knowledge Layer — sender domains
+  ...Object.fromEntries(
+    Object.entries(WAR_COMP_SENDER_DOMAINS)
+      .filter(([d]) => !['taxes.gov.il', 'btl.gov.il', 'mas-rechush.gov.il', 'rfrp.gov.il'].includes(d))
+      .map(([d, info]) => [d, { category: info.category as EmailClassification['category'], label: info.label }])
+  ),
   // Banks
   'leumi.co.il': { category: 'bank', label: 'בנק לאומי' },
   'bankhapoalim.co.il': { category: 'bank', label: 'בנק הפועלים' },
@@ -118,6 +129,25 @@ const WORK_KEYWORDS: { pattern: RegExp; weight: number; category: EmailClassific
   { pattern: /דחוף/i, weight: 40, category: 'general_work' },
   { pattern: /אישור/i, weight: 35, category: 'general_work' },
   { pattern: /בקשה/i, weight: 30, category: 'general_work' },
+  // War compensation — מסלול אדום / פיצויי מלחמה (Knowledge Layer)
+  { pattern: /פיצוי מלחמה|פיצויי מלחמה/i, weight: 95, category: 'legal' },
+  { pattern: /מסלול אדום/i, weight: 95, category: 'legal' },
+  { pattern: /חרבות ברזל/i, weight: 90, category: 'legal' },
+  { pattern: /צוק איתן/i, weight: 85, category: 'legal' },
+  { pattern: /נזק עקיף/i, weight: 90, category: 'legal' },
+  { pattern: /מס רכוש/i, weight: 85, category: 'legal' },
+  { pattern: /ערר.*רשות|ערר.*מס/i, weight: 90, category: 'legal' },
+  { pattern: /תביעת פיצוי/i, weight: 88, category: 'legal' },
+  // Knowledge Layer — מבצעים נוספים
+  { pattern: /עם כלביא/i, weight: 90, category: 'legal' },
+  { pattern: /שאגת הארי/i, weight: 80, category: 'legal' },
+  // Knowledge Layer — מסמכים ותהליכי פיצוי
+  { pattern: /קרן הפיצויים|קרן פיצויים/i, weight: 90, category: 'legal' },
+  { pattern: /השלמת מסמכים.*נזק|נזק.*השלמת מסמכים/i, weight: 88, category: 'legal' },
+  { pattern: /מענק עידוד תעסוקה/i, weight: 80, category: 'legal' },
+  { pattern: /פיצוי.*נזק עקיף|נזק עקיף.*פיצוי/i, weight: 92, category: 'legal' },
+  { pattern: /חישוב הפסד/i, weight: 85, category: 'legal' },
+  { pattern: /יישוב ספר/i, weight: 80, category: 'legal' },
 ];
 
 /** Work-related attachment extensions */
@@ -235,6 +265,124 @@ export function extractIsraelDomainOrEntity(text: string): string | undefined {
   }
   
   return undefined;
+}
+
+// #endregion
+
+// #region Full Classification (email-to-workflow)
+
+import type { EmailCategory, ClassifiedEmail } from '../integrations/gmail/classificationTypes';
+import { CATEGORY_QUEUE_MAP } from '../integrations/gmail/classificationTypes';
+import { extractAll } from '../integrations/gmail/extractors';
+
+/** מיפוי קטגוריה מקורית → EmailCategory */
+const CATEGORY_MAP: Record<EmailClassification['category'], EmailCategory> = {
+  invoice: 'invoice',
+  tax_notice: 'accounting_document',
+  client: 'client_document',
+  bank: 'bank_request',
+  government: 'legal_task',
+  legal: 'legal_task',
+  payroll: 'accounting_document',
+  general_work: 'client_document',
+  personal: 'marketing',
+  spam: 'marketing',
+};
+
+/** Gmail labels → category signals */
+const LABEL_SIGNALS: Record<string, EmailCategory> = {
+  'taxes': 'accounting_document',
+  'מסים': 'accounting_document',
+  'invoices': 'invoice',
+  'חשבוניות': 'invoice',
+  'bank': 'bank_request',
+  'בנק': 'bank_request',
+  'client': 'client_document',
+  'לקוח': 'client_document',
+  'legal': 'legal_task',
+  'משפטי': 'legal_task',
+  'payments': 'payment_required',
+  'תשלומים': 'payment_required',
+  'receipts': 'invoice',
+  'קבלות': 'invoice',
+};
+
+/**
+ * סיווג מלא של מייל — מחזיר ClassifiedEmail מוכן לניתוב.
+ * משלב: domain patterns + keyword weights + Gmail labels + extraction
+ * @param emailId — מזהה ייחודי
+ * @param from — שולח
+ * @param subject — נושא
+ * @param body — גוף המייל
+ * @param date — תאריך
+ * @param labels — תוויות Gmail
+ * @returns ClassifiedEmail עם כל הנתונים לניתוב
+ */
+export function classifyEmailFull(
+  emailId: string,
+  from: string,
+  subject: string,
+  body: string,
+  date: string,
+  labels: string[] = []
+): ClassifiedEmail {
+  // שלב 1: סיווג בסיסי (domain + keywords)
+  const basic = classifyEmail(from, subject);
+
+  // שלב 2: בדוק labels של Gmail
+  let labelCategory: EmailCategory | null = null;
+  for (const label of labels) {
+    const lowerLabel = label.toLowerCase();
+    for (const [key, cat] of Object.entries(LABEL_SIGNALS)) {
+      if (lowerLabel.includes(key)) {
+        labelCategory = cat;
+        break;
+      }
+    }
+    if (labelCategory) break;
+  }
+
+  // שלב 3: בדוק אם יש סכום → ייתכן payment_required
+  const extracted = extractAll(from, subject, body);
+  const hasAmount = extracted.amount !== null && extracted.amount > 0;
+  const hasPayLink = extracted.paymentLink !== null;
+
+  // החלטה סופית
+  let category: EmailCategory;
+  let confidence = basic.confidence;
+  let reason = basic.reason;
+
+  if (labelCategory) {
+    // Label מ-Gmail עוקף (מגביר ביטחון)
+    category = labelCategory;
+    confidence = Math.max(confidence, 75);
+    reason += ` | Gmail label: ${labels.join(', ')}`;
+  } else if (basic.isWork) {
+    category = CATEGORY_MAP[basic.category] || 'client_document';
+  } else if (hasAmount && hasPayLink) {
+    // לא מזוהה כעבודה אבל יש סכום + קישור תשלום
+    category = 'payment_required';
+    confidence = 60;
+    reason = 'סכום + קישור תשלום';
+  } else if (!basic.isWork) {
+    category = 'marketing';
+  } else {
+    category = 'marketing';
+  }
+
+  return {
+    emailId,
+    from,
+    subject,
+    body,
+    date,
+    labels,
+    category,
+    confidence,
+    reason,
+    extracted,
+    targetQueue: CATEGORY_QUEUE_MAP[category],
+  };
 }
 
 // #endregion

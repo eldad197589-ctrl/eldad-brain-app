@@ -1,14 +1,19 @@
 /* ============================================
    FILE: ListView.tsx
-   PURPOSE: ListView component
-   DEPENDENCIES: react-router-dom, lucide-react
+   PURPOSE: Dashboard list view — enriched from Process Registry
+   DEPENDENCIES: react-router-dom, lucide-react, processSeed
    EXPORTS: ListView (default)
    ============================================ */
-/**
- * ListView — Flat process list view with stat cards
- */
 import { Link } from 'react-router-dom';
 import { Activity, Wrench, FolderOpen, CheckCircle, Clock } from 'lucide-react';
+import { PROCESS_DEFINITIONS } from '../../../system/processSeed';
+import type { ProcessDefinition } from '../../../system/processRegistry';
+
+/** Looks up a process by route and returns its title (with fallback) */
+function reg(route: string, fallback: string): string {
+  const p: ProcessDefinition | undefined = PROCESS_DEFINITIONS.find(d => d.route === route);
+  return p ? p.title : fallback;
+}
 
 interface Props {
   neuronCount: number;
@@ -31,40 +36,40 @@ export default function ListView({ neuronCount, flowchartCount }: Props) {
         <CaseCard href="/quotes-generator" badge="כלי AI" badgeType="tool" title='מחולל הצעות מחיר (Smart Bareau)' subtitle='הפקת הצעת מחיר אוטומטית מבוססת מחירון משרד' />
       </ProcessSection>
 
-      <ProcessSection title="💰 רווח הון — מכירת נכס בחו״ל">
-        <CaseCard href="/flow/capital-gains" badge="תרשים" badgeType="ready" title='תרשים זרימה — חישוב רווח הון סעיף 91' subtitle='7 שלבים · פורמולות · טופס 1399 · שע"ח' num="#1" />
+      <ProcessSection title={`💰 ${reg('/flow/capital-gains', 'רווח הון')} — מכירת נכס בחו״ל`}>
+        <CaseCard href="/flow/capital-gains" badge="תרשים" badgeType="ready" title={`תרשים זרימה — ${reg('/flow/capital-gains', 'חישוב רווח הון')}`} subtitle='7 שלבים · פורמולות · טופס 1399 · שע"ח' num="#1" />
         <CaseCard href="/calculator" badge="כלי" badgeType="tool" title='נייר עבודה — חישוב רווח הון (סעיף 91)' subtitle='מכירת נכס מקרקעין בחו"ל · תושב ישראל · שע"ח · אינפלציה' />
         <CaseCard href="/case/helman" badge="תיק" badgeType="pending" title='הלמן — מכירת נכס בחו"ל (Texas, USA)' subtitle='רבקה הלמן + אברהם יוסף חלפון · 333 Daleview Dr' />
         <CaseCard href="/letter" badge="כלי" badgeType="tool" title='מכתב שחרור כספים לבנק' subtitle='מכתב רשמי · שחרור נכס · חתימת רו"ח' />
       </ProcessSection>
 
-      <ProcessSection title="🛡️ אפוטרופוס — Guardian Pro">
-        <CaseCard href="/flow/guardian-pro" badge="תרשים" badgeType="ready" title='תרשים זרימה — דוח אפוטרופוס' subtitle='9 שלבים · AI סיווג · חוות דעת · דוח שנתי' num="#2" />
+      <ProcessSection title={`🏥️ ${reg('/flow/guardian-pro', 'אפוטרופוס')} — Guardian Pro`}>
+        <CaseCard href="/flow/guardian-pro" badge="תרשים" badgeType="ready" title={`תרשים זרימה — ${reg('/flow/guardian-pro', 'דוח אפוטרופוס')}`} subtitle='9 שלבים · AI סיווג · חוות דעת · דוח שנתי' num="#2" />
         <CaseCard href="/case/guardian" badge="תיק לקוח" badgeType="tool" title='דין וחשבון לאפוטרופוס — אנריקה' subtitle='דוח שינויים בהון · חוות דעת לא מסוייגת חתומה · 2024' />
       </ProcessSection>
 
-      <ProcessSection title="⏱️ נוכחות ושכר — דיני עבודה">
-        <CaseCard href="/flow/attendance" badge="תרשים" badgeType="ready" title='תרשים זרימה — מנוע נוכחות (חוק עבודה)' subtitle='6 שלבים · משמרות · שעות נוספות · חגים' num="#3" />
+      <ProcessSection title={`⏱️ ${reg('/flow/attendance', 'נוכחות ושכר')} — דיני עבודה`}>
+        <CaseCard href="/flow/attendance" badge="תרשים" badgeType="ready" title={`תרשים זרימה — ${reg('/flow/attendance', 'מנוע נוכחות')}`} subtitle='6 שלבים · משמרות · שעות נוספות · חגים' num="#3" />
       </ProcessSection>
 
-      <ProcessSection title="🎖️ פיצויי מלחמה — מס רכוש">
-        <CaseCard href="/flow/war-compensation" badge="תרשים" badgeType="ready" title='תרשים זרימה — פיצויי מלחמה' subtitle='8 שלבים · 3 מסלולים · חרבות ברזל + צוק איתן' num="#4" />
+      <ProcessSection title={`🏅 ${reg('/flow/war-compensation', 'פיצויי מלחמה')} — מס רכוש`}>
+        <CaseCard href="/flow/war-compensation" badge="תרשים" badgeType="ready" title={`תרשים זרימה — ${reg('/flow/war-compensation', 'פיצויי מלחמה')}`} subtitle='8 שלבים · מסלול אדום (נזק עקיף) · חרבות ברזל · צוק איתן · עם כלביא · שאגת הארי' num="#4" />
       </ProcessSection>
 
-      <ProcessSection title="⚖️ חדלות פירעון — דוח חודשי">
-        <CaseCard href="/flow/insolvency" badge="תרשים" badgeType="ready" title='תרשים זרימה — חדלות פירעון' subtitle='7 שלבים · מנוע Guardian · אישור רו"ח · חודשי' num="#5" />
+      <ProcessSection title={`⚖️ ${reg('/flow/insolvency', 'חדלות פירעון')} — דוח חודשי`}>
+        <CaseCard href="/flow/insolvency" badge="תרשים" badgeType="ready" title={`תרשים זרימה — ${reg('/flow/insolvency', 'חדלות פירעון')}`} subtitle='7 שלבים · מנוע Guardian · אישור רו"ח · חודשי' num="#5" />
       </ProcessSection>
 
-      <ProcessSection title="📝 חוות דעת כלכלית — דיני עבודה">
-        <CaseCard href="/flow/expert-opinion" badge="תרשים" badgeType="ready" title='תרשים זרימה — חוות דעת כלכלית' subtitle='8 שלבים · 79 תיקים · 9 ענפים · תובע/נתבע' num="#6" />
+      <ProcessSection title={`📝 ${reg('/flow/expert-opinion', 'חוות דעת כלכלית')} — דיני עבודה`}>
+        <CaseCard href="/flow/expert-opinion" badge="תרשים" badgeType="ready" title={`תרשים זרימה — ${reg('/flow/expert-opinion', 'חוות דעת כלכלית')}`} subtitle='8 שלבים · 79 תיקים · 9 ענפים · תובע/נתבע' num="#6" />
       </ProcessSection>
 
-      <ProcessSection title="🏢 דיווחי מוסדות — עץ דיווחים">
-        <CaseCard href="/flow/institutional-reports" badge="תרשים" badgeType="ready" title='תרשים זרימה — דיווחי מוסדות' subtitle='6 שלבים · מס הכנסה · ביט"ל · מע"מ · 2017-2025' num="#7" />
+      <ProcessSection title={`🏢 ${reg('/flow/institutional-reports', 'דיווחי מוסדות')} — עץ דיווחים`}>
+        <CaseCard href="/flow/institutional-reports" badge="תרשים" badgeType="ready" title={`תרשים זרימה — ${reg('/flow/institutional-reports', 'דיווחי מוסדות')}`} subtitle='6 שלבים · מס הכנסה · ביט"ל · מע"מ · 2017-2025' num="#7" />
       </ProcessSection>
 
-      <ProcessSection title="📜 הצהרת הון — נוסחת איזון">
-        <CaseCard href="/flow/declaration-of-capital" badge="תרשים" badgeType="ready" title='תרשים זרימה — הצהרת הון' subtitle='8 שלבים · איסוף מסמכים · קליטת נתונים · נוסחת איזון' num="#8" />
+      <ProcessSection title={`📜 ${reg('/flow/declaration-of-capital', 'הצהרת הון')} — נוסחת איזון`}>
+        <CaseCard href="/flow/declaration-of-capital" badge="תרשים" badgeType="ready" title={`תרשים זרימה — ${reg('/flow/declaration-of-capital', 'הצהרת הון')}`} subtitle='8 שלבים · איסוף מסמכים · קליטת נתונים · נוסחת איזון' num="#8" />
       </ProcessSection>
 
       <ProcessSection title="🚨 ביטול קנסות — מס הכנסה">

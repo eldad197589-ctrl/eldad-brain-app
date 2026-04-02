@@ -12,14 +12,14 @@
 
 // #region Imports
 import { NavLink, Outlet } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Menu, X, Calendar, Search, Eye, EyeOff } from 'lucide-react';
 import CollapsibleSection from './CollapsibleSection';
 import CommandPalette from './CommandPalette';
 import BrainChat from './BrainChat';
 import Breadcrumbs from './Breadcrumbs';
 import { useRecentPages } from '../hooks/useRecentPages';
-import { SIDEBAR_SECTIONS } from '../data/sidebarNav';
+import { resolveSidebarSections } from '../data/sidebarResolver';
 import type { NavItem } from '../data/sidebarNav';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 // #endregion
@@ -34,6 +34,9 @@ export default function Layout() {
   const [currentDate, setCurrentDate] = useState('');
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [showComingSoon, setShowComingSoon] = useState(false);
+
+  // Resolve sidebar from Registry — titles/emojis/visibility derived from single source of truth
+  const sidebarSections = useMemo(() => resolveSidebarSections(), []);
 
   // Track recent pages for CommandPalette
   useRecentPages();
@@ -123,7 +126,7 @@ export default function Layout() {
         </div>
 
         <nav className="sidebar-nav">
-          {SIDEBAR_SECTIONS.map((section) => (
+          {sidebarSections.map((section) => (
             <CollapsibleSection
               key={section.id}
               label={section.label}

@@ -114,6 +114,7 @@ export const SIDEBAR_SECTIONS: NavSection[] = [
       { to: '/clients', emoji: '👥', label: 'כל הלקוחות' },
       { to: '/onboarding', emoji: '👤', label: 'קליטת לקוח חדש' },
       { to: '/quotes-generator', emoji: '💰', label: 'הצעות מחיר' },
+      { to: '/messaging', emoji: '💬', label: 'הודעות ללקוחות' },
       // קליטת מסמכים
       { to: '#', emoji: '📥', label: 'קליטת מסמכים', isDivider: true },
       { to: '/coming-soon', emoji: '📥', label: 'קליטת חשבונית ספק', dim: true },
@@ -179,6 +180,9 @@ export const SIDEBAR_SECTIONS: NavSection[] = [
       { to: '/flow/guardian-pro', emoji: '🏛️', label: 'אפוטרופוס' },
       { to: '/flow/war-compensation', emoji: '🛡️', label: 'פיצויי מלחמה' },
       { to: '/flow/insolvency', emoji: '📉', label: 'חדלות פירעון' },
+      // תיקים פעילים
+      { to: '#', emoji: '📁', label: 'תיקים פעילים', isDivider: true },
+      { to: '/case/dima-rodnitski', emoji: '🛡️', label: 'ערר — דימה רודניצקי' },
       { to: '/coming-soon', emoji: '🏠', label: 'מיסוי מקרקעין', dim: true },
       { to: '/coming-soon', emoji: '📊', label: 'הערכות שווי', dim: true },
     ],

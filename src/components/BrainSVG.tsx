@@ -6,7 +6,8 @@
    ============================================ */
 // #region Imports
 
-import { NEURONS, SYNAPSES, PENDING, CATEGORIES, type Neuron } from '../data/neurons';
+import { SYNAPSES, PENDING, CATEGORIES, type Neuron } from '../data/neurons';
+import { resolveNeurons } from '../data/neuronsResolver';
 
 
 // #endregion
@@ -21,8 +22,8 @@ interface BrainSVGProps {
 
 // #endregion
 
-function computePositions(neurons: typeof NEURONS) {
-  const catNeurons: Record<string, typeof NEURONS> = {};
+function computePositions(neurons: Neuron[]) {
+  const catNeurons: Record<string, Neuron[]> = {};
   CATEGORIES.forEach(c => catNeurons[c.id] = []);
   neurons.forEach(n => {
     if (catNeurons[n.category]) catNeurons[n.category].push(n);
@@ -57,9 +58,11 @@ function computePositions(neurons: typeof NEURONS) {
 
 /** BrainSVG component — BrainSVG component */
 export default function BrainSVG({ onNeuronClick }: BrainSVGProps) {
-  const positions = computePositions(NEURONS);
+  // Resolve neurons from Registry — labels/emojis derived from single source of truth
+  const RESOLVED_NEURONS = resolveNeurons();
+  const positions = computePositions(RESOLVED_NEURONS);
   const neuronMap: Record<string, Neuron> = {};
-  NEURONS.forEach(n => neuronMap[n.id] = n);
+  RESOLVED_NEURONS.forEach(n => neuronMap[n.id] = n);
 
   // Generate pending dots
   const pendingDots = PENDING.map((_, i) => {
@@ -73,7 +76,7 @@ export default function BrainSVG({ onNeuronClick }: BrainSVGProps) {
   });
 
   // Category cluster labels
-  const activeCats = CATEGORIES.filter(c => NEURONS.some(n => n.category === c.id));
+  const activeCats = CATEGORIES.filter(c => RESOLVED_NEURONS.some(n => n.category === c.id));
 
   return (
     <div className="brain-container">
@@ -154,7 +157,7 @@ export default function BrainSVG({ onNeuronClick }: BrainSVGProps) {
         ))}
 
         {/* Neurons */}
-        {NEURONS.map(n => {
+        {RESOLVED_NEURONS.map(n => {
           const pos = positions[n.id];
           if (!pos) return null;
           return (

@@ -1,14 +1,10 @@
 /* ============================================
    FILE: breadcrumbsMap.ts
-   PURPOSE: breadcrumbsMap module
-   DEPENDENCIES: None (local only)
+   PURPOSE: Maps route paths to Hebrew breadcrumb labels — enriched from Registry
+   DEPENDENCIES: ../system/processSeed
    EXPORTS: BreadcrumbNode, BREADCRUMB_MAP, DYNAMIC_BREADCRUMBS, resolveBreadcrumb, buildBreadcrumbChain
    ============================================ */
-/**
- * FILE: breadcrumbsMap.ts
- * PURPOSE: Maps route paths to Hebrew breadcrumb labels for navigation awareness
- * DEPENDENCIES: none (pure data)
- */
+import { PROCESS_DEFINITIONS } from '../system/processSeed';
 
 // #region Types
 
@@ -24,16 +20,29 @@ export interface BreadcrumbNode {
 
 // #endregion
 
+// #region Registry-enriched helpers
+
+/** Looks up a process by route and returns its emoji */
+function registryEmoji(route: string, fallback: string): string {
+  return PROCESS_DEFINITIONS.find(p => p.route === route)?.emoji || fallback;
+}
+
+/** Looks up a process by route and returns its title */
+function registryTitle(route: string, fallback: string): string {
+  return PROCESS_DEFINITIONS.find(p => p.route === route)?.title || fallback;
+}
+
+// #endregion
+
 // #region Data
 
 /**
  * Static route-to-breadcrumb mapping.
- * Each key is a route path, and the value describes how it appears in breadcrumbs.
- * `parent` builds the chain: /ceo → / (דשבורד > לשכת מנכ"ל)
+ * Processes in the Registry derive emoji/title from the single source of truth.
  */
 export const BREADCRUMB_MAP: Record<string, BreadcrumbNode> = {
-  '/': { emoji: '📊', label: 'דשבורד' },
-  '/ceo': { emoji: '🏢', label: 'לשכת מנכ"ל', parent: '/' },
+  '/': { emoji: registryEmoji('/', '📊'), label: registryTitle('/', 'דשבורד') },
+  '/ceo': { emoji: registryEmoji('/ceo', '🏢'), label: registryTitle('/ceo', 'לשכת מנכ"ל'), parent: '/' },
   '/hub': { emoji: '🎛️', label: 'מרכז שליטה', parent: '/' },
   '/clients': { emoji: '👥', label: 'כל הלקוחות', parent: '/' },
   '/products': { emoji: '📦', label: 'תיק מוצרים', parent: '/' },
@@ -43,7 +52,8 @@ export const BREADCRUMB_MAP: Record<string, BreadcrumbNode> = {
   '/comparison': { emoji: '📊', label: 'ניתוח מתחרים', parent: '/products' },
   '/incubator': { emoji: '🏗️', label: 'חממה טכנולוגית', parent: '/products' },
   '/letter': { emoji: '✉️', label: 'מכתבים', parent: '/' },
-  '/documents': { emoji: '📋', label: 'בוט מילוי מסמכים', parent: '/' },
+  '/documents': { emoji: registryEmoji('/documents', '📋'), label: registryTitle('/documents', 'בוט מילוי מסמכים'), parent: '/' },
+  '/personal/payments': { emoji: registryEmoji('/personal/payments', '💳'), label: registryTitle('/personal/payments', 'תשלומי בית'), parent: '/' },
   '/hobbies': { emoji: '🎵', label: 'זמר ומוזיקה', parent: '/' },
   '/settings': { emoji: '⚙️', label: 'הגדרות', parent: '/' },
   '/calculator': { emoji: '🧮', label: 'מחשבון', parent: '/' },
@@ -61,25 +71,21 @@ export const DYNAMIC_BREADCRUMBS: Array<{
   {
     pattern: /^\/flow\/(.+)$/,
     getNode: (match) => {
-      const flowNames: Record<string, string> = {
-        'attendance': 'מנוע נוכחות',
-        'attendance-agents': 'סוכני נוכחות',
-        'payroll-processing': 'עיבוד שכר',
-        'worklaw': 'דיני עבודה',
-        'expert-opinion': 'חוות דעת כלכלית',
-        'capital-gains': 'רווח הון בחו"ל',
-        'declaration-of-capital': 'הצהרת הון',
-        'war-compensation': 'פיצויי מלחמה',
-        'guardian-pro': 'אפוטרופוס',
-        'insolvency': 'חדלות פירעון',
-        'institutional-reports': 'דיווחי מוסדות',
-        'penalty-cancellation': 'ביטול קנסות',
-        'brain-router': 'Brain Router',
-      };
       const flowId = match[1];
+      const route = `/flow/${flowId}`;
+      // Registry lookup — single source of truth for titles
+      const process = PROCESS_DEFINITIONS.find(p => p.route === route);
+      if (process) {
+        return { emoji: process.emoji, label: process.title, parent: '/' };
+      }
+      // Fallback for flows not yet in Registry
+      const fallback: Record<string, string> = {
+        'attendance-agents': 'סוכני נוכחות',
+        'penalty-cancellation': 'ביטול קנסות',
+      };
       return {
         emoji: '📐',
-        label: flowNames[flowId] || flowId,
+        label: fallback[flowId] || flowId,
         parent: '/',
       };
     },

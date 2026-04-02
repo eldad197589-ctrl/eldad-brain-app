@@ -1,0 +1,1 @@
+import { DIMA_CASE_SEED } from './src/data/dimaCaseSeed'; console.log('DOCS:', DIMA_CASE_SEED.documents.map(d=>d.type)); console.log('MAP:', DIMA_CASE_SEED.attackMap?.length);
