@@ -115,5 +115,6 @@
   "services/pdfFormService.ts",
   "services/pdfLetterService.ts",
   "services/ragService.ts",
-  "services/wordExportService.ts"
+  "services/wordExportService.ts",
+  "store/brainStore.ts"
 ]
