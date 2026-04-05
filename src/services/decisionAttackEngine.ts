@@ -6,6 +6,7 @@
    ============================================ */
 import type { CaseDocument, CaseProcessType, AuthoredArgument } from '../data/caseTypes';
 import type { CaseBundle } from '../integrations/gmail/caseBundle';
+import type { ClaimResponse } from './caseBuilderTypes';
 
 // #region Types
 
@@ -50,6 +51,8 @@ export interface AttackEngineInput {
   caseDocuments: CaseDocument[];
   caseBundle?: CaseBundle;
   processType: CaseProcessType;
+  /** מענים ייעודיים 1:1 — עוקף fuzzy matching כשקיים */
+  claimResponses?: ClaimResponse[];
 }
 
 // #endregion
@@ -60,9 +63,31 @@ export interface AttackEngineInput {
  * בונה מפת תקיפה מסודרת נגד החלטת הרשות
  */
 export function buildAttackMap(input: AttackEngineInput): AttackPoint[] {
-  // 1. חילוץ טענות החלטה מהטקסט (כרגע דמה/סימולטיבי, יעבוד מול LLM בהמשך)
+  // 1. חילוץ טענות החלטה מהטקסט
   const claims = extractAuthorityClaims(input.decisionText);
 
+  // === DIRECT INJECT PATH ===
+  // כשיש claimResponses מאושרים — inject ישיר 1:1, ללא fuzzy matching
+  console.log(`[AttackEngine] claims: ${claims.length}, claimResponses: ${input.claimResponses?.length ?? 'undefined'}`);
+  if (input.claimResponses && input.claimResponses.length === claims.length) {
+    console.log('[AttackEngine] ✅ DIRECT INJECT PATH — bypassing fuzzy matching');
+    return claims.map((claim, i) => {
+      const cr = input.claimResponses![i];
+      console.log(`[AttackEngine] Claim ${i + 1}: "${claim.slice(0, 40)}..." → Counter: "${cr.counterText.slice(0, 40)}..."`);
+      return {
+        authorityClaim: claim,
+        issueType: classifyClaimWeakness(claim, input.processType),
+        weaknessExplanation: generateWeaknessExplanation(classifyClaimWeakness(claim, input.processType)),
+        counterArgument: cr.counterText,
+        supportingEvidence: cr.evidenceFileNames,
+        strengthLevel: 'strong' as StrengthLevel,
+        source: 'authored_response' as const,
+      };
+    });
+  }
+  console.log('[AttackEngine] ⚠️ FUZZY FALLBACK PATH — no claimResponses match');
+
+  // === FUZZY FALLBACK PATH (תיקים ללא claimResponses) ===
   const attackMap: AttackPoint[] = [];
 
   for (const claim of claims) {

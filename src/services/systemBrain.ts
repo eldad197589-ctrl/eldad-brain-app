@@ -113,6 +113,14 @@ export async function planMission(
   return mission;
 }
 
+/** Inject a pre-planned mission (e.g. from caseMissionPlanner) into the brain */
+export function launchPreconfiguredMission(mission: Mission): Mission {
+  const all = loadMissions();
+  all.unshift(mission);
+  saveMissions(all);
+  return mission;
+}
+
 // #endregion
 
 // #region Step Execution

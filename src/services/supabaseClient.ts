@@ -17,8 +17,9 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // #region Configuration
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+const _env = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : ({} as any);
+const SUPABASE_URL = _env.VITE_SUPABASE_URL as string | undefined;
+const SUPABASE_ANON_KEY = _env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
 let supabaseInstance: SupabaseClient | null = null;
 

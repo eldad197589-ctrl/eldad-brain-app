@@ -29,6 +29,13 @@ import {
   searchPastMissionsTool,
   requestHumanInputTool,
 } from './agentToolDefinitionsP2';
+import {
+  getCaseContextTool,
+  updateCaseDraftTool,
+  evaluateCaseReadinessTool,
+  generateCaseOutputTool,
+  approveCaseDraftTool,
+} from './agentToolDefinitionsCase';
 
 // #region Types
 
@@ -60,6 +67,12 @@ export const AGENT_TOOLS: AgentTool[] = [
   // Phase 2 tools
   searchPastMissionsTool,
   requestHumanInputTool,
+  // Case tools — bridge agent layer ↔ case layer
+  getCaseContextTool,
+  updateCaseDraftTool,
+  evaluateCaseReadinessTool,
+  approveCaseDraftTool,
+  generateCaseOutputTool,
 ];
 
 /**

@@ -6,6 +6,7 @@
                  brainStore, caseTypes, draftGenerator
    EXPORTS: CaseViewPage (default)
    ============================================ */
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useBrainStore } from '../../store/brainStore';
 import { generateAppealDraft } from '../../integrations/gmail/draftGenerator';
@@ -13,10 +14,13 @@ import { AlertTriangle, Calendar, FileText, Clock, Shield } from 'lucide-react';
 import CaseEmailList from './components/CaseEmailList';
 import CaseDocumentList from './components/CaseDocumentList';
 import CaseDraftPreview from './components/CaseDraftPreview';
+import CaseFinalOutput from './components/CaseFinalOutput';
 import CaseAttackMapSection from './components/CaseAttackMapSection';
 import SuggestedBlocksSection from './components/SuggestedBlocksSection';
 import type { CaseDraft } from '../../data/caseTypes';
-
+import { exportToWord } from '../../services/wordExportService';
+import { DIMA_CASE_SEED } from '../../data/dimaCaseSeed';
+import { CASE_BUILDER_VERSION } from '../../services/caseBuilder';
 // #region Component
 
 /** CaseViewPage — reads caseId from route, pulls data from store */
@@ -38,6 +42,24 @@ export default function CaseViewPage() {
     );
   }
 
+  // ─── Safe Seed Restore for Dima ───
+  // Only refreshes the case entity from DIMA_CASE_SEED (attack map + documents).
+  // Does NOT touch draft status, does NOT auto-export, does NOT force-close.
+  useEffect(() => {
+    if (caseId === 'dima-rodnitski') {
+      const current = useBrainStore.getState().cases.find(x => x.caseId === 'dima-rodnitski');
+      const seedVersion = DIMA_CASE_SEED.builtWithVersion ?? 0;
+      const currentVersion = current?.builtWithVersion ?? 0;
+      if (!current || currentVersion < seedVersion) {
+        console.log(`[CaseView] Restoring Dima from seed (v${seedVersion} > v${currentVersion})`);
+        useBrainStore.getState().upsertCase({
+          ...DIMA_CASE_SEED,
+          updatedAt: new Date().toISOString()
+        });
+      }
+    }
+  }, [caseId]);
+
   // ─── Deadline ───
   const deadlineDate = new Date(caseEntity.deadline + 'T00:00:00');
   const daysLeft = Math.ceil((deadlineDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
@@ -47,45 +69,82 @@ export default function CaseViewPage() {
   const submittedDocs = caseEntity.documents.filter(d => d.wasSubmitted).length;
   const totalDocs = caseEntity.documents.length;
 
-  /** Generate appeal draft — preserves all review state, regenerates only template */
+  /** Generate appeal draft — rebuilds from attack map blocks, NOT from generic template */
   const handleGenerateDraft = () => {
-    const result = generateAppealDraft(
-      `ערר על החלטה — ${caseEntity.clientName} — בקשה ${caseEntity.officialCaseNumber || ''}`,
-      caseEntity.deadline,
-      null,
-      'war_compensation_red_track'
-    );
-    
-    // Preserve ALL existing review/state — regenerate only base template (subject/body)
     const existing = caseEntity.draft;
     
-    // Don't demote status: if already under_review or higher, keep it
-    const preservedStatus = existing?.status === 'under_review'
-      || existing?.status === 'approved_by_eldad'
-      || existing?.status === 'ready_for_submission'
-      ? existing.status
-      : 'draft';
+    // === הגנה 1: ברירת מחדל = לא לדרוס טיוטה מהותית ===
+    const hasRealContent = existing?.body && existing.body.length > 200 
+      && !existing.body.includes('[נימוקים מפורטים]')
+      && !existing.body.includes('[תיאור הנזק');
+    
+    if (hasRealContent) {
+      const confirmed = window.confirm(
+        'הטיוטה הנוכחית מכילה תוכן מהותי (ערר מקצועי).\n\n'
+        + 'לחיצה על "אישור" תיצור טיוטה חדשה מגוף מפת התקיפה.\n'
+        + 'הטיוטה הקודמת תישמר כ-snapshot.\n'
+        + 'לחיצה על "ביטול" תשמור על הטיוטה הקיימת.'
+      );
+      if (!confirmed) return;
+    }
 
-    const draft: CaseDraft = {
-      templateType: result.templateType,
-      subject: result.subject,
-      body: result.body,
-      status: preservedStatus,
-      sufficiencyWarning: 'הטיוטה נוצרה מחדש. בלוקי הטיעון והבדיקות נשמרו.',
-      createdAt: new Date().toISOString(),
-      // Preserve: suggestedBlocks (includes includeInDraft per block)
-      suggestedBlocks: existing?.suggestedBlocks,
-      // Preserve: export timestamps
-      exportedDraftAt: existing?.exportedDraftAt,
-      exportedFinalAt: existing?.exportedFinalAt,
-      // Preserve: review metadata
-      lastReviewedAt: existing?.lastReviewedAt,
-      reviewedBy: existing?.reviewedBy,
-      // Preserve: insertion tracking
-      suggestedBlocksInsertedAt: existing?.suggestedBlocksInsertedAt,
-      insertedAttackBlockIds: existing?.insertedAttackBlockIds,
-    };
-    updateCaseDraft(caseEntity.caseId, draft);
+    // === הגנה 2: שמירת snapshot לפני דריסה ===
+    const snapshot = existing?.body ? {
+      body: existing.body,
+      subject: existing.subject,
+      savedAt: new Date().toISOString(),
+      builtFromVersion: existing.builtFromVersion,
+    } : undefined;
+
+    // === Source of truth: rebuild from seed (attack map blocks) ===
+    const seedCase = DIMA_CASE_SEED;
+    const seedDraft = seedCase.draft;
+    const now = new Date().toISOString();
+    
+    if (seedDraft && seedDraft.body && !seedDraft.body.includes('[נימוקים מפורטים]')) {
+      const draft: CaseDraft = {
+        templateType: seedDraft.templateType,
+        subject: seedDraft.subject,
+        body: seedDraft.body,
+        status: 'draft',
+        sufficiencyWarning: null,
+        createdAt: now,
+        builtFromVersion: CASE_BUILDER_VERSION,
+        builtFromSource: 'seed_blocks',
+        previousSnapshot: snapshot,
+        suggestedBlocks: existing?.suggestedBlocks ?? seedDraft.suggestedBlocks,
+        exportedDraftAt: existing?.exportedDraftAt,
+        exportedFinalAt: existing?.exportedFinalAt,
+        lastReviewedAt: existing?.lastReviewedAt,
+        reviewedBy: existing?.reviewedBy,
+        suggestedBlocksInsertedAt: existing?.suggestedBlocksInsertedAt,
+        insertedAttackBlockIds: existing?.insertedAttackBlockIds,
+      };
+      console.log(`[Draft] ✅ נבנה מ-seed_blocks | version=${CASE_BUILDER_VERSION} | ${now}`);
+      updateCaseDraft(caseEntity.caseId, draft);
+    } else {
+      // Fallback for non-Dima cases: generic template
+      const result = generateAppealDraft(
+        `ערר על החלטה — ${caseEntity.clientName} — בקשה ${caseEntity.officialCaseNumber || ''}`,
+        caseEntity.deadline,
+        null,
+        'war_compensation_red_track'
+      );
+      const draft: CaseDraft = {
+        templateType: result.templateType,
+        subject: result.subject,
+        body: result.body,
+        status: 'draft',
+        sufficiencyWarning: 'טיוטה גנרית — נדרשת כתיבה ידנית.',
+        createdAt: now,
+        builtFromVersion: CASE_BUILDER_VERSION,
+        builtFromSource: 'generic_template',
+        previousSnapshot: snapshot,
+        suggestedBlocks: existing?.suggestedBlocks,
+      };
+      console.log(`[Draft] ⚠️ נבנה מ-generic_template | version=${CASE_BUILDER_VERSION} | ${now}`);
+      updateCaseDraft(caseEntity.caseId, draft);
+    }
   };
 
   /** Update draft content (e.g. appending blocks) — does NOT change status */
@@ -208,6 +267,11 @@ export default function CaseViewPage() {
           clientName={caseEntity.clientName}
           onGenerateDraft={handleGenerateDraft}
         />
+        {(caseEntity.draft?.status === 'ready_for_submission' || caseEntity.draft?.exportedFinalAt) && (
+          <div style={{ marginTop: 24 }}>
+            <CaseFinalOutput draft={caseEntity.draft} clientName={caseEntity.clientName} />
+          </div>
+        )}
       </div>
     </div>
   );

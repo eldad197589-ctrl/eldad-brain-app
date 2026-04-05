@@ -51,6 +51,8 @@ export interface Mission {
   systemName: string;
   processId?: string;
   clientId?: string;
+  /** Case ID — when mission operates on a CaseEntity */
+  caseId?: string;
   steps: MissionStep[];
   status: 'planning' | 'executing' | 'review' | 'completed';
   form4?: Form4Report;

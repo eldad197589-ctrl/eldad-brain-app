@@ -11,7 +11,11 @@ import {
   WidthType, AlignmentType, BorderStyle, HeadingLevel,
   SectionType, PageNumber,
 } from 'docx';
-import { saveAs } from 'file-saver';
+// Fallback mechanism to safely run in Node scripts without crashing
+let fileSaverSaveAs: any = null;
+if (typeof window !== 'undefined') {
+  import('file-saver').then(m => { fileSaverSaveAs = m.saveAs || m.default; }).catch(() => {});
+}
 
 // #region Types
 
@@ -476,7 +480,35 @@ export async function exportToWord(options: WordExportOptions): Promise<void> {
   const fname = options.filename.endsWith('.docx')
     ? options.filename
     : `${options.filename}.docx`;
-  saveAs(blob, fname);
+  if (typeof window !== 'undefined') {
+    // 1. Post to local API to save physical file in Vite workspace
+    try {
+      await fetch(`/api/save-file?filename=${encodeURIComponent(fname)}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        },
+        body: blob
+      });
+      console.log(`[WordExportService] File dispatched to local local workspace successfully.`);
+    } catch (e) {
+      console.log('Failed to save physically to local server API. Ignored.');
+    }
+    // 2. Fallback local browser download
+    if (fileSaverSaveAs) {
+      fileSaverSaveAs(blob, fname);
+    }
+  } else {
+    // We are in Node! Save it physically using fs.
+    console.log(`[WordExportService] Generated DOCX blob (${blob.size} bytes). Saving physically in Node context...`);
+    const arrayBuffer = await blob.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const fs = await import('fs');
+    const path = await import('path');
+    const outPath = path.join(process.cwd(), fname);
+    fs.writeFileSync(outPath, buffer);
+    console.log(`[WordExportService] File written physically to: ${outPath}`);
+  }
 }
 
 // #endregion

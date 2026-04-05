@@ -32,6 +32,7 @@ import CeoFooter from './components/CeoFooter';
 import OverdueAlerts from './components/OverdueAlerts';
 import DocumentIntake from './components/DocumentIntake';
 import MorningBrief from './components/MorningBrief';
+import MissionLauncher from './components/MissionLauncher';
 import DashboardSummaryCards from '../dashboard/components/DashboardSummaryCards';
 import { LayoutDashboard, Calendar, Columns } from 'lucide-react';
 
@@ -123,6 +124,9 @@ export default function CeoOffice() {
         {/* ============================== */}
         {activeTab === 'overview' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <div style={{ padding: '0 20px' }}>
+              <MissionLauncher />
+            </div>
             <div style={{ padding: '0 20px' }}><MorningBrief /></div>
             <DashboardSummaryCards />
             <div style={{ padding: '0 20px' }}><DocumentIntake /></div>

@@ -40,7 +40,7 @@ const TEMPLATES: Record<DraftResult['templateType'], { subject: string; body: st
 
 אבקש לעדכנני בהתאם.
 בברכה,
-אלדד ברגר, רו"ח`,
+דוד אלדד, רו"ח`,
   },
   insurance_response: {
     subject: 'מענה לדרישת ביטוח לאומי — [REFERENCE]',
@@ -55,7 +55,7 @@ const TEMPLATES: Record<DraftResult['templateType'], { subject: string; body: st
 
 נא לאשר קבלת המסמכים.
 בברכה,
-אלדד ברגר, רו"ח`,
+דוד אלדד, רו"ח`,
   },
   municipal_appeal: {
     subject: 'ערר על הודעת חיוב — [REFERENCE]',
@@ -72,7 +72,7 @@ const TEMPLATES: Record<DraftResult['templateType'], { subject: string; body: st
 
 מצורפים אסמכתאות תומכות.
 בברכה,
-אלדד ברגר, רו"ח`,
+דוד אלדד, רו"ח`,
   },
   war_compensation_appeal: {
     subject: 'ערר על החלטה — פיצוי מלחמה מסלול אדום — [REFERENCE]',
@@ -107,7 +107,7 @@ const TEMPLATES: Record<DraftResult['templateType'], { subject: string; body: st
 מצורפים כלל המסמכים התומכים.
 
 בברכה,
-אלדד ברגר, רו"ח
+דוד אלדד, רו"ח
 מייצג מורשה`,
   },
   // Knowledge Layer — תבנית השלמת מסמכים / מכתב נלווה
@@ -143,7 +143,7 @@ ${WAR_COMP_DRAFT_TEMPLATES.war_compensation_supplement.signature}`,
 
 נשמח לפתור את העניין בדרכי שלום.
 בברכה,
-אלדד ברגר, רו"ח`,
+דוד אלדד, רו"ח`,
   },
   general_response: {
     subject: 'מענה לפנייתכם — [REFERENCE]',
@@ -156,7 +156,7 @@ ${WAR_COMP_DRAFT_TEMPLATES.war_compensation_supplement.signature}`,
 [תוכן המענה]
 
 בברכה,
-אלדד ברגר, רו"ח`,
+דוד אלדד, רו"ח`,
   },
 };
 

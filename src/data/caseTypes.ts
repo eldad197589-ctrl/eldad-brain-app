@@ -172,6 +172,17 @@ export interface CaseDraft {
   suggestedBlocksInsertedAt?: string;
   /** מזהי בלוקים שכבר הוזרקו — למניעת כפילות */
   insertedAttackBlockIds?: string[];
+  /** מאיזה גרסת seed נבנתה הטיוטה */
+  builtFromVersion?: number;
+  /** מקור הטיוטה: seed_blocks / generic_template / manual_edit */
+  builtFromSource?: 'seed_blocks' | 'generic_template' | 'manual_edit';
+  /** snapshot של הטיוטה הקודמת לפני דריסה (כלל הגנה) */
+  previousSnapshot?: {
+    body: string;
+    subject: string;
+    savedAt: string;
+    builtFromVersion?: number;
+  };
 }
 
 /** ישות תיק מלאה */

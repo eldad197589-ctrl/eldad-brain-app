@@ -24,7 +24,7 @@ export { deriveSuggestedBlocks } from './caseBuilderHelpers';
 
 // #region Main Builder
 
-export const CASE_BUILDER_VERSION = 9;
+export const CASE_BUILDER_VERSION = 17;
 
 /**
  * Build a complete CaseEntity from raw sources.
@@ -100,7 +100,8 @@ function buildAttackDataAndDraft(input: CaseSourceInput, documents: CaseDocument
       authoredArguments: parsedResponse?.arguments,
       caseDocuments: documents,
       caseBundle,
-      processType: input.processType
+      processType: input.processType,
+      claimResponses: input.claimResponses,
     });
     
     attackSummary = {

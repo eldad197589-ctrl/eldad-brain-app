@@ -109,6 +109,20 @@ ${step.description}
 4. תן פלט מובנה וברור (רשימות, טבלאות, שלבים)
 5. אל תמציא נתונים — עבוד רק עם מה שיש`;
 
+  // Add case context when mission is case-aware
+  if (mission.caseId) {
+    prompt += `
+
+═══ הקשר תיק ═══
+תיק פעיל: ${mission.caseId}
+**חובה:** השתמש בכלי get_case_context עם case_id="${mission.caseId}" כדי לטעון את מצב התיק לפני כל פעולה.
+כלים זמינים על תיקים:
+- get_case_context — טעינת snapshot מלא של התיק
+- update_case_draft — עדכון טיוטה (body, subject, review)
+- evaluate_case_readiness — בדיקת מוכנות ערר
+- generate_case_output — הפקת Word (טיוטה/סופי)`;
+  }
+
   // Add tool instructions
   if (hasTools) {
     prompt += `
@@ -121,7 +135,11 @@ ${step.description}
 - ליצור משימות (create_task)
 - ליצור טיוטות מסמכים (generate_document_draft)
 - לחפש משימות קודמות (search_past_missions)
-- לבקש קלט מהמנכ"ל (request_human_input)
+- לבקש קלט מהמנכ"ל (request_human_input)${mission.caseId ? `
+- לטעון תיק (get_case_context)
+- לעדכן טיוטת תיק (update_case_draft)
+- להעריך מוכנות תיק (evaluate_case_readiness)
+- להפיק מסמך Word מתיק (generate_case_output)` : ''}
 
 **חובה:** השתמש בכלים כשאתה צריך מידע. אל תנחש — חפש!`;
   }

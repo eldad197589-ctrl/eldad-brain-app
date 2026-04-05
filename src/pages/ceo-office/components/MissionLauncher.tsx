@@ -20,10 +20,12 @@ import type { Mission } from '../../../data/agentRegistry';
 import { PROCESS_REGISTRY } from '../../../data/processRegistry';
 import {
   planMission, loadMissions, runFullMissionPipeline,
-  generateForm4,
+  generateForm4, launchPreconfiguredMission,
 } from '../../../services/systemBrain';
 import { isAIConfigured } from '../../../services/geminiService';
 import { ModeButton, StepRow, MissionStatusBadge, Form4Display } from './MissionSubComponents';
+
+import { planCaseMission } from '../../../services/caseMissionPlanner';
 
 // #region Component
 
@@ -42,6 +44,21 @@ export default function MissionLauncher() {
   const stepsRef = useRef<HTMLDivElement>(null);
 
   const aiReady = isAIConfigured();
+
+  /** Trigger direct dima-rodnitski case mission (Dev Trigger) */
+  const handleDimaAppeal = useCallback(() => {
+    try {
+      const missionRaw = planCaseMission('dima-rodnitski');
+      if ('error' in missionRaw) {
+        setError(missionRaw.error);
+        return;
+      }
+      const savedMission = launchPreconfiguredMission(missionRaw as Mission);
+      setActiveMission(savedMission);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'כישלון ביצירת משימת ערר');
+    }
+  }, []);
 
   /** Create a new mission plan */
   const handlePlan = useCallback(async () => {
@@ -142,6 +159,16 @@ export default function MissionLauncher() {
               label="📂 תיוק בלבד" value="filing" current={mode}
               onClick={() => setMode('filing')}
             />
+            <button
+              onClick={handleDimaAppeal}
+              style={{
+                background: 'rgba(52,211,153,0.1)', border: '1px solid #34d399', 
+                color: '#34d399', padding: '6px 12px', borderRadius: 8,
+                fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer',
+              }}
+            >
+              🛡️ הרץ ערר דימה
+            </button>
           </div>
 
           {/* System Name Picker */}

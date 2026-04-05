@@ -27,6 +27,18 @@ export type DamageType = 'direct' | 'indirect';
 /** רמת אימות ידע */
 export type KnowledgeVerification = 'knowledge_rule' | 'knowledge_candidate' | 'marketing_or_newsletter';
 
+/** תקדים משפטי (שכבת ידע מובנית לפסיקה) */
+export interface WarCompLegalPrecedent {
+  id: string;
+  caseNumber: string;
+  caseName: string;
+  principle: string;
+  authorityUsesItFor: string;
+  counterArgument: string;
+  whenToTrigger: string[];
+  classification: 'supports_authority' | 'supports_appellant' | 'requires_distinction';
+}
+
 // #endregion
 
 // #region Subtypes
@@ -331,11 +343,59 @@ export const WAR_COMP_WARS = [
 
 // #region Legal Precedents
 
-/** תקדימים משפטיים (מתוך תיקי אלדד) */
-export const WAR_COMP_LEGAL_PRECEDENTS = [
-  { id: '749_87', citation: 'ע"א 749/87 מוסך המרכז בע"מ', principle: 'המבחן אובייקטיבי-כלכלי, לא בוחנים מניע אישי' },
-  { id: 'tsuk_eitan_hb', citation: 'הוראת ביצוע צוק איתן 10.8.14', principle: 'הנחיות מפורטות לתביעות פיצויים' },
-] as const;
+/** תקדימים משפטיים (מתוך תיקי אלדד ופסיקת בתי משפט) */
+export const WAR_COMP_LEGAL_PRECEDENTS: WarCompLegalPrecedent[] = [
+  {
+    id: '749_87_mosach',
+    caseNumber: 'ע"א 749/87',
+    caseName: 'מוסך המרכז בע"מ נ\' צרפתי',
+    principle: 'המבחן אובייקטיבי-כלכלי, לא בוחנים מניע אישי של הצדדים.',
+    authorityUsesItFor: 'לפסול ביטולי עסקאות בנימוק שהם מקורם במניע אישי או רגשי ולא קשורים ישירות למלחמה.',
+    counterArgument: 'המבחן האמיתי הוא מבחן האדם הסביר — האם אדם סביר היה מקיים עסקה באותו אזור, תחת אותן הגבלות צבאיות?',
+    whenToTrigger: ['מניע אישי', 'סיבה סובייקטיבית', 'ביטל מרצונו', 'מטעמיו האישיים'],
+    classification: 'requires_distinction'
+  },
+  {
+    id: '6948_13_katif',
+    caseNumber: 'ברע"א 6948/13',
+    caseName: 'קטיף מושב שיתופי',
+    principle: 'הכרעה פרטנית דורשת ראיות פרטניות; דחייה ללא בחינת הראיות היא פגם מנהלי.',
+    authorityUsesItFor: 'לדחות תביעות בטענה שלא הובאו ראיות פרטניות לנזק.',
+    counterArgument: 'התובע הגיש ראיות פרטניות כדין (תחשיבים, ספר עסקאות, מסמכים). התעלמות הרשות מראיות אלו מהווה הפרה של אותה ההלכה עצמה — התעלמות מראיות.',
+    whenToTrigger: ['היעדר ראיות פרטניות', 'לא הוכח קשר ספציפי', 'דחייה עקב חוסר מסמכים'],
+    classification: 'requires_distinction'
+  },
+  {
+    id: '1942_12_emek_ayalon',
+    caseNumber: 'ברע"א 1942/12',
+    caseName: 'רהיטי עמק איילון',
+    principle: 'נטל ההוכחה והבאת הראיות מוטל על התובע (האזרח).',
+    authorityUsesItFor: 'תזכורת לכך שהרשות לא צריכה להוכיח שסירבה כדין, אלא התובע צריך להוכיח אקטיבית את נזקו.',
+    counterArgument: 'נטל זה מולא באופן מלא על ידי הגשת מסמכים. מרגע שהנטל הורם, נטל סתירת הראיות חל על הרשות, והיא כשלה בכך בכך שלא התייחסה אליהן מהותית.',
+    whenToTrigger: ['נטל ההוכחה', 'חובת ההוכחה'],
+    classification: 'supports_authority'
+  },
+  {
+    id: '6904_97_bekaot',
+    caseNumber: 'ברע"א 6904/97',
+    caseName: 'ס.ת.ו. בקעות',
+    principle: 'נטל השכנוע מוטל על התובע כמקובל בהליכים אזרחיים, קרי במאזן ההסתברות של 51%.',
+    authorityUsesItFor: 'טענה שהתובע לא עמד ברמת הוודאות הנדרשת שמתקיים נזק עקיף.',
+    counterArgument: 'מאזן הסתברות אזרחי הוא נמוך. כשיש חישוב רו"ח, דוחות מע"מ וספר עסקאות — רף ה-51% נחצה בבירור והרשות מתבקשת לא לאמץ סטנדרט פלילי מחמיר מדי.',
+    whenToTrigger: ['מאזן הסתברות', 'רמת ודאות', 'נטל השכנוע בהליך אזרחי'],
+    classification: 'requires_distinction'
+  },
+  {
+    id: '718_01_ein_gedi',
+    caseNumber: 'ברע"א 718/01',
+    caseName: 'בית הארחה עין גדי',
+    principle: 'נדרש קשר סיבתי ספציפי בין הנזק למושג "יישוב ספר".',
+    authorityUsesItFor: 'לטעון שהנזק אינו כתוצאה מהיות העסק ביישוב ספר אלא מ"השפעה כללית של המלחמה" על המשק (כמו ירידה בתיירות הארצית).',
+    counterArgument: 'יש הבדל מהותי בין השפעה ארצית לבין מניעה פיזית (כגון הוראות פיקוד עורף מחמירות שסוגרות כליל התקהלויות ותנועה באשקלון, בניגוד לרמת גן). הנזק נובע אופרטיבית וספציפית מהמיקום באשקלון.',
+    whenToTrigger: ['אין קשר בין הנזק למיקום', 'השפעה כללית של המלחמה', 'העסקה הייתה מבוטלת בכל מקום אחר', 'מניעת הגעה שלא קשורה לספר'],
+    classification: 'requires_distinction'
+  }
+];
 
 // #endregion
 
