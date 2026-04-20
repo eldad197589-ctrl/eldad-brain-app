@@ -15,13 +15,18 @@ import type { CaseDocumentType, CaseProcessType } from '../data/caseTypes';
  */
 export interface RawEmail {
   id: string;
+  threadId?: string;
   from: string;
   to: string;
   cc?: string;
   subject: string;
   date: string;
+  body?: string;
+  attachments?: string[];
   /** Gmail snippet — NOT the full body. Navigation aid only (כלל 10). */
   snippet: string;
+  isPartial?: boolean;
+  missingFields?: string[];
 }
 
 /** סטטוס מסמך — 3 מצבים במקום boolean */

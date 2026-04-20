@@ -34,6 +34,8 @@ import type {
   MessageContact, MessageTemplate, MessageDraft, MessageLogEntry,
 } from '../pages/messaging/types';
 import { BUILT_IN_TEMPLATES } from '../pages/messaging/constants';
+import type { EmployeeSignal } from '../domain/attendance/employeeSignalTypes';
+import { PayrollService, PayrollInput, PayrollResult } from '../domain/payroll';
 
 // #region Types
 
@@ -140,6 +142,17 @@ interface BrainState {
 
   messageLogs: MessageLogEntry[];
   addLogEntry: (entry: Omit<MessageLogEntry, 'id' | 'sentAt'>) => void;
+
+  // ═══ Employee Signals ═══
+  employeeSignals: EmployeeSignal[];
+  addEmployeeSignal: (signal: Omit<EmployeeSignal, 'id' | 'acknowledged'>) => void;
+  acknowledgeSignal: (signalId: string) => void;
+
+  // ═══ Payroll Engine ═══
+  payrollResult: PayrollResult | null;
+  payrollError: string | null;
+  calculateEmployeePayroll: (input: Partial<PayrollInput> & { grossSalary: number }) => void;
+  clearPayrollResult: () => void;
 }
 
 // #endregion
@@ -440,6 +453,76 @@ export const useBrainStore = create<BrainState>()(
         };
         set((s) => ({ messageLogs: [...s.messageLogs, newEntry] }));
       },
+
+      // ═══ Employee Signals ═══
+      employeeSignals: [],
+      addEmployeeSignal: (signal) => {
+        const newSignal: EmployeeSignal = { ...signal, id: uid(), acknowledged: false };
+        set((s) => ({ employeeSignals: [...s.employeeSignals, newSignal] }));
+
+        // Auto-inject Task for critical signals: employee_deactivated, missing_documents
+        if (signal.signalName === 'employee_deactivated') {
+          const task: Omit<import('../data/calendarTypes').Task, 'id'> = {
+            title: `⚠️ עובד ${signal.employeeName} סומן כלא פעיל`,
+            dueDate: new Date().toISOString().slice(0, 10),
+            priority: 'high',
+            status: 'todo',
+            category: 'עובדים',
+            notes: `ת.ז. ${signal.employeeIdNumber}. ${signal.payload?.reason || ''}`.trim(),
+          };
+          get().addTask(task);
+        }
+        if (signal.signalName === 'missing_documents') {
+          const missingList = signal.payload?.missingDocIds?.join(', ') || 'מסמכים חסרים';
+          const task: Omit<import('../data/calendarTypes').Task, 'id'> = {
+            title: `📄 חסרים מסמכים לעובד ${signal.employeeName}`,
+            dueDate: new Date().toISOString().slice(0, 10),
+            priority: 'high',
+            status: 'todo',
+            category: 'עובדים',
+            notes: `ת.ז. ${signal.employeeIdNumber}. חסר: ${missingList}`,
+          };
+          get().addTask(task);
+        }
+      },
+      acknowledgeSignal: (signalId) => set((s) => ({
+        employeeSignals: s.employeeSignals.map(sig =>
+          sig.id === signalId ? { ...sig, acknowledged: true } : sig
+        ),
+      })),
+
+      // ═══ Payroll Engine ═══
+      payrollResult: null,
+      payrollError: null,
+      calculateEmployeePayroll: (input) => {
+        try {
+          if (input.grossSalary === undefined || input.grossSalary === null) {
+            throw new Error('Gross salary is required to orchestrate payroll.');
+          }
+          
+          const result = PayrollService.calculateFullPayroll({
+            grossSalary: input.grossSalary,
+            taxYear: input.taxYear,
+            isOver67: input.isOver67,
+            taxCreditPoints: input.taxCreditPoints,
+            pensionEmployeeRate: input.pensionEmployeeRate,
+            pensionEmployerRate: input.pensionEmployerRate,
+            educationFundEmployeeRate: input.educationFundEmployeeRate,
+            educationFundEmployerRate: input.educationFundEmployerRate,
+            severanceRate: input.severanceRate,
+            deductions: input.deductions,
+            overtimePay: input.overtimePay,
+            travelReimbursement: input.travelReimbursement,
+            convalescencePay: input.convalescencePay,
+          });
+
+          set({ payrollResult: result, payrollError: null });
+        } catch (err: any) {
+          console.error('[BrainStore] Payroll orchestration failed: ', err);
+          set({ payrollError: err.message || 'Unknown payroll error occurred.', payrollResult: null });
+        }
+      },
+      clearPayrollResult: () => set({ payrollResult: null, payrollError: null }),
     }),
     {
       name: 'brain-store-v2',
@@ -462,6 +545,8 @@ export const useBrainStore = create<BrainState>()(
           if (!Array.isArray(state.messageDrafts)) state.messageDrafts = [];
           if (!Array.isArray(state.messageLogs)) state.messageLogs = [];
         }
+        // v13: Employee Signals — safe init
+        if (!Array.isArray(state.employeeSignals)) state.employeeSignals = [];
         return state;
       },
       onRehydrateStorage: () => (state) => {

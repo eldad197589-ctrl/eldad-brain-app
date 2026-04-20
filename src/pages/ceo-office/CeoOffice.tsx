@@ -33,6 +33,8 @@ import OverdueAlerts from './components/OverdueAlerts';
 import DocumentIntake from './components/DocumentIntake';
 import MorningBrief from './components/MorningBrief';
 import MissionLauncher from './components/MissionLauncher';
+import PipelineAlerts from './components/PipelineAlerts';
+import QuickPayrollCalculator from './components/QuickPayrollCalculator';
 import DashboardSummaryCards from '../dashboard/components/DashboardSummaryCards';
 import { LayoutDashboard, Calendar, Columns } from 'lucide-react';
 
@@ -128,6 +130,8 @@ export default function CeoOffice() {
               <MissionLauncher />
             </div>
             <div style={{ padding: '0 20px' }}><MorningBrief /></div>
+            <div style={{ padding: '0 20px' }}><PipelineAlerts /></div>
+            <div style={{ padding: '0 20px' }}><QuickPayrollCalculator /></div>
             <DashboardSummaryCards />
             <div style={{ padding: '0 20px' }}><DocumentIntake /></div>
           </div>

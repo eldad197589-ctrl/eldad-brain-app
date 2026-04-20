@@ -77,18 +77,28 @@ export interface CaseTimelineEvent {
 export interface CaseEmail {
   /** Gmail message ID */
   id: string;
+  /** Gmail thread ID (if available) */
+  threadId?: string;
   /** שולח */
   from: string;
   /** נמען */
   to: string;
   /** עותק */
-  cc: string;
+  cc?: string;
   /** נושא */
   subject: string;
   /** תאריך ISO */
   date: string;
   /** תקציר */
   snippet: string;
+  /** גוף ההודעה המלא (אם נשאב) */
+  body?: string;
+  /** רשימת קבצים מצורפים */
+  attachments?: string[];
+  /** האם המייל חלקי (ללא body מלא או חוסר אחר) */
+  isPartial?: boolean;
+  /** פרטים חסרים (כגון 'body', 'attachments') */
+  missingFields?: string[];
   /** סיווג אוטומטי (מ-emailClassifier) */
   classification?: {
     category: string;

@@ -9,6 +9,7 @@
 
 import { useState, useMemo } from 'react';
 import { EntityType, DocumentItem, KycState } from '../types';
+import { useBrainStore } from '../../../store/brainStore';
 
 const BASE_DOCUMENTS: DocumentItem[] = [
   { id: 'b1', category: 'permanent', label: 'צילום תעודת זהות של בעל השליטה/העצמאי', description: 'משני הצדדים', status: 'pending' },
@@ -32,9 +33,12 @@ interface InitialParams {
   isTransfer?: boolean;
   /** Doc IDs to mark as 'uploaded' from the start */
   foundDocIds?: string[];
+  /** ת.ז. — used to match employee signals from external system */
+  idNumber?: string;
 }
 
 export function useKycChecklist(initial?: InitialParams): Result {
+  const employeeSignals = useBrainStore(s => s.employeeSignals);
   const [clientName, setClientName] = useState<string>(initial?.name || '');
   const [entityType, setEntityType] = useState<EntityType>(initial?.entityType || 'exempt');
   const [isTransfer, setIsTransfer] = useState<boolean>(initial?.isTransfer || false);
@@ -72,12 +76,21 @@ export function useKycChecklist(initial?: InitialParams): Result {
 
     // Transfer docs
     if (isTransfer) {
-      docs.push({ id: 't1', category: 'transfer', label: 'מכתב דרישת מסמכים + שחרור ממייצג קודם', description: 'מופק ונשלח על ידי המשרד', status: 'pending' });
-      docs.push({ id: 't2', category: 'transfer', label: 'מאזני בוחן ודוחות רווח והפסד לשנה קודמת/נוכחית', status: 'pending' });
-      docs.push({ id: 't3', category: 'transfer', label: 'דוחות מע"מ ומקדמות מהחצי שנה האחרונה', status: 'pending' });
+      // CPA-generated letters (generate_send — CPA produces and sends, not uploaded by client)
+      docs.push({ id: 'prev_accountant', category: 'transfer', label: 'מכתב שחרור ממייצג קודם', description: 'מופק ונשלח על ידי המשרד למייצג הקודם', status: 'pending', actionType: 'generate_send', required: true, priority: 'high' });
+      docs.push({ id: 'prev_accountant_docs_req', category: 'transfer', label: 'מכתב בקשת מסמכים ממייצג קודם', description: 'מופק ונשלח על ידי המשרד למייצג הקודם', status: 'pending', actionType: 'generate_send', required: true, priority: 'high' });
+
+      // VAT certificate for authorized dealers only
+      if (entityType === 'authorized') {
+        docs.push({ id: 'vat_certificate', category: 'transfer', label: 'תעודת עוסק מורשה (מע"מ)', description: 'עותק מהמייצג הקודם או מרשויות המס', status: 'pending', actionType: 'upload', required: true, priority: 'high' });
+      }
+
+      // Client-uploaded transfer documents
+      docs.push({ id: 't2', category: 'transfer', label: 'מאזני בוחן ודוחות רווח והפסד לשנה קודמת/נוכחית', status: 'pending', actionType: 'upload', required: true, priority: 'high' });
+      docs.push({ id: 't3', category: 'transfer', label: 'דוחות מע"מ ומקדמות מהחצי שנה האחרונה', status: 'pending', actionType: 'upload', required: true, priority: 'medium' });
       
       if (entityType === 'company' || entityType === 'npo') {
-        docs.push({ id: 't4', category: 'transfer', label: 'דוחות כספיים רשמיים ומאושרים', description: 'שנתיים אחרונות', status: 'pending' });
+        docs.push({ id: 't4', category: 'transfer', label: 'דוחות כספיים רשמיים ומאושרים', description: 'שנתיים אחרונות', status: 'pending', actionType: 'upload', required: true, priority: 'high' });
       }
     }
 
@@ -87,13 +100,80 @@ export function useKycChecklist(initial?: InitialParams): Result {
       status: docStatuses[doc.id] || 'pending'
     }));
 
+    // ═══ Employee Signal → Document Injection ═══
+    // Only when idNumber is provided and matches
+    if (initial?.idNumber) {
+      const matchedSignals = employeeSignals.filter(
+        s => s.employeeIdNumber === initial.idNumber && !s.acknowledged
+      );
+
+      // form101_approved → doc item with status 'verified'
+      const has101 = matchedSignals.find(s => s.signalName === 'form101_approved');
+      docs.push({
+        id: 'emp_form101',
+        category: 'employee',
+        label: 'טופס 101 (מערכת עובדים)',
+        description: has101 ? `אושר ${new Date(has101.occurredAt).toLocaleDateString('he-IL')}` : 'ממתין לאישור מהמערכת החיצונית',
+        status: has101 ? 'verified' : 'pending',
+      });
+
+      // form130_uploaded → doc item
+      const has130 = matchedSignals.find(s => s.signalName === 'form130_uploaded');
+      docs.push({
+        id: 'emp_form130',
+        category: 'employee',
+        label: 'טופס 130 (מערכת עובדים)',
+        description: has130 ? `הועלה ${new Date(has130.occurredAt).toLocaleDateString('he-IL')}` : 'ממתין להעלאה מהמערכת החיצונית',
+        status: has130 ? 'uploaded' : 'pending',
+      });
+
+      // employment_agreement_signed → doc item
+      const hasSigned = matchedSignals.find(s => s.signalName === 'employment_agreement_signed');
+      docs.push({
+        id: 'emp_agreement',
+        category: 'employee',
+        label: 'הסכם העסקה חתום (מערכת עובדים)',
+        description: hasSigned ? `נחתם ${new Date(hasSigned.occurredAt).toLocaleDateString('he-IL')}` : 'ממתין לחתימה',
+        status: hasSigned ? 'verified' : 'pending',
+      });
+
+      // missing_documents → alert doc
+      const hasMissing = matchedSignals.find(s => s.signalName === 'missing_documents');
+      if (hasMissing) {
+        const missingList = hasMissing.payload?.missingDocIds?.join(', ') || 'מסמכים לא מזוהים';
+        docs.push({
+          id: 'emp_missing_alert',
+          category: 'employee',
+          label: `⚠️ חסרים מסמכים: ${missingList}`,
+          description: 'דורש טיפול במערכת העובדים החיצונית',
+          status: 'rejected',
+          required: true,
+          priority: 'high',
+        });
+      }
+
+      // employee_deactivated → alert doc
+      const hasDeactivated = matchedSignals.find(s => s.signalName === 'employee_deactivated');
+      if (hasDeactivated) {
+        docs.push({
+          id: 'emp_deactivated_alert',
+          category: 'employee',
+          label: '🔴 עובד סומן כלא פעיל במערכת החיצונית',
+          description: hasDeactivated.payload?.reason || 'סיבה לא צוינה',
+          status: 'rejected',
+          required: true,
+          priority: 'high',
+        });
+      }
+    }
+
     return {
       clientName,
       entityType,
       isTransfer,
       documents: docs
     };
-  }, [clientName, entityType, isTransfer, docStatuses]);
+  }, [clientName, entityType, isTransfer, docStatuses, employeeSignals, initial?.idNumber]);
 
   const updateClientInfo = (name: string, type: EntityType, transfer: boolean) => {
     setClientName(name);

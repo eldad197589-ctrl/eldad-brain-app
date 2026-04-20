@@ -53,7 +53,14 @@ export default function CaseEmailList({ emails }: CaseEmailListProps) {
                   </span>
                 </td>
                 <td style={{ ...tdStyle, color: '#94a3b8', maxWidth: 250 }}>
-                  {email.snippet.slice(0, 80)}{email.snippet.length > 80 ? '...' : ''}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <span>{email.snippet.slice(0, 80)}{email.snippet.length > 80 ? '...' : ''}</span>
+                    {email.isPartial && (
+                      <span style={{ fontSize: '0.7rem', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)', padding: '2px 6px', borderRadius: '4px', alignSelf: 'flex-start' }}>
+                        PARTIAL: חסר {email.missingFields?.join(', ')}
+                      </span>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

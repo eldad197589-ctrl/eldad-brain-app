@@ -21,6 +21,14 @@ export interface DomainEventMap {
   inbox_synced:        { processed: number; skipped: number };
   dashboard_updated:   { urgent: number; upcoming: number; paid: number; anomalies: number };
   store_reset:         Record<string, never>;
+
+  // ═══ Employee System Signals ═══
+  employee_form101_approved:      { signalId: string; employeeIdNumber: string; employeeName: string };
+  employee_form130_uploaded:      { signalId: string; employeeIdNumber: string; employeeName: string };
+  employee_agreement_signed:      { signalId: string; employeeIdNumber: string; employeeName: string };
+  employee_attendance_calculated: { signalId: string; period: { year: number; month: number }; count: number };
+  employee_deactivated:           { signalId: string; employeeIdNumber: string; employeeName: string; reason?: string };
+  employee_docs_missing:          { signalId: string; employeeIdNumber: string; employeeName: string; missingDocIds?: string[] };
 }
 
 export type DomainEventName = keyof DomainEventMap;
@@ -32,7 +40,7 @@ export type DomainEventName = keyof DomainEventMap;
 /** מטא-דאטה שמלווה כל אירוע */
 export interface EventMeta {
   /** מקור האירוע */
-  source: 'store' | 'pipeline' | 'inbox' | 'executor' | 'unknown';
+  source: 'store' | 'pipeline' | 'inbox' | 'executor' | 'employee_system' | 'unknown';
   /** מזהה שרשרת — לקבצ אירועים קשורים */
   correlationId: string;
 }

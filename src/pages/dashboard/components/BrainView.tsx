@@ -36,7 +36,7 @@ export default function BrainView({ neuronCount, flowchartCount, onNeuronClick }
       <div style={{ textAlign: 'center', marginBottom: 24 }}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 6px' }}>המוח של אלדד</h2>
         <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
-          {neuronCount} תחומי מומחיות · 147 לקוחות · {flowchartCount} תרשימי זרימה · 22+ שנות ניסיון
+          {neuronCount} תחומי מומחיות · 147 לקוחות · {flowchartCount} תרשימי זרימה · 25+ שנות ניסיון
         </p>
       </div>
 

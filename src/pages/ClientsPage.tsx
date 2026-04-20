@@ -9,6 +9,7 @@ import { Users, ArrowLeft, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PROCESS_LABELS, FILTER_OPTIONS, type ClientProcess } from '../data/clients';
 import { getClients, BrainClient } from '../services/clientService';
+import { useBrainStore } from '../store/brainStore';
 
 
 // #endregion
@@ -23,15 +24,31 @@ export default function ClientsPage() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<ClientProcess | 'all'>('all');
 
+  const storeCases = useBrainStore(s => s.cases);
+
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
       const data = await getClients();
-      setClients(data);
+
+      // Bridge: merge CaseEntity records from brainStore into client list
+      const caseClients: BrainClient[] = storeCases.map(c => ({
+        id: c.caseId,
+        name: c.clientName,
+        status: 'פעיל' as const,
+        files_count: c.documents.length,
+        last_ingest_date: c.updatedAt || c.createdAt,
+        created_at: c.createdAt,
+      }));
+
+      // Merge: case clients first, then service clients (skip duplicates by name)
+      const caseNames = new Set(caseClients.map(c => c.name));
+      const merged = [...caseClients, ...data.filter(d => !caseNames.has(d.name))];
+      setClients(merged);
       setIsLoading(false);
     }
     loadData();
-  }, []);
+  }, [storeCases]);
 
   const filtered = useMemo(() => {
     let list = clients;
@@ -69,7 +86,7 @@ export default function ClientsPage() {
               </span>
             </h1>
             <p style={{ color: '#94a3b8', fontSize: '0.88rem', margin: 0 }}>
-              {clients.length} תיקים · 8 תהליכים · {activeCount} פעילים · 22+ שנות ניסיון
+              {clients.length} תיקים · 8 תהליכים · {activeCount} פעילים · 25+ שנות ניסיון
             </p>
           </div>
           <Link to="/" style={{
@@ -151,10 +168,16 @@ export default function ClientsPage() {
             </thead>
             <tbody>
               {filtered.map((c, i) => {
-                const p = PROCESS_LABELS['accounting']; // Default to accounting for now
+                const matchedCase = storeCases.find(sc => sc.caseId === c.id);
+                const processKey: ClientProcess = matchedCase?.processType === 'war_compensation_appeal' ? 'war' : 'accounting';
+                const p = PROCESS_LABELS[processKey];
                 return (
                   <tr key={i} style={{ transition: 'background 0.15s', cursor: 'pointer' }}
-                    onClick={() => navigate(`/clients/${c.id}`)}
+                    onClick={() => {
+                      // If this client is a CaseEntity, navigate to case view
+                      const isCase = storeCases.some(sc => sc.caseId === c.id);
+                      navigate(isCase ? `/case/${c.id}` : `/clients/${c.id}`);
+                    }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'rgba(201,168,76,0.04)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >

@@ -29,7 +29,7 @@ export default function ListView({ neuronCount, flowchartCount }: Props) {
         <StatCard icon={<Activity size={28} />} number={String(flowchartCount)} label="תרשימי זרימה" color="#38bdf8" />
         <StatCard icon={<Wrench size={28} />} number="3" label="כלים פעילים" color="#a78bfa" />
         <StatCard icon={<FolderOpen size={28} />} number={String(neuronCount)} label="תהליכים מתועדים" color="#fbbf24" />
-        <StatCard icon={<CheckCircle size={28} />} number="22+" label="שנות ניסיון" color="#34d399" />
+        <StatCard icon={<CheckCircle size={28} />} number="25+" label="שנות ניסיון" color="#34d399" />
       </div>
 
       <ProcessSection title="💰 קליטת לקוחות ותמחור">

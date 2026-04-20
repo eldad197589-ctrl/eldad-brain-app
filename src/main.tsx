@@ -31,7 +31,10 @@ useBrainStore.getState().initializeFromSupabase();
 
 // Initialize Process Registry — single source of truth for all processes
 import { seedAllProcesses } from './system/processSeed';
+import { initializeWorkSpineEnvironment } from './work-spine/runtime/work-spine-bootstrap';
+
 seedAllProcesses();
+initializeWorkSpineEnvironment();
 
 const Dashboard = lazy(() => import('./pages/dashboard'))
 const CeoOffice = lazy(() => import('./pages/ceo-office'))
@@ -56,6 +59,9 @@ const ComparisonPage = lazy(() => import('./pages/comparison/ComparisonPage'))
 const QuotesGeneratorPage = lazy(() => import('./pages/quotes-generator/QuotesGeneratorPage'))
 const PricingManagerPage = lazy(() => import('./pages/ceo-office/PricingManagerPage'))
 const ClientOnboardingPage = lazy(() => import('./pages/client-onboarding/ClientOnboardingPage'))
+const PhasePoA = lazy(() => import('./pages/client-onboarding/PhasePoA'))
+const PhaseRegistrar = lazy(() => import('./pages/client-onboarding/PhaseRegistrar'))
+const PhaseBank = lazy(() => import('./pages/client-onboarding/PhaseBank'))
 const ClientPortal = lazy(() => import('./pages/portal/ClientPortal'))
 const LeadsManagerPage = lazy(() => import('./pages/leads/LeadsManagerPage'))
 const MessagingPage = lazy(() => import('./pages/messaging/MessagingPage'))
@@ -65,6 +71,10 @@ const PesachExodusHero = lazy(() => import('./pages/messaging/PesachExodusHero')
 const IncubatorPage = lazy(() => import('./pages/incubator/IncubatorPage'))
 const IncubatorAgreementsPage = lazy(() => import('./pages/incubator-agreements/IncubatorAgreementsPage'))
 const CaseViewPage = lazy(() => import('./pages/case-view/CaseViewPage'))
+const DocumentChangeAgentPage = lazy(() => import('./pages/document-change-agent/DocumentChangeAgentPage'))
+const RobiumClientHub = lazy(() => import('./pages/clients/RobiumClientHub'))
+const AccountingCoreDashboardWorkspace = lazy(() => import('./accounting-core/ui/components/accounting-core-dashboard-workspace'))
+const TodayControlBoard = lazy(() => import('./work-spine/ui/TodayControlBoard'))
 
 // Placeholder for pages we'll build later
 const ComingSoon = lazy(() => import('./pages/ComingSoon'))
@@ -95,9 +105,11 @@ createRoot(document.getElementById('root')!).render(
           <Route element={<Layout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/ceo" element={<CeoOffice />} />
+            <Route path="/work-spine" element={<TodayControlBoard />} />
             <Route path="/hub" element={<RobiumHub />} />
             {/* Clients & Cases */}
             <Route path="/clients" element={<ClientsPage />} />
+            <Route path="/clients/robium" element={<RobiumClientHub />} />
             <Route path="/clients/:id" element={<ClientProfile />} />
             <Route path="/case/helman" element={<CaseHelman />} />
             <Route path="/case/:caseId" element={<CaseViewPage />} />
@@ -108,6 +120,9 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/quotes-generator" element={<QuotesGeneratorPage />} />
             <Route path="/pricing-manager" element={<PricingManagerPage />} />
             <Route path="/onboarding" element={<ClientOnboardingPage />} />
+            <Route path="/poa" element={<PhasePoA />} />
+            <Route path="/registrar" element={<PhaseRegistrar />} />
+            <Route path="/bank" element={<PhaseBank />} />
             <Route path="/leads" element={<LeadsManagerPage />} />
             <Route path="/messaging" element={<MessagingPage />} />
             <Route path="/messaging/pesach" element={<PesachCardPage />} />
@@ -115,6 +130,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/agreement/original" element={<EmbeddedPage title="הסכם מקורי (3.3.26) — היסטורי" src="/legacy/robium_agreement_original.html" badge="מקור (33%)" badgeColor="#ef4444" />} />
             <Route path="/agreement/legacy" element={<EmbeddedPage title="טיוטה מעודכנת (11/03/26) — ROBIUM L.T.D" src="/legacy/robium_agreement_updated.html" badge="טיוטה ב׳" badgeColor="#f59e0b" />} />
             <Route path="/agreement/diff" element={<AgreementDiffPage />} />
+            <Route path="/document-change-agent" element={<DocumentChangeAgentPage />} />
             <Route path="/agreement/review" element={<AgreementPage />} />
             <Route path="/founders" element={<FoundersPage />} />
             <Route path="/founders/kirill-dispute" element={<KirillDisputePage />} />
@@ -132,6 +148,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/flow/:flowId" element={<FlowchartPageWrapper />} />
             {/* Personal */}
             <Route path="/personal/payments" element={<PaymentsPage />} />
+            {/* Accounting Core Dashboard Shell */}
+            <Route path="/accounting-core" element={<AccountingCoreDashboardWorkspace />} />
           </Route>
           {/* External Client Portal (No Sidebar) */}
           <Route path="/portal/:token" element={<ClientPortal />} />

@@ -24,6 +24,7 @@ const ClientOnboardingPage: React.FC = () => {
   const paramEntity = (searchParams.get('entity') as EntityType) || undefined;
   const paramTransfer = searchParams.get('transfer') === 'true';
   const paramFound = searchParams.get('found')?.split(',').filter(Boolean) || undefined;
+  const paramIdNumber = searchParams.get('idNumber') || undefined;
 
   // Initialize hook WITH pre-detected values from the smart intake
   const { state, updateClientInfo, toggleDocStatus } = useKycChecklist({
@@ -31,6 +32,7 @@ const ClientOnboardingPage: React.FC = () => {
     entityType: paramEntity,
     isTransfer: paramTransfer,
     foundDocIds: paramFound,
+    idNumber: paramIdNumber,
   });
 
   const isAutoPopulated = !!paramName;

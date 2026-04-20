@@ -18,7 +18,6 @@ import CaseFinalOutput from './components/CaseFinalOutput';
 import CaseAttackMapSection from './components/CaseAttackMapSection';
 import SuggestedBlocksSection from './components/SuggestedBlocksSection';
 import type { CaseDraft } from '../../data/caseTypes';
-import { exportToWord } from '../../services/wordExportService';
 import { DIMA_CASE_SEED } from '../../data/dimaCaseSeed';
 import { CASE_BUILDER_VERSION } from '../../services/caseBuilder';
 // #region Component
@@ -264,6 +263,7 @@ export default function CaseViewPage() {
       <div style={{ marginTop: 24 }}>
         <CaseDraftPreview
           draft={caseEntity.draft}
+          caseEntity={caseEntity}
           clientName={caseEntity.clientName}
           onGenerateDraft={handleGenerateDraft}
         />

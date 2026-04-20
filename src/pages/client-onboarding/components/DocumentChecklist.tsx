@@ -24,7 +24,8 @@ export const DocumentChecklist: React.FC<Props> = ({
   const categories = [
     { id: 'permanent', label: 'תיק קבע (חובה לכל לקוח)', color: 'text-white' },
     { id: 'regulatory', label: 'מסמכים רגולטוריים (לפי סיווג התאגדות)', color: 'text-[#f59e0b]' },
-    { id: 'transfer', label: 'מעבר ממייצג קודם (Transfer)', color: 'text-[#38bdf8]' }
+    { id: 'transfer', label: 'מעבר ממייצג קודם (Transfer)', color: 'text-[#38bdf8]' },
+    { id: 'employee', label: 'מסמכי עובד (ממערכת חיצונית)', color: 'text-[#a78bfa]' }
   ];
 
   const getPercentage = () => {

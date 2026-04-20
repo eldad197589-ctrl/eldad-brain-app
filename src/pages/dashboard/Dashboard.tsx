@@ -22,7 +22,6 @@ import CategoriesView from './components/CategoriesView';
 import ListView from './components/ListView';
 import LiveStatsBar from './components/LiveStatsBar';
 
-
 // #endregion
 
 // #region Component

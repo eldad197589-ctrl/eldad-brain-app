@@ -23,8 +23,7 @@ export { deriveSuggestedBlocks } from './caseBuilderHelpers';
 // #endregion
 
 // #region Main Builder
-
-export const CASE_BUILDER_VERSION = 17;
+export const CASE_BUILDER_VERSION = 25; // v25: Section ז polish + header fix (no representative) + signature fix
 
 /**
  * Build a complete CaseEntity from raw sources.
