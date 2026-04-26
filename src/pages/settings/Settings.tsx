@@ -43,10 +43,20 @@ export default function Settings() {
 
   const vaultStatus = useLocalVaultStore(s => s.status);
   const vaultLabel = useLocalVaultStore(s => s.label);
+  const isScanning = useLocalVaultStore(s => s.isScanning);
+  const scannedFolders = useLocalVaultStore(s => s.scannedFolders);
+  const scannedFiles = useLocalVaultStore(s => s.scannedFiles);
+  const currentPath = useLocalVaultStore(s => s.currentPath);
+  const lastIndexedAt = useLocalVaultStore(s => s.lastIndexedAt);
+  const totalFolders = useLocalVaultStore(s => s.totalFolders);
+  const totalFiles = useLocalVaultStore(s => s.totalFiles);
+  
   const initVault = useLocalVaultStore(s => s.initVault);
   const connectVaultRoot = useLocalVaultStore(s => s.connectRoot);
   const checkVaultPermission = useLocalVaultStore(s => s.checkPermission);
   const disconnectVaultRoot = useLocalVaultStore(s => s.disconnectRoot);
+  const startIndexScan = useLocalVaultStore(s => s.startIndexScan);
+  const clearVaultIndex = useLocalVaultStore(s => s.clearIndex);
 
   /** Refresh statuses */
   useEffect(() => {
@@ -158,23 +168,67 @@ export default function Settings() {
       {/* Integration Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
         {/* Local Brain Vault */}
-        <IntegrationCard
-          icon={<Database size={22} color="#10b981" />}
-          title="📁 תיקיית המוח המקומית"
-          description={vaultLabel ? `מחובר לתיקייה: ${vaultLabel}` : 'חיבור לספריית האם (המוח של אלדד)'}
-          connected={vaultStatus === 'connected'}
-          loading={false}
-          onConnect={vaultStatus === 'permission_required' ? checkVaultPermission : connectVaultRoot}
-          connectLabel={vaultStatus === 'permission_required' ? '🔓 אישור הרשאה' : '🔌 חבר תיקייה'}
-          onDisconnect={disconnectVaultRoot}
-          note={
-            vaultStatus === 'unsupported' ? 'הדפדפן לא תומך ב-File System API' :
-            vaultStatus === 'permission_required' ? 'נדרש אישור מחודש של הדפדפן' :
-            vaultStatus === 'denied' ? 'אין הרשאה לתיקייה' :
-            'גישה ישירה למערכת הקבצים ללא העלאה'
-          }
-          disabled={vaultStatus === 'unsupported'}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <IntegrationCard
+            icon={<Database size={22} color="#10b981" />}
+            title="📁 תיקיית המוח המקומית"
+            description={vaultLabel ? `מחובר לתיקייה: ${vaultLabel}` : 'חיבור לספריית האם (המוח של אלדד)'}
+            connected={vaultStatus === 'connected'}
+            loading={false}
+            onConnect={vaultStatus === 'permission_required' ? checkVaultPermission : connectVaultRoot}
+            connectLabel={vaultStatus === 'permission_required' ? '🔓 אישור הרשאה' : '🔌 חבר תיקייה'}
+            onDisconnect={disconnectVaultRoot}
+            note={
+              vaultStatus === 'unsupported' ? 'הדפדפן לא תומך ב-File System API' :
+              vaultStatus === 'permission_required' ? 'נדרש אישור מחודש של הדפדפן' :
+              vaultStatus === 'denied' ? 'אין הרשאה לתיקייה' :
+              'גישה ישירה למערכת הקבצים ללא העלאה'
+            }
+            disabled={vaultStatus === 'unsupported'}
+          />
+          
+          {/* Index Scan Sub-Panel */}
+          {vaultStatus === 'connected' && (
+            <div style={{
+              padding: '12px 16px', borderRadius: 10,
+              background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#e2e8f0' }}>אינדקס קבצים</span>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {lastIndexedAt && !isScanning && (
+                    <button onClick={clearVaultIndex} style={{ ...btnStyle('#ef4444'), padding: '4px 10px', fontSize: '0.7rem' }}>נקה אינדקס</button>
+                  )}
+                  <button 
+                    onClick={startIndexScan} 
+                    disabled={isScanning}
+                    style={{ ...btnStyle(isScanning ? '#64748b' : '#34d399'), padding: '4px 10px', fontSize: '0.7rem' }}
+                  >
+                    {isScanning ? '⏳ סורק...' : '🔍 סרוק אינדקס'}
+                  </button>
+                </div>
+              </div>
+              
+              {isScanning ? (
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: 4 }}>
+                    סורק: {scannedFolders} תיקיות, {scannedFiles} קבצים
+                  </div>
+                  <div style={{ fontSize: '0.65rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', direction: 'ltr', textAlign: 'right' }}>
+                    {currentPath || '...'}
+                  </div>
+                </div>
+              ) : lastIndexedAt ? (
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                  <div style={{ marginBottom: 2 }}>עודכן לאחרונה: {new Date(lastIndexedAt).toLocaleString('he-IL')}</div>
+                  <div>סה"כ: {totalFolders} תיקיות, {totalFiles} קבצים</div>
+                </div>
+              ) : (
+                <div style={{ fontSize: '0.75rem', color: '#64748b' }}>טרם נסרק אינדקס.</div>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Gmail */}
         <IntegrationCard
