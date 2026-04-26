@@ -20,6 +20,8 @@ export interface LocalBrainRootIndex {
   error?: string;
 }
 
+export type FolderCategory = 'client' | 'generated_output' | 'archive' | 'app_source' | 'system' | 'unknown';
+
 export interface ManagedLocalFolder {
   relativePath: string;
   name: string;
@@ -28,6 +30,7 @@ export interface ManagedLocalFolder {
   fileCount: number;
   folderCount: number;
   status: 'indexed' | 'skipped' | 'inaccessible';
+  inferredCategory?: FolderCategory;
 }
 
 export interface LocalFileReference {
@@ -39,11 +42,12 @@ export interface LocalFileReference {
   lastModified?: number;
   depth: number;
   canOpen: boolean;
+  inferredCategory?: FolderCategory;
 }
 
 function getDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 3);
+    const request = indexedDB.open(DB_NAME, 4);
     request.onupgradeneeded = (e) => {
       const db = (e.target as IDBOpenDBRequest).result;
       const oldVersion = e.oldVersion;
@@ -74,6 +78,19 @@ function getDB(): Promise<IDBDatabase> {
           }
           if (!filesStore.indexNames.contains('by_extension')) {
             filesStore.createIndex('by_extension', 'extension', { unique: false });
+          }
+        }
+      }
+      if (oldVersion < 4) {
+        const tx = request.transaction;
+        if (tx) {
+          const foldersStore = tx.objectStore('folders');
+          if (!foldersStore.indexNames.contains('by_category')) {
+            foldersStore.createIndex('by_category', 'inferredCategory', { unique: false });
+          }
+          const filesStore = tx.objectStore('files');
+          if (!filesStore.indexNames.contains('by_category')) {
+            filesStore.createIndex('by_category', 'inferredCategory', { unique: false });
           }
         }
       }
@@ -204,9 +221,18 @@ export const localVaultService = {
     let scannedFolders = 0;
     let scannedFiles = 0;
     let iterations = 0;
-    const MAX_DEPTH = 5;
-    const EXCLUDED_DIRS = new Set(['.git', 'node_modules', '.DS_Store', 'Thumbs.db', 'AppData', '$RECYCLE.BIN', 'System Volume Information']);
+    const MAX_DEPTH = 8;
+    const EXCLUDED_DIRS = new Set(['.git', 'node_modules', '.DS_Store', 'Thumbs.db', 'AppData', '$RECYCLE.BIN', 'System Volume Information', 'dist', '.vercel', '.agents', '.gemini', 'src', 'public', 'tests', 'scratch']);
     const INCLUDED_EXTS = new Set(['pdf', 'doc', 'docx', 'txt', 'html', 'htm', 'xlsx', 'xls', 'csv', 'zip', 'rar', 'jpg', 'jpeg', 'png']);
+
+    const inferCategory = (path: string): FolderCategory => {
+      if (path.startsWith('לקוחות/') || path.startsWith('דוד אלדד/') || path.startsWith('סריקות/')) return 'client';
+      if (path.startsWith('brain-app/output/archive/')) return 'archive';
+      if (path.startsWith('brain-app/output/') || path.startsWith('brain-app/cases/')) return 'generated_output';
+      if (path.startsWith('brain-app/src/') || path.startsWith('brain-app/dist/')) return 'app_source';
+      if (path.startsWith('.agents/') || path.startsWith('.gemini/')) return 'system';
+      return 'unknown';
+    };
 
     const db = await getDB();
     
@@ -278,7 +304,8 @@ export const localVaultService = {
               size,
               lastModified,
               depth: depth + 1,
-              canOpen: INCLUDED_EXTS.has(ext)
+              canOpen: INCLUDED_EXTS.has(ext),
+              inferredCategory: inferCategory(newPath)
             });
           }
         }
@@ -291,7 +318,8 @@ export const localVaultService = {
           depth,
           fileCount: 0,
           folderCount: 0,
-          status: 'inaccessible'
+          status: 'inaccessible',
+          inferredCategory: inferCategory(currentPath)
         });
         return;
       }
@@ -304,7 +332,8 @@ export const localVaultService = {
           depth,
           fileCount,
           folderCount,
-          status: 'indexed'
+          status: 'indexed',
+          inferredCategory: inferCategory(currentPath)
         });
       }
     };
@@ -342,10 +371,11 @@ export const localVaultService = {
     }
   },
 
-  async searchIndex(query: string, options?: { extensionFilter?: string; limit?: number }): Promise<{ folders: ManagedLocalFolder[]; files: LocalFileReference[]; totalMatched: number }> {
+  async searchIndex(query: string, options?: { extensionFilter?: string; categoryFilter?: FolderCategory; limit?: number }): Promise<{ folders: ManagedLocalFolder[]; files: LocalFileReference[]; totalMatched: number }> {
     const limit = options?.limit ?? 100;
     const lowerQuery = query.toLowerCase();
     const extFilter = options?.extensionFilter;
+    const catFilter = options?.categoryFilter;
     
     const db = await getDB();
     return new Promise((resolve, reject) => {
@@ -354,7 +384,8 @@ export const localVaultService = {
       const matchedFiles: LocalFileReference[] = [];
       let totalMatched = 0;
 
-      const matchesQuery = (name: string, path: string) => {
+      const matchesQuery = (name: string, path: string, cat?: string) => {
+        if (catFilter && cat !== catFilter) return false;
         if (!lowerQuery) return true;
         return name.toLowerCase().includes(lowerQuery) || path.toLowerCase().includes(lowerQuery);
       };
@@ -364,6 +395,9 @@ export const localVaultService = {
       if (extFilter) {
         const index = fileStore.index('by_extension');
         fileReq = index.openCursor(IDBKeyRange.only(extFilter));
+      } else if (catFilter && !lowerQuery) {
+        const index = fileStore.index('by_category');
+        fileReq = index.openCursor(IDBKeyRange.only(catFilter));
       } else {
         fileReq = fileStore.openCursor();
       }
@@ -372,7 +406,7 @@ export const localVaultService = {
         const cursor = e.target.result;
         if (cursor) {
           const file = cursor.value as LocalFileReference;
-          if (matchesQuery(file.name, file.relativePath)) {
+          if (matchesQuery(file.name, file.relativePath, file.inferredCategory)) {
             totalMatched++;
             if (matchedFiles.length + matchedFolders.length < limit) {
               matchedFiles.push(file);
@@ -385,12 +419,19 @@ export const localVaultService = {
             return;
           }
           const folderStore = tx.objectStore('folders');
-          const folderReq = folderStore.openCursor();
+          let folderReq: IDBRequest;
+          if (catFilter && !lowerQuery) {
+            const index = folderStore.index('by_category');
+            folderReq = index.openCursor(IDBKeyRange.only(catFilter));
+          } else {
+            folderReq = folderStore.openCursor();
+          }
+          
           folderReq.onsuccess = (e: any) => {
             const cursor2 = e.target.result;
             if (cursor2) {
               const folder = cursor2.value as ManagedLocalFolder;
-              if (matchesQuery(folder.name, folder.relativePath)) {
+              if (matchesQuery(folder.name, folder.relativePath, folder.inferredCategory)) {
                 totalMatched++;
                 if (matchedFiles.length + matchedFolders.length < limit) {
                   matchedFolders.push(folder);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, Folder, FileText, ChevronDown, ChevronUp } from 'lucide-react';
-import { localVaultService, ManagedLocalFolder, LocalFileReference } from '../../services/localVaultService';
+import { localVaultService, ManagedLocalFolder, LocalFileReference, FolderCategory } from '../../services/localVaultService';
 import { useLocalVaultStore } from '../../store/localVaultStore';
 
 export default function VaultBrowserPanel() {
@@ -8,6 +8,7 @@ export default function VaultBrowserPanel() {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [extensionFilter, setExtensionFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<FolderCategory | ''>('');
   const [extensions, setExtensions] = useState<Array<{ ext: string; count: number }>>([]);
   
   const [folders, setFolders] = useState<ManagedLocalFolder[]>([]);
@@ -41,7 +42,7 @@ export default function VaultBrowserPanel() {
     const fetchResults = async () => {
       setIsLoading(true);
       try {
-        if (!debouncedQuery && !extensionFilter) {
+        if (!debouncedQuery && !extensionFilter && !categoryFilter) {
           // Empty search -> list root
           const rootContents = await localVaultService.listFolderContents('');
           if (isActive) {
@@ -51,7 +52,7 @@ export default function VaultBrowserPanel() {
           }
         } else {
           // Search or filter
-          const results = await localVaultService.searchIndex(debouncedQuery, { extensionFilter });
+          const results = await localVaultService.searchIndex(debouncedQuery, { extensionFilter, categoryFilter: categoryFilter as FolderCategory || undefined });
           if (isActive) {
             setFolders(results.folders);
             setFiles(results.files);
@@ -70,7 +71,7 @@ export default function VaultBrowserPanel() {
     return () => {
       isActive = false;
     };
-  }, [isOpen, debouncedQuery, extensionFilter]);
+  }, [isOpen, debouncedQuery, extensionFilter, categoryFilter]);
 
   if (vaultStatus !== 'connected' || !lastIndexedAt) {
     return null;
@@ -86,6 +87,18 @@ export default function VaultBrowserPanel() {
   const formatDate = (ts?: number) => {
     if (!ts) return '';
     return new Date(ts).toLocaleDateString('he-IL');
+  };
+
+  const getCategoryBadge = (category?: string) => {
+    switch(category) {
+      case 'client': return <span style={{ fontSize: '0.6rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '2px 4px', borderRadius: 4 }}>לקוח</span>;
+      case 'generated_output': return <span style={{ fontSize: '0.6rem', color: '#8b5cf6', background: 'rgba(139, 92, 246, 0.1)', padding: '2px 4px', borderRadius: 4 }}>תוצר</span>;
+      case 'archive': return <span style={{ fontSize: '0.6rem', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)', padding: '2px 4px', borderRadius: 4 }}>ארכיון</span>;
+      case 'app_source': return <span style={{ fontSize: '0.6rem', color: '#3b82f6', background: 'rgba(59, 130, 246, 0.1)', padding: '2px 4px', borderRadius: 4 }}>קוד</span>;
+      case 'system': return <span style={{ fontSize: '0.6rem', color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)', padding: '2px 4px', borderRadius: 4 }}>מערכת</span>;
+      case 'unknown': return <span style={{ fontSize: '0.6rem', color: '#64748b', background: 'rgba(100, 116, 139, 0.1)', padding: '2px 4px', borderRadius: 4 }}>לא מסווג</span>;
+      default: return null;
+    }
   };
 
   return (
@@ -124,6 +137,23 @@ export default function VaultBrowserPanel() {
               />
             </div>
             <select
+              value={categoryFilter}
+              onChange={e => setCategoryFilter(e.target.value as FolderCategory | '')}
+              style={{
+                padding: '8px 12px', borderRadius: 6,
+                background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)',
+                color: '#e2e8f0', fontSize: '0.8rem', outline: 'none', cursor: 'pointer'
+              }}
+            >
+              <option value="">כל הקטגוריות</option>
+              <option value="client">לקוח</option>
+              <option value="generated_output">תוצר</option>
+              <option value="archive">ארכיון</option>
+              <option value="app_source">קוד</option>
+              <option value="system">מערכת</option>
+              <option value="unknown">לא מסווג</option>
+            </select>
+            <select
               value={extensionFilter}
               onChange={e => setExtensionFilter(e.target.value)}
               style={{
@@ -160,8 +190,11 @@ export default function VaultBrowserPanel() {
                       <div style={{ fontSize: '0.8rem', color: '#e2e8f0', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {folder.name}
                       </div>
-                      <div style={{ fontSize: '0.65rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', direction: 'ltr', textAlign: 'right' }}>
-                        {folder.relativePath}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {getCategoryBadge(folder.inferredCategory)}
+                        <div style={{ fontSize: '0.65rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', direction: 'ltr', textAlign: 'right' }}>
+                          {folder.relativePath}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -177,8 +210,11 @@ export default function VaultBrowserPanel() {
                       <div style={{ fontSize: '0.8rem', color: '#e2e8f0', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {file.name}
                       </div>
-                      <div style={{ fontSize: '0.65rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', direction: 'ltr', textAlign: 'right' }}>
-                        {file.relativePath}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {getCategoryBadge(file.inferredCategory)}
+                        <div style={{ fontSize: '0.65rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', direction: 'ltr', textAlign: 'right' }}>
+                          {file.relativePath}
+                        </div>
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
