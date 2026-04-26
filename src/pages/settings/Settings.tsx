@@ -19,6 +19,7 @@ import {
 } from '../../services/gmailService';
 import { useIntegrationStore } from '../../store/integrationStore';
 import { useLocalVaultStore } from '../../store/localVaultStore';
+import VaultBrowserPanel from './VaultBrowserPanel';
 import { Database } from 'lucide-react';
 
 // #region Component
@@ -228,6 +229,9 @@ export default function Settings() {
               )}
             </div>
           )}
+
+          {/* Vault Browser */}
+          <VaultBrowserPanel />
         </div>
 
         {/* Gmail */}

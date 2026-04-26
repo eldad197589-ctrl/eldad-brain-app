@@ -43,7 +43,7 @@ export interface LocalFileReference {
 
 function getDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 2);
+    const request = indexedDB.open(DB_NAME, 3);
     request.onupgradeneeded = (e) => {
       const db = (e.target as IDBOpenDBRequest).result;
       const oldVersion = e.oldVersion;
@@ -59,6 +59,22 @@ function getDB(): Promise<IDBDatabase> {
         }
         if (!db.objectStoreNames.contains('indexMeta')) {
           db.createObjectStore('indexMeta', { keyPath: 'key' });
+        }
+      }
+      if (oldVersion < 3) {
+        const tx = request.transaction;
+        if (tx) {
+          const foldersStore = tx.objectStore('folders');
+          if (!foldersStore.indexNames.contains('by_parentPath')) {
+            foldersStore.createIndex('by_parentPath', 'parentPath', { unique: false });
+          }
+          const filesStore = tx.objectStore('files');
+          if (!filesStore.indexNames.contains('by_parentPath')) {
+            filesStore.createIndex('by_parentPath', 'parentPath', { unique: false });
+          }
+          if (!filesStore.indexNames.contains('by_extension')) {
+            filesStore.createIndex('by_extension', 'extension', { unique: false });
+          }
         }
       }
     };
@@ -324,5 +340,141 @@ export const localVaultService = {
       await updateIndexMeta('failed', err.message);
       throw err;
     }
+  },
+
+  async searchIndex(query: string, options?: { extensionFilter?: string; limit?: number }): Promise<{ folders: ManagedLocalFolder[]; files: LocalFileReference[]; totalMatched: number }> {
+    const limit = options?.limit ?? 100;
+    const lowerQuery = query.toLowerCase();
+    const extFilter = options?.extensionFilter;
+    
+    const db = await getDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(['folders', 'files'], 'readonly');
+      const matchedFolders: ManagedLocalFolder[] = [];
+      const matchedFiles: LocalFileReference[] = [];
+      let totalMatched = 0;
+
+      const matchesQuery = (name: string, path: string) => {
+        if (!lowerQuery) return true;
+        return name.toLowerCase().includes(lowerQuery) || path.toLowerCase().includes(lowerQuery);
+      };
+
+      const fileStore = tx.objectStore('files');
+      let fileReq: IDBRequest;
+      if (extFilter) {
+        const index = fileStore.index('by_extension');
+        fileReq = index.openCursor(IDBKeyRange.only(extFilter));
+      } else {
+        fileReq = fileStore.openCursor();
+      }
+
+      fileReq.onsuccess = (e: any) => {
+        const cursor = e.target.result;
+        if (cursor) {
+          const file = cursor.value as LocalFileReference;
+          if (matchesQuery(file.name, file.relativePath)) {
+            totalMatched++;
+            if (matchedFiles.length + matchedFolders.length < limit) {
+              matchedFiles.push(file);
+            }
+          }
+          cursor.continue();
+        } else {
+          if (extFilter) {
+            resolve({ folders: matchedFolders, files: matchedFiles, totalMatched });
+            return;
+          }
+          const folderStore = tx.objectStore('folders');
+          const folderReq = folderStore.openCursor();
+          folderReq.onsuccess = (e: any) => {
+            const cursor2 = e.target.result;
+            if (cursor2) {
+              const folder = cursor2.value as ManagedLocalFolder;
+              if (matchesQuery(folder.name, folder.relativePath)) {
+                totalMatched++;
+                if (matchedFiles.length + matchedFolders.length < limit) {
+                  matchedFolders.push(folder);
+                }
+              }
+              cursor2.continue();
+            } else {
+              const sortResults = (arr: any[]) => {
+                if (!lowerQuery) return;
+                arr.sort((a, b) => {
+                  const aNameExact = a.name.toLowerCase() === lowerQuery;
+                  const bNameExact = b.name.toLowerCase() === lowerQuery;
+                  if (aNameExact && !bNameExact) return -1;
+                  if (!aNameExact && bNameExact) return 1;
+                  const aNameInc = a.name.toLowerCase().includes(lowerQuery);
+                  const bNameInc = b.name.toLowerCase().includes(lowerQuery);
+                  if (aNameInc && !bNameInc) return -1;
+                  if (!aNameInc && bNameInc) return 1;
+                  return 0;
+                });
+              };
+              sortResults(matchedFolders);
+              sortResults(matchedFiles);
+              resolve({ folders: matchedFolders, files: matchedFiles, totalMatched });
+            }
+          };
+        }
+      };
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+
+  async listFolderContents(parentPath: string): Promise<{ subfolders: ManagedLocalFolder[]; files: LocalFileReference[] }> {
+    const db = await getDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(['folders', 'files'], 'readonly');
+      const subfolders: ManagedLocalFolder[] = [];
+      const files: LocalFileReference[] = [];
+      const folderIdx = tx.objectStore('folders').index('by_parentPath');
+      const fileIdx = tx.objectStore('files').index('by_parentPath');
+      
+      let pending = 2;
+      const checkDone = () => {
+        pending--;
+        if (pending === 0) resolve({ subfolders, files });
+      };
+
+      const folderReq = folderIdx.getAll(parentPath);
+      folderReq.onsuccess = () => {
+        subfolders.push(...folderReq.result);
+        checkDone();
+      };
+      
+      const fileReq = fileIdx.getAll(parentPath);
+      fileReq.onsuccess = () => {
+        files.push(...fileReq.result);
+        checkDone();
+      };
+      
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+
+  async getExtensionSummary(): Promise<Array<{ ext: string; count: number }>> {
+    const db = await getDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('files', 'readonly');
+      const store = tx.objectStore('files');
+      const req = store.openCursor();
+      const counts: Record<string, number> = {};
+      
+      req.onsuccess = (e: any) => {
+        const cursor = e.target.result;
+        if (cursor) {
+          const ext = cursor.value.extension;
+          if (ext) counts[ext] = (counts[ext] || 0) + 1;
+          cursor.continue();
+        } else {
+          const result = Object.keys(counts).map(ext => ({ ext, count: counts[ext] }));
+          result.sort((a, b) => b.count - a.count || a.ext.localeCompare(b.ext));
+          resolve(result);
+        }
+      };
+      tx.onerror = () => reject(tx.error);
+    });
   }
 };
