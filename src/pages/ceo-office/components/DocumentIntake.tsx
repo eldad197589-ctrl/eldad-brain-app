@@ -17,6 +17,8 @@ import { useState, useMemo } from 'react';
 import { FileText, Plus, Check, Trash2, Filter, Mail } from 'lucide-react';
 import { useBrainStore, type IncomingDocument } from '../../../store/brainStore';
 import type { CaseDocument } from '../../../data/caseTypes';
+import { FileBasedWorkItemRepository } from '../../../work-spine/persistence/file-based-work-item-repository';
+import { WorkItemStatus } from '../../../work-spine/types/work-spine-types';
 import EmailImportModal from './EmailImportModal';
 import DriveImportModal from './DriveImportModal';
 
@@ -61,7 +63,6 @@ export default function DocumentIntake() {
   const deleteDocument = useBrainStore((s) => s.deleteDocument);
   const cases = useBrainStore((s) => s.cases);
   const updateCase = useBrainStore((s) => s.updateCase);
-  const addTask = useBrainStore((s) => s.addTask);
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -147,22 +148,28 @@ export default function DocumentIntake() {
       return;
     }
 
-    // ─── Route to Task ───
+    // ─── Route to Task (WorkSpine) ───
     if (linked === 'task') {
-      addTask({
-        title: doc.description || 'מסמך חדש',
-        dueDate: new Date().toISOString().slice(0, 10),
-        priority: 'medium',
-        status: 'todo',
-        category: 'מסמכים',
-        notes: doc.onboardingUrl ? `🔗 לינק ישיר לאשף קליטה:\n${doc.onboardingUrl}\n\nנמצאו ${doc.fileCount || 0} קבצים בתיקייה: ${doc.folderName || ''}` : undefined,
-        sourceUrl: doc.sourceUrl,
+      const repo = new FileBasedWorkItemRepository();
+      const now = new Date().toISOString();
+      const uid = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      
+      repo.create({
+        id: `wi-${uid}`,
+        domain_type: 'GENERAL',
+        title: doc.description || 'מסמך נכנס ללא תיאור',
+        next_action_description: `לטפל במסמך נכנס: ${doc.description || 'ללא תיאור'}${doc.onboardingUrl ? `\n🔗 לינק אשף קליטה: ${doc.onboardingUrl}` : ''}`,
+        status: WorkItemStatus.NEW,
+        created_at: now,
+        updated_at: now,
+        source_url: doc.sourceUrl,
         senderName: doc.senderName,
         sourceLabel: doc.sourceLabel,
         sourceKind: doc.sourceKind,
         requestType: doc.requestType,
         linkedDocumentId: doc.id,
       });
+      
       updateDocStatus(doc.id, 'processed');
       return;
     }
@@ -174,7 +181,7 @@ export default function DocumentIntake() {
     }
 
     // ─── Invalid ───
-    alert('יש להזין linkedTo בפורמט case:<caseId> או task, או לנקות את השדה כדי לסמן כטופל כללי');
+    alert(`שגיאת שיוך: הערך שמור במערכת לא תקין ("${linked}"). יש למחוק מסמך זה ולקלוט אותו מחדש, או שזהו מסמך בעייתי מפיתוח קודם.`);
   };
 
   return (
@@ -265,12 +272,19 @@ export default function DocumentIntake() {
             <select value={source} onChange={(e) => setSource(e.target.value)} style={selectStyle}>
               {SOURCES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
-            <input
+            <select
               value={linkedTo}
               onChange={(e) => setLinkedTo(e.target.value)}
-              placeholder="מקושר ל..."
-              style={{ ...selectStyle, width: 120 }}
-            />
+              style={{ ...selectStyle, width: 180 }}
+            >
+              <option value="">תיוק בלבד / ללא פעולה</option>
+              <option value="task">צור משימה לביצוע</option>
+              {cases.map((c) => (
+                <option key={c.caseId} value={`case:${c.caseId}`}>
+                  שייך לתיק: {c.clientName || c.caseId}
+                </option>
+              ))}
+            </select>
             {docType === 'supplier_invoice' && (
               <>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.78rem', color: '#94a3b8' }}>
@@ -344,7 +358,9 @@ export default function DocumentIntake() {
                     {doc.description}
                   </div>
                   <div style={{ fontSize: '0.68rem', color: '#64748b' }}>
-                    {doc.linkedTo || 'כללי'} · {doc.source}
+                    {doc.linkedTo === 'task' ? 'משימה' : 
+                     doc.linkedTo?.startsWith('case:') ? `תיק: ${cases.find(c => c.caseId === doc.linkedTo?.slice(5))?.clientName || doc.linkedTo?.slice(5)}` :
+                     doc.linkedTo ? `שיוך לא תקין: ${doc.linkedTo}` : 'כללי'} · {doc.source}
                     {doc.amount ? ` · ₪${doc.amount.toLocaleString()}` : ''}
                     {doc.hasVat ? ' · כולל מע"מ' : ''}
                   </div>
