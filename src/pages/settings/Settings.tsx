@@ -18,6 +18,8 @@ import {
   signInWithGoogle, signOutGoogle,
 } from '../../services/gmailService';
 import { useIntegrationStore } from '../../store/integrationStore';
+import { useLocalVaultStore } from '../../store/localVaultStore';
+import { Database } from 'lucide-react';
 
 // #region Component
 
@@ -39,10 +41,17 @@ export default function Settings() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const vaultStatus = useLocalVaultStore(s => s.status);
+  const vaultLabel = useLocalVaultStore(s => s.label);
+  const initVault = useLocalVaultStore(s => s.initVault);
+  const connectVaultRoot = useLocalVaultStore(s => s.connectRoot);
+  const checkVaultPermission = useLocalVaultStore(s => s.checkPermission);
+  const disconnectVaultRoot = useLocalVaultStore(s => s.disconnectRoot);
+
   /** Refresh statuses */
   useEffect(() => {
-    // Relying on zustand reactivity
-  }, []);
+    initVault();
+  }, [initVault]);
 
   /** Save Google Client ID */
   const handleSaveClientId = () => {
@@ -148,6 +157,25 @@ export default function Settings() {
 
       {/* Integration Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+        {/* Local Brain Vault */}
+        <IntegrationCard
+          icon={<Database size={22} color="#10b981" />}
+          title="📁 תיקיית המוח המקומית"
+          description={vaultLabel ? `מחובר לתיקייה: ${vaultLabel}` : 'חיבור לספריית האם (המוח של אלדד)'}
+          connected={vaultStatus === 'connected'}
+          loading={false}
+          onConnect={vaultStatus === 'permission_required' ? checkVaultPermission : connectVaultRoot}
+          connectLabel={vaultStatus === 'permission_required' ? '🔓 אישור הרשאה' : '🔌 חבר תיקייה'}
+          onDisconnect={disconnectVaultRoot}
+          note={
+            vaultStatus === 'unsupported' ? 'הדפדפן לא תומך ב-File System API' :
+            vaultStatus === 'permission_required' ? 'נדרש אישור מחודש של הדפדפן' :
+            vaultStatus === 'denied' ? 'אין הרשאה לתיקייה' :
+            'גישה ישירה למערכת הקבצים ללא העלאה'
+          }
+          disabled={vaultStatus === 'unsupported'}
+        />
+
         {/* Gmail */}
         <IntegrationCard
           icon={<Mail size={22} color="#ef4444" />}
@@ -212,10 +240,11 @@ interface CardProps {
   onDisconnect?: () => void;
   note?: string;
   disabled?: boolean;
+  connectLabel?: string;
 }
 
 /** Integration card */
-function IntegrationCard({ icon, title, description, connected, loading, onConnect, onDisconnect, note, disabled }: CardProps) {
+function IntegrationCard({ icon, title, description, connected, loading, onConnect, onDisconnect, note, disabled, connectLabel }: CardProps) {
   return (
     <div style={{
       padding: '18px 20px', borderRadius: 12,
@@ -250,7 +279,7 @@ function IntegrationCard({ icon, title, description, connected, loading, onConne
             disabled={disabled || loading}
             style={btnStyle(disabled ? '#475569' : '#3b82f6')}
           >
-            {loading ? '⏳ מתחבר...' : '🔌 חבר'}
+            {loading ? '⏳ מתחבר...' : (connectLabel || '🔌 חבר')}
           </button>
         )}
       </div>
