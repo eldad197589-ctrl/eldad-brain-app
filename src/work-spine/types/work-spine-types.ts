@@ -19,7 +19,7 @@ export type SourceChannel = 'email' | 'drive' | 'whatsapp' | 'scan' | 'manual' |
 
 export type SourceKind = 'person' | 'client' | 'authority' | 'lawyer' | 'supplier' | 'bank' | 'internal' | 'unknown';
 
-export type RequestType = 'task' | 'work_item' | 'case_document' | 'review_request' | 'agreement_review' | 'evidence' | 'archive' | 'unknown';
+export type RequestType = 'task' | 'work_item' | 'case_document' | 'review_request' | 'agreement_review' | 'evidence' | 'archive' | 'unknown' | 'client_onboarding';
 
 
 export interface WorkItemRecord {

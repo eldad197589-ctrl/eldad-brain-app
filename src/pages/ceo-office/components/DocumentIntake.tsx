@@ -28,6 +28,7 @@ const DOC_TYPES = [
   { value: 'client_doc', label: '👤 מסמך לקוח', color: '#3b82f6' },
   { value: 'tax_notice', label: '🏛️ הודעת מס', color: '#ef4444' },
   { value: 'contract', label: '📝 חוזה/הסכם', color: '#a78bfa' },
+  { value: 'client_onboarding_package', label: '🚀 חבילת קליטה', color: '#10b981' },
   { value: 'other', label: '📎 אחר', color: '#94a3b8' },
 ] as const;
 
@@ -154,6 +155,7 @@ export default function DocumentIntake() {
         priority: 'medium',
         status: 'todo',
         category: 'מסמכים',
+        notes: doc.onboardingUrl ? `🔗 לינק ישיר לאשף קליטה:\n${doc.onboardingUrl}\n\nנמצאו ${doc.fileCount || 0} קבצים בתיקייה: ${doc.folderName || ''}` : undefined,
         sourceUrl: doc.sourceUrl,
         senderName: doc.senderName,
         sourceLabel: doc.sourceLabel,

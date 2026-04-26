@@ -119,6 +119,11 @@ export interface IncomingDocument {
   requestType?: RequestType;
   receivedAt?: string;
   rawSubject?: string;
+  folderName?: string;
+  fileCount?: number;
+  detectedClientName?: string;
+  detectedEntityType?: string;
+  onboardingUrl?: string;
 }
 
 /** Sync status indicator */

@@ -16,6 +16,7 @@ import { ingestLocalRawText } from '../../../services/ragService';
 import { createOrUpdateClient } from '../../../services/clientService';
 import { scanDocument, aggregateScanResults, ScanResult, AggregatedIntake } from '../../../services/documentScanner';
 import { useNavigate } from 'react-router-dom';
+import { useBrainStore } from '../../../store/brainStore';
 
 // #region Types
 
@@ -43,6 +44,7 @@ interface IngestStatus {
 
 export const FolderIngester: React.FC = () => {
   const navigate = useNavigate();
+  const addDocument = useBrainStore(s => s.addDocument);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [intake, setIntake] = useState<AggregatedIntake | null>(null);
@@ -159,6 +161,36 @@ export const FolderIngester: React.FC = () => {
     }
 
     if (fileInputRef.current) fileInputRef.current.value = '';
+
+    // 6. Register as an IncomingDocument in the central DocumentIntake queue
+    const onboardingParams = new URLSearchParams();
+    onboardingParams.set('name', aggregated.clientName);
+    if (aggregated.detectedEntityType) onboardingParams.set('entity', aggregated.detectedEntityType);
+    if (aggregated.isTransfer) onboardingParams.set('transfer', 'true');
+    if (aggregated.foundDocIds.length > 0) onboardingParams.set('found', aggregated.foundDocIds.join(','));
+    if (aggregated.idNumber) onboardingParams.set('idNumber', aggregated.idNumber);
+
+    const folderName = validFiles.length > 0 && validFiles[0].webkitRelativePath 
+      ? validFiles[0].webkitRelativePath.split(/[/\\]/)[0] 
+      : 'Unknown Folder';
+
+    addDocument({
+      description: `חבילת onboarding ללקוח: ${aggregated.clientName || folderName}`,
+      docType: 'client_onboarding_package',
+      source: 'local_folder',
+      sourceUrl: 'local_folder',
+      sourceLabel: 'תיקייה מקומית',
+      sourceKind: 'client',
+      requestType: 'client_onboarding',
+      senderName: aggregated.clientName || folderName,
+      linkedTo: '',
+      status: 'pending',
+      folderName: folderName,
+      fileCount: validFiles.length,
+      detectedClientName: aggregated.clientName,
+      detectedEntityType: aggregated.detectedEntityType,
+      onboardingUrl: `/onboarding?${onboardingParams.toString()}`
+    });
 
     // Don't auto-navigate — let user review the findings first
     void createdClientId;
