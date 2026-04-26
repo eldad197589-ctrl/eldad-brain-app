@@ -35,47 +35,33 @@ export interface GmailMessage {
   attachments: string[];
 }
 
-/** OAuth token info */
-interface TokenInfo {
-  access_token: string;
-  expires_in: number;
-  token_type: string;
-  scope: string;
-}
+import {
+  getGoogleClientId as storeGetClientId,
+  setGoogleClientId as storeSetClientId,
+  getGoogleAccessToken,
+  setGoogleAccessToken,
+  type TokenInfo
+} from '../store/integrationStore';
 
 // #endregion
 
 // #region Configuration
 
-const STORAGE_KEY = 'brain_gmail_token';
 const SCOPES = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.readonly';
 
 /** Get stored Client ID from localStorage settings */
 export function getGoogleClientId(): string {
-  return localStorage.getItem('brain_google_client_id') || '';
+  return storeGetClientId();
 }
 
 /** Save Client ID */
 export function setGoogleClientId(clientId: string): void {
-  localStorage.setItem('brain_google_client_id', clientId);
-}
-
-/** Get stored access token */
-function getStoredToken(): TokenInfo | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
-}
-
-/** Store access token */
-function storeToken(token: TokenInfo): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(token));
+  storeSetClientId(clientId);
 }
 
 /** Clear stored token */
 export function clearGmailToken(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  setGoogleAccessToken(null);
 }
 
 // #endregion
@@ -84,7 +70,7 @@ export function clearGmailToken(): void {
 
 /** Check if Gmail is connected (has valid token) */
 export function isGmailConnected(): boolean {
-  return !!getStoredToken();
+  return !!getGoogleAccessToken();
 }
 
 /**
@@ -108,7 +94,7 @@ export function signInWithGoogle(): Promise<string> {
           reject(new Error(response.error));
           return;
         }
-        storeToken(response);
+        setGoogleAccessToken(response);
         resolve(response.access_token);
       },
     });
@@ -118,7 +104,7 @@ export function signInWithGoogle(): Promise<string> {
 
 /** Sign out — revoke token */
 export function signOutGoogle(): void {
-  const token = getStoredToken();
+  const token = getGoogleAccessToken();
   if (token) {
     // @ts-expect-error — google.accounts loaded from external script
     google.accounts.oauth2.revoke(token.access_token);
@@ -135,7 +121,7 @@ const GMAIL_API = 'https://gmail.googleapis.com/gmail/v1/users/me';
 
 /** Get auth headers */
 function authHeaders(): HeadersInit {
-  const token = getStoredToken();
+  const token = getGoogleAccessToken();
   if (!token) throw new Error('לא מחובר ל-Gmail');
   return { Authorization: `Bearer ${token.access_token}` };
 }

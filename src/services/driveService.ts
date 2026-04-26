@@ -36,20 +36,20 @@ export interface DriveFile {
 
 // #region Configuration
 
+import { getGoogleAccessToken } from '../store/integrationStore';
+
 const DRIVE_API = 'https://www.googleapis.com/drive/v3';
-const STORAGE_KEY = 'brain_gmail_token';
 
 /** Get auth headers (shared with Gmail) */
 function authHeaders(): HeadersInit {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) throw new Error('לא מחובר ל-Google');
-  const token = JSON.parse(raw);
+  const token = getGoogleAccessToken();
+  if (!token) throw new Error('לא מחובר ל-Google');
   return { Authorization: `Bearer ${token.access_token}` };
 }
 
 /** Check if Drive is connected */
 export function isDriveConnected(): boolean {
-  return !!localStorage.getItem(STORAGE_KEY);
+  return !!getGoogleAccessToken();
 }
 
 // #endregion

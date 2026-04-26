@@ -15,11 +15,9 @@
 import { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, Mail, HardDrive, MessageSquare, Brain, CheckCircle, XCircle, Key } from 'lucide-react';
 import {
-  isGmailConnected, signInWithGoogle, signOutGoogle,
-  getGoogleClientId, setGoogleClientId,
+  signInWithGoogle, signOutGoogle,
 } from '../../services/gmailService';
-import { isDriveConnected } from '../../services/driveService';
-import { isAIConfigured } from '../../services/geminiService';
+import { useIntegrationStore } from '../../store/integrationStore';
 
 // #region Component
 
@@ -27,10 +25,15 @@ import { isAIConfigured } from '../../services/geminiService';
  * Settings page — integration cards for Gmail, Drive, WhatsApp, Gemini.
  */
 export default function Settings() {
-  const [gmailConnected, setGmailConnected] = useState(isGmailConnected());
-  const [driveConnected, setDriveConnected] = useState(isDriveConnected());
-  const [aiConfigured, setAiConfigured] = useState(isAIConfigured());
-  const [clientId, setClientId] = useState(getGoogleClientId());
+  const storeClientId = useIntegrationStore((s) => s.googleClientId);
+  const token = useIntegrationStore((s) => s.googleAccessToken);
+  const setStoreClientId = useIntegrationStore((s) => s.setGoogleClientId);
+
+  const gmailConnected = !!token;
+  const driveConnected = !!token;
+  const aiConfigured = !!import.meta.env.VITE_GEMINI_API_KEY;
+  
+  const [clientId, setClientId] = useState(storeClientId);
   const [showClientIdInput, setShowClientIdInput] = useState(false);
   const [loading, setLoading] = useState('');
   const [error, setError] = useState('');
@@ -38,15 +41,13 @@ export default function Settings() {
 
   /** Refresh statuses */
   useEffect(() => {
-    setGmailConnected(isGmailConnected());
-    setDriveConnected(isDriveConnected());
-    setAiConfigured(isAIConfigured());
+    // Relying on zustand reactivity
   }, []);
 
   /** Save Google Client ID */
   const handleSaveClientId = () => {
     if (!clientId.trim()) return;
-    setGoogleClientId(clientId.trim());
+    setStoreClientId(clientId.trim());
     setShowClientIdInput(false);
     setSuccess('Client ID נשמר בהצלחה!');
     setTimeout(() => setSuccess(''), 3000);
@@ -54,7 +55,7 @@ export default function Settings() {
 
   /** Connect Gmail */
   const handleConnectGmail = async () => {
-    if (!getGoogleClientId()) {
+    if (!storeClientId) {
       setShowClientIdInput(true);
       setError('הכנס Google Client ID קודם');
       setTimeout(() => setError(''), 3000);
@@ -64,8 +65,6 @@ export default function Settings() {
     setError('');
     try {
       await signInWithGoogle();
-      setGmailConnected(true);
-      setDriveConnected(true); // Same token
       setSuccess('Gmail + Drive מחוברים!');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
@@ -78,8 +77,6 @@ export default function Settings() {
   /** Disconnect Gmail */
   const handleDisconnectGmail = () => {
     signOutGoogle();
-    setGmailConnected(false);
-    setDriveConnected(false);
     setSuccess('Gmail + Drive נותקו');
     setTimeout(() => setSuccess(''), 3000);
   };
