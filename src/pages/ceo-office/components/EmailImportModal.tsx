@@ -84,12 +84,19 @@ export default function EmailImportModal({ onClose }: EmailImportModalProps) {
       other: 'other',
     };
     addDocument({
-      description: `${item.email.subject} — ${item.email.from}`,
+      description: item.email.subject || '(ללא נושא)',
       docType: docTypeMap[item.classification.suggestedDocType || 'other'] || 'other',
       source: 'email',
       linkedTo: '',
       status: 'pending',
       hasVat: false,
+      sourceUrl: `https://mail.google.com/mail/u/0/#all/${item.email.id}`,
+      rawSubject: item.email.subject,
+      senderName: item.email.from,
+      sourceLabel: 'Gmail',
+      sourceKind: 'person',
+      requestType: 'unknown',
+      receivedAt: item.email.date,
     });
     setImported((prev) => new Set([...prev, item.email.id]));
   };

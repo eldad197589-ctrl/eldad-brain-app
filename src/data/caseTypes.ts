@@ -4,11 +4,12 @@
             Seeds and future loaders must produce this exact shape.
    DEPENDENCIES: None (pure types)
    EXPORTS: CaseEntity, CaseEmail, CaseDocument, CaseDocumentType,
-            CaseStatus, CaseProcessType, CaseDraft, SuggestedAttackBlock
+            CaseStatus, CaseProcessType, CaseDraft, SuggestedAttackBlock,
    ============================================ */
 
 import type { CaseBundle } from '../integrations/gmail/caseBundle';
 import type { AttackPoint } from '../services/decisionAttackEngine';
+import type { SourceChannel, SourceKind, RequestType } from '../work-spine/types/work-spine-types';
 
 // #region Types
 
@@ -28,6 +29,7 @@ export type CaseProcessType =
   | 'tax_audit'
   | 'penalty_appeal'
   | 'insurance_claim'
+  | 'academic_submission'
   | 'general';
 
 /** סיווג מסמך */
@@ -117,10 +119,22 @@ export interface CaseDocument {
   type: CaseDocumentType;
   /** תיאור */
   description: string;
-  /** מקור: 'local_folder' | 'email_attachment' */
-  source: 'local_folder' | 'email_attachment';
+  /** מקור: 'local_folder' | 'email_attachment' או הרחבות */
+  source: SourceChannel | 'email_attachment';
   /** נתיב יחסי (לתיקיה מקומית) */
   relativePath?: string;
+  /** URL מקור חיצוני (למשל Gmail, Drive, או מערכת אחרת) */
+  sourceUrl?: string;
+  /** שם השולח */
+  senderName?: string;
+  /** תווית מקור (למשל Gmail) */
+  sourceLabel?: string;
+  /** סוג השולח */
+  sourceKind?: SourceKind;
+  /** סוג הבקשה */
+  requestType?: RequestType;
+  /** מזהה מסמך נכנס */
+  incomingDocumentId?: string;
   /** האם סופק למפקח */
   wasSubmitted: boolean;
   /** תאריך הגשה */
@@ -133,6 +147,26 @@ export type CaseDraftStatus =
   | 'under_review'
   | 'approved_by_eldad'
   | 'ready_for_submission';
+
+/** משימת תיקון שנוצרה לאחר דחייה של אלדד */
+export interface RepairMission {
+  /** מזהה ייחודי של משימת התיקון */
+  id: string;
+  /** תאריך ושעת יצירה */
+  createdAt: string;
+  /** על איזה ארטיפקט מדובר (למשל 'canonical_document', 'draft') */
+  targetArtifact: string;
+  /** איזה סוג תקלה */
+  errorType: 'visual' | 'content' | 'compliance' | 'other';
+  /** תיאור מילולי של התקלה וההנחיה לתיקון */
+  description: string;
+  /** סטטוס המשימה */
+  status: 'open' | 'in_progress' | 'resolved';
+  /** מתי תוקן (אם תוקן) */
+  resolvedAt?: string;
+  /** הערות לגבי אופן התיקון */
+  resolutionNotes?: string;
+}
 
 /** בלוק טיעון מוצע — נגזר ממפת התקיפה לשימוש ידני בטיוטה */
 export interface SuggestedAttackBlock {
@@ -201,6 +235,14 @@ export interface CaseEntity {
   caseId: string;
   /** שם לקוח */
   clientName: string;
+  /** מזהה לקוח (legacy) */
+  clientId?: string;
+  /** מזהה Subject (canonical) */
+  subjectId?: string;
+  /** מזהה תוכנית/משפחת פרויקטים (optional grouping across cases) */
+  programId?: string;
+  /** שם תוכנית/משפחת פרויקטים */
+  programName?: string;
   /** סוג תהליך */
   processType: CaseProcessType;
   /** סטטוס */
@@ -249,6 +291,14 @@ export interface CaseEntity {
   builtAt?: string;
   /** טביעת אצבע של המקור (אופציונלי כרגע) */
   sourceFingerprint?: string;
+  /** שלב עבודה נוכחי */
+  workflowStage?: string;
+  /** סטטוס אישור סופי (למשל ממתין לאלדד) */
+  approvalStatus?: 'pending_eldad' | 'approved_eldad' | 'rejected_eldad';
+  /** הפעולה הבאה הנדרשת בתיק */
+  nextRequiredAction?: string;
+  /** משימות תיקון (Repair Missions) פתוחות או סגורות */
+  repairMissions?: RepairMission[];
 }
 
 // #endregion

@@ -65,11 +65,15 @@ export default function DriveImportModal({ onClose }: Props) {
       const linkedEntity = extractIsraelDomainOrEntity(file.name) || 'כללי';
 
       addDocument({
-        description: `יובא מדרייב: ${file.name}`,
+        description: file.name,
         docType,
-        source: 'scan', // mapped to scan or drive
+        source: 'drive',
         linkedTo: linkedEntity,
         status: 'pending',
+        sourceUrl: file.webViewLink,
+        sourceLabel: 'Google Drive',
+        sourceKind: 'unknown',
+        requestType: linkedEntity !== 'כללי' ? 'case_document' : 'unknown',
       });
 
       // Remove from list after import

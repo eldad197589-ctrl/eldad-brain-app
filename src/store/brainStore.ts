@@ -30,6 +30,41 @@ import { DocumentCategory } from '../domain/documents/classifier';
 import type { CaseEntity, CaseDraft } from '../data/caseTypes';
 import { DIMA_CASE_SEED } from '../data/dimaCaseSeed';
 import { CASE_BUILDER_VERSION } from '../services/caseBuilder';
+import { TSILA_CASE_SEED, TSILA_SEED_VERSION } from '../data/tsilaCaseSeed';
+import { FileBasedWorkItemRepository } from '../work-spine/persistence/file-based-work-item-repository';
+import { WorkItemStatus } from '../work-spine/types/work-spine-types';
+import type { Subject } from '../data/subjectTypes';
+import type { MetadataRequest } from '../data/personalAreaTypes';
+import { TSILA_METADATA_REQUEST } from '../data/tsilaMetadataRequest';
+import type { SourceChannel, SourceKind, RequestType } from '../work-spine/types/work-spine-types';
+
+const mapCaseStatusToTaskStatus = (status: string): WorkItemStatus | null => {
+  if (status === 'processing' || status === 'drafting') return WorkItemStatus.IN_REVIEW;
+  if (status === 'review') return WorkItemStatus.WAITING_EXTERNAL;
+  if (status === 'submitted') return WorkItemStatus.RESOLVED;
+  if (status === 'closed') return WorkItemStatus.CLOSED;
+  return null;
+};
+
+const syncCaseToTask = (caseId: string, caseStatus: string) => {
+  try {
+    const repo = new FileBasedWorkItemRepository();
+    const all = repo.listAll();
+    const tasks = all.filter(t => t.case_id === caseId);
+    const mapped = mapCaseStatusToTaskStatus(caseStatus);
+    if (!mapped) return;
+    
+    tasks.forEach(t => {
+      if (t.status !== mapped) {
+        t.status = mapped;
+        t.updated_at = new Date().toISOString();
+        repo.update(t);
+      }
+    });
+  } catch (e) {
+    console.error('Failed to sync case to task', e);
+  }
+};
 import type {
   MessageContact, MessageTemplate, MessageDraft, MessageLogEntry,
 } from '../pages/messaging/types';
@@ -61,8 +96,8 @@ export interface IncomingDocument {
   description: string;
   /** Type: 'supplier_invoice' | 'client_doc' | 'tax_notice' | 'contract' | 'other' */
   docType: string;
-  /** Source channel: 'email' | 'whatsapp' | 'scan' | 'manual' */
-  source: string;
+  /** Source channel: 'email' | 'whatsapp' | 'scan' | 'manual' | etc */
+  source: SourceChannel | string;
   /** Linked client or case name */
   linkedTo: string;
   /** Status: 'pending' | 'classified' | 'processed' */
@@ -75,6 +110,15 @@ export interface IncomingDocument {
   amount?: number;
   /** Domain Engine Analysis Result */
   analysis?: DomainResult<DocumentCategory>;
+  /** URL מקור חיצוני (Gmail deep link, Drive URL, וכו') */
+  sourceUrl?: string;
+  senderName?: string;
+  senderId?: string;
+  sourceLabel?: string;
+  sourceKind?: SourceKind;
+  requestType?: RequestType;
+  receivedAt?: string;
+  rawSubject?: string;
 }
 
 /** Sync status indicator */
@@ -153,6 +197,18 @@ interface BrainState {
   payrollError: string | null;
   calculateEmployeePayroll: (input: Partial<PayrollInput> & { grossSalary: number }) => void;
   clearPayrollResult: () => void;
+
+  // ═══ Subject Registry ═══
+  subjects: Subject[];
+  addSubject: (subject: Omit<Subject, 'id' | 'createdAt' | 'updatedAt'>) => Subject;
+  getSubjectById: (id: string) => Subject | undefined;
+  updateSubject: (id: string, updates: Partial<Omit<Subject, 'id' | 'createdAt'>>) => void;
+
+  // ═══ Personal Area — Metadata Requests ═══
+  metadataRequests: MetadataRequest[];
+  addMetadataRequest: (req: MetadataRequest) => void;
+  getMetadataRequestsByCase: (caseId: string) => MetadataRequest[];
+  updateMetadataField: (requestId: string, fieldKey: string, value: string, via: 'personal_area' | 'whatsapp' | 'email' | 'manual') => void;
 }
 
 // #endregion
@@ -328,19 +384,23 @@ export const useBrainStore = create<BrainState>()(
       },
 
       // ═══ Cases ═══
-      cases: [DIMA_CASE_SEED],
+      cases: [DIMA_CASE_SEED, TSILA_CASE_SEED],
 
       addCase: (c) => set((s) => ({
         cases: [...s.cases.filter(x => x.caseId !== c.caseId), c],
       })),
 
-      updateCase: (caseId, updates) => set((s) => ({
-        cases: s.cases.map(c =>
-          c.caseId === caseId ? { ...c, ...updates, updatedAt: new Date().toISOString() } : c
-        ),
-      })),
+      updateCase: (caseId, updates) => set((s) => {
+        if (updates.status) syncCaseToTask(caseId, updates.status);
+        return {
+          cases: s.cases.map(c =>
+            c.caseId === caseId ? { ...c, ...updates, updatedAt: new Date().toISOString() } : c
+          ),
+        };
+      }),
 
       upsertCase: (c) => set((s) => {
+        syncCaseToTask(c.caseId, c.status);
         const idx = s.cases.findIndex(x => x.caseId === c.caseId);
         if (idx >= 0) {
           const updated = [...s.cases];
@@ -523,10 +583,50 @@ export const useBrainStore = create<BrainState>()(
         }
       },
       clearPayrollResult: () => set({ payrollResult: null, payrollError: null }),
+
+      // ═══ Subject Registry ═══
+      subjects: [],
+      addSubject: (input) => {
+        const now = new Date().toISOString();
+        const newSubject: Subject = { ...input, id: uid(), createdAt: now, updatedAt: now };
+        set((s) => ({ subjects: [...s.subjects, newSubject] }));
+        return newSubject;
+      },
+      getSubjectById: (id) => get().subjects.find(s => s.id === id),
+      updateSubject: (id, updates) => set((s) => ({
+        subjects: s.subjects.map(sub =>
+          sub.id === id ? { ...sub, ...updates, updatedAt: new Date().toISOString() } : sub
+        ),
+      })),
+
+      // ═══ Personal Area — Metadata Requests ═══
+      metadataRequests: [],
+      addMetadataRequest: (req) => set((s) => ({
+        metadataRequests: [...s.metadataRequests, req],
+      })),
+      getMetadataRequestsByCase: (caseId) => get().metadataRequests.filter(r => r.caseId === caseId),
+      updateMetadataField: (requestId, fieldKey, value, via) => set((s) => {
+        const now = new Date().toISOString();
+        const updated = s.metadataRequests.map(req => {
+          if (req.id !== requestId) return req;
+          const fields = req.fields.map(f =>
+            f.fieldKey === fieldKey ? { ...f, value, filledAt: now, filledVia: via } : f
+          );
+          const allFilled = fields.filter(f => f.required).every(f => f.value !== null);
+          const anyFilled = fields.some(f => f.value !== null);
+          return {
+            ...req,
+            fields,
+            status: allFilled ? 'completed' as const : anyFilled ? 'partial' as const : req.status,
+            updatedAt: now,
+          };
+        });
+        return { metadataRequests: updated };
+      }),
     }),
     {
       name: 'brain-store-v2',
-      version: 12,
+      version: 15,
       migrate: (persisted: unknown, version: number) => {
         const state = persisted as Record<string, unknown>;
         if (version < 3 && Array.isArray(state.meetings)) {
@@ -537,7 +637,25 @@ export const useBrainStore = create<BrainState>()(
         if (version < 7) { state.tasks = SEED_TASKS as unknown; state.meetings = SEED_MEETINGS as unknown; }
         if (version < 8) { state.meetings = SEED_MEETINGS as unknown; state.tasks = SEED_TASKS as unknown; }
         if (version < 10) state.meetings = SEED_MEETINGS as unknown;
-        if (version < 11) state.cases = [DIMA_CASE_SEED] as unknown;
+        if (version < 11) state.cases = [DIMA_CASE_SEED, TSILA_CASE_SEED] as unknown;
+        // v13: Ensure Tsila case exists in persisted stores from before v13
+        if (version < 13) {
+          const cases = state.cases as CaseEntity[];
+          if (!cases.find((c: CaseEntity) => c.caseId === 'tsila-shvartz')) {
+            (state.cases as CaseEntity[]).push(TSILA_CASE_SEED);
+          }
+        }
+        // v14: Force-inject Tsila if dropping out of runtime
+        if (version < 14) {
+          const cases = state.cases as CaseEntity[];
+          if (!cases.find((c: CaseEntity) => c.caseId === 'tsila-shvartz')) {
+            (state.cases as CaseEntity[]).push(TSILA_CASE_SEED);
+          }
+        }
+        // v15: Purge metadata requests to force a clean canonical sync without ghost fields
+        if (version < 15) {
+          state.metadataRequests = [];
+        }
         // v12: Messaging Engine — safe init
         if (version < 12) {
           if (!Array.isArray(state.messageContacts)) state.messageContacts = [];
@@ -547,6 +665,10 @@ export const useBrainStore = create<BrainState>()(
         }
         // v13: Employee Signals — safe init
         if (!Array.isArray(state.employeeSignals)) state.employeeSignals = [];
+        // v15: Subject Registry — safe init
+        if (!Array.isArray(state.subjects)) state.subjects = [];
+        // v16: Metadata Requests — safe init
+        if (!Array.isArray(state.metadataRequests)) state.metadataRequests = [];
         return state;
       },
       onRehydrateStorage: () => (state) => {
@@ -556,19 +678,87 @@ export const useBrainStore = create<BrainState>()(
         // Verify if any seeded case is from an older builder version or modified structure
         let updated = false;
         const validatedCases = state.cases.map(c => {
-          // Identify seeded cases (e.g. Dima) and check version
           if (c.caseId === 'dima-rodnitski' && c.builtWithVersion !== CASE_BUILDER_VERSION) {
-            console.log(`[BrainStore] CaseBuilder version mismatch for ${c.caseId}. Rebuilding from sources (v${c.builtWithVersion} -> v${CASE_BUILDER_VERSION})`);
-            console.log(`[BrainStore] SEED version: ${DIMA_CASE_SEED.builtWithVersion}, SEED suggestedBlocks:`, DIMA_CASE_SEED.draft?.suggestedBlocks);
+            console.log(`[BrainStore] CaseBuilder version mismatch for ${c.caseId}. Rebuilding (v${c.builtWithVersion} -> v${CASE_BUILDER_VERSION})`);
             updated = true;
-            return DIMA_CASE_SEED; // rebuilds dynamically via seed
+            return DIMA_CASE_SEED; 
+          }
+          if (c.caseId === 'tsila-shvartz' && c.builtWithVersion !== TSILA_SEED_VERSION) {
+            console.log(`[BrainStore] CaseBuilder version mismatch for ${c.caseId}. Rebuilding (v${c.builtWithVersion} -> v${TSILA_SEED_VERSION})`);
+            updated = true;
+            return TSILA_CASE_SEED; 
           }
           return c;
         });
         
+        // Ensure Tsila exists if missing
+        if (!validatedCases.some(c => c.caseId === 'tsila-shvartz')) {
+           console.log('[BrainStore] Injecting TSILA_CASE_SEED — not found in persisted state');
+           validatedCases.push(TSILA_CASE_SEED);
+           updated = true;
+        }
+        
         if (updated) {
-          console.log('[BrainStore] Setting cases with rebuilt data. First case version:', validatedCases[0]?.builtWithVersion);
+          console.log('[BrainStore] Setting cases with rebuilt data.');
           useBrainStore.setState({ cases: validatedCases });
+        }
+
+        // --- Subject Registry Seeding ---
+        // Inject canonical subjects if registry is empty or missing them.
+        // Idempotent: checks by stable ID before inserting.
+        const subjects = (state.subjects || []) as Subject[];
+        let subjectsUpdated = false;
+
+        if (!subjects.find(s => s.id === 'subj-dima-rodnitski')) {
+          subjects.push({
+            id: 'subj-dima-rodnitski',
+            name: 'דימה רודניצקי',
+            aliases: ['Dima', 'Dima Rudnitsky', 'דימה'],
+            role: 'client',
+            lifecycle: 'active',
+            personalArea: 'not_provisioned',
+            personalAreaType: 'client_portal',
+            caseIds: ['dima-rodnitski'],
+            createdAt: '2024-03-13T00:00:00.000Z',
+            updatedAt: new Date().toISOString(),
+          });
+          subjectsUpdated = true;
+        }
+
+        if (!subjects.find(s => s.id === 'subj-tsila-shvartz')) {
+          subjects.push({
+            id: 'subj-tsila-shvartz',
+            name: 'צילה שוורץ דוד',
+            aliases: ['Tsila', 'צילה'],
+            role: 'personal',
+            lifecycle: 'active',
+            personalArea: 'not_provisioned',
+            personalAreaType: 'private_portal',
+            caseIds: ['tsila-shvartz'],
+            createdAt: '2026-04-22T00:00:00.000Z',
+            updatedAt: new Date().toISOString(),
+          });
+          subjectsUpdated = true;
+        }
+
+        if (subjectsUpdated) {
+          console.log(`[BrainStore] Subject registry seeded — ${subjects.length} subjects`);
+          useBrainStore.setState({ subjects });
+        }
+
+        // --- Metadata Requests Seeding & Synchronization ---
+        let metaReqs = (state.metadataRequests || []) as MetadataRequest[];
+        const existingTsila = metaReqs.find(r => r.id === TSILA_METADATA_REQUEST.id);
+        
+        if (!existingTsila) {
+          metaReqs.push(TSILA_METADATA_REQUEST);
+          console.log('[BrainStore] Tsila metadata request seeded');
+          useBrainStore.setState({ metadataRequests: metaReqs });
+        } else {
+          // Force synchronization: Canonical TSILA_METADATA_REQUEST reads overrides.json
+          // We must overwrite the localStorage request so ghost fields don't get stuck.
+          metaReqs = metaReqs.map(r => r.id === TSILA_METADATA_REQUEST.id ? TSILA_METADATA_REQUEST : r);
+          useBrainStore.setState({ metadataRequests: metaReqs });
         }
       },
     }

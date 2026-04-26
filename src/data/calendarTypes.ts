@@ -13,6 +13,8 @@ export interface MeetingTopic {
   link?: string;
 }
 
+import type { SourceKind, RequestType } from '../work-spine/types/work-spine-types';
+
 /** A single prep item — link, message template, or checklist */
 export interface MeetingPrepItem {
   /** Item type: link opens a page, message can be copied, checklist has toggleable items */
@@ -69,6 +71,13 @@ export interface Task {
   actionLink?: string;     // internal route to relevant page
   assignee?: string;       // responsible person (from Protokol)
   subTasks?: { text: string; done: boolean }[];
+  /** URL מקור חיצוני — לשימוש עתידי */
+  sourceUrl?: string;
+  senderName?: string;
+  sourceLabel?: string;
+  sourceKind?: SourceKind;
+  requestType?: RequestType;
+  linkedDocumentId?: string;
 }
 
 export interface CalendarEvent {

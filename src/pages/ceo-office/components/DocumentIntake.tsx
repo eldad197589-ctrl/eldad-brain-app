@@ -1,7 +1,7 @@
 /* ============================================
    FILE: DocumentIntake.tsx
-   PURPOSE: DocumentIntake component
-   DEPENDENCIES: react, lucide-react
+   PURPOSE: DocumentIntake component — receives, classifies, and routes documents
+   DEPENDENCIES: react, lucide-react, brainStore, caseTypes
    EXPORTS: DocumentIntake (default)
    ============================================ */
 /**
@@ -16,6 +16,7 @@
 import { useState, useMemo } from 'react';
 import { FileText, Plus, Check, Trash2, Filter, Mail } from 'lucide-react';
 import { useBrainStore, type IncomingDocument } from '../../../store/brainStore';
+import type { CaseDocument } from '../../../data/caseTypes';
 import EmailImportModal from './EmailImportModal';
 import DriveImportModal from './DriveImportModal';
 
@@ -57,6 +58,9 @@ export default function DocumentIntake() {
   const addDocument = useBrainStore((s) => s.addDocument);
   const updateDocStatus = useBrainStore((s) => s.updateDocStatus);
   const deleteDocument = useBrainStore((s) => s.deleteDocument);
+  const cases = useBrainStore((s) => s.cases);
+  const updateCase = useBrainStore((s) => s.updateCase);
+  const addTask = useBrainStore((s) => s.addTask);
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -66,6 +70,7 @@ export default function DocumentIntake() {
   const [linkedTo, setLinkedTo] = useState('');
   const [hasVat, setHasVat] = useState(false);
   const [amount, setAmount] = useState('');
+  const [sourceUrl, setSourceUrl] = useState('');
 
   // Filter
   const [filter, setFilter] = useState<'all' | 'pending' | 'classified' | 'processed'>('all');
@@ -86,17 +91,88 @@ export default function DocumentIntake() {
       description: description.trim(),
       docType,
       source,
-      linkedTo: linkedTo.trim() || 'לא מקושר',
+      linkedTo: linkedTo.trim(),
       status: 'pending',
       hasVat: docType === 'supplier_invoice' ? hasVat : undefined,
       amount: amount ? parseFloat(amount) : undefined,
+      sourceUrl: sourceUrl.trim() || undefined,
     });
     // Reset form
     setDescription('');
     setLinkedTo('');
     setAmount('');
     setHasVat(false);
+    setSourceUrl('');
     setShowForm(false);
+  };
+
+  /**
+   * handleProcessDocument — routes an IncomingDocument to a case or task.
+   * linkedTo format: 'case:<caseId>' or 'task'
+   */
+  const handleProcessDocument = (doc: IncomingDocument) => {
+    const linked = (doc.linkedTo || '').trim();
+
+    // ─── Route to Case ───
+    if (linked.startsWith('case:')) {
+      const caseId = linked.slice(5).trim();
+      if (!caseId) {
+        alert('linkedTo חסר: יש להזין case:<caseId>');
+        return;
+      }
+      const target = cases.find(c => c.caseId === caseId);
+      if (!target) {
+        alert(`תיק "${caseId}" לא נמצא ב-store`);
+        return;
+      }
+      const newCaseDoc: CaseDocument = {
+        id: `doc-intake-${doc.id}`,
+        fileName: doc.description,
+        type: 'other',
+        description: doc.description,
+        source: (doc.source as any) || 'local_folder',
+        sourceUrl: doc.sourceUrl,
+        senderName: doc.senderName,
+        sourceLabel: doc.sourceLabel,
+        sourceKind: doc.sourceKind,
+        requestType: doc.requestType,
+        incomingDocumentId: doc.id,
+        wasSubmitted: false,
+      };
+      updateCase(caseId, {
+        documents: [...target.documents, newCaseDoc],
+      });
+      updateDocStatus(doc.id, 'processed');
+      return;
+    }
+
+    // ─── Route to Task ───
+    if (linked === 'task') {
+      addTask({
+        title: doc.description || 'מסמך חדש',
+        dueDate: new Date().toISOString().slice(0, 10),
+        priority: 'medium',
+        status: 'todo',
+        category: 'מסמכים',
+        sourceUrl: doc.sourceUrl,
+        senderName: doc.senderName,
+        sourceLabel: doc.sourceLabel,
+        sourceKind: doc.sourceKind,
+        requestType: doc.requestType,
+        linkedDocumentId: doc.id,
+      });
+      updateDocStatus(doc.id, 'processed');
+      return;
+    }
+
+    // ─── Route: General (Empty linkedTo) ───
+    if (linked === '') {
+      updateDocStatus(doc.id, 'processed');
+      return;
+    }
+
+    // ─── Invalid ───
+    alert('יש להזין linkedTo בפורמט case:<caseId> או task, או לנקות את השדה כדי לסמן כטופל כללי');
   };
 
   return (
@@ -266,7 +342,7 @@ export default function DocumentIntake() {
                     {doc.description}
                   </div>
                   <div style={{ fontSize: '0.68rem', color: '#64748b' }}>
-                    {doc.linkedTo} · {doc.source}
+                    {doc.linkedTo || 'כללי'} · {doc.source}
                     {doc.amount ? ` · ₪${doc.amount.toLocaleString()}` : ''}
                     {doc.hasVat ? ' · כולל מע"מ' : ''}
                   </div>
@@ -287,7 +363,7 @@ export default function DocumentIntake() {
                 )}
                 {doc.status === 'classified' && (
                   <button
-                    onClick={() => updateDocStatus(doc.id, 'processed')}
+                    onClick={() => handleProcessDocument(doc)}
                     style={actionBtn('#10b981')}
                   >
                     <Check size={12} /> טופל
