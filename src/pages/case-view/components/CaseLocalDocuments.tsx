@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { ChevronDown, ChevronUp, Folder, FileText } from 'lucide-react';
-import { localVaultService, LocalFileReference, ManagedLocalFolder, FolderCategory } from '../../../services/localVaultService';
+import { localVaultService, LocalFileReference, ManagedLocalFolder, FolderCategory, isTechnicalArtifact } from '../../../services/localVaultService';
 import { useLocalVaultStore } from '../../../store/localVaultStore';
 import type { CaseEntity } from '../../../data/caseTypes';
 
@@ -157,6 +157,7 @@ export default function CaseLocalDocuments({ caseEntity }: CaseLocalDocumentsPro
             if (!isActive) return;
 
             for (const file of res.files) {
+              if (isTechnicalArtifact(file.relativePath, file.name)) continue;
               const existing = hitMap.get(file.relativePath);
               if (existing) {
                 existing.hits++;
@@ -165,6 +166,7 @@ export default function CaseLocalDocuments({ caseEntity }: CaseLocalDocumentsPro
               }
             }
             for (const folder of res.folders) {
+              if (isTechnicalArtifact(folder.relativePath, folder.name)) continue;
               const existing = hitMap.get(folder.relativePath);
               if (existing) {
                 existing.hits++;

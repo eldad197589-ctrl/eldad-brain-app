@@ -45,6 +45,28 @@ export interface LocalFileReference {
   inferredCategory?: FolderCategory;
 }
 
+/**
+ * Detect technical/extraction artifacts that should be hidden from user-facing panels.
+ * Matches DOCX internal structure files, _rels metadata, and similar extraction byproducts.
+ * @param relativePath - the relativePath of the file or folder
+ * @param name - the file or folder name
+ * @returns true if this item is a technical artifact
+ */
+export function isTechnicalArtifact(relativePath: string, name: string): boolean {
+  const path = relativePath.toLowerCase();
+  const n = name.toLowerCase();
+  // DOCX/ZIP internal extraction folders and files
+  if (path.includes('/docx_extract/') || path.startsWith('docx_extract/')) return true;
+  if (path.includes('/_rels/') || path.startsWith('_rels/')) return true;
+  if (path.includes('/word/') && (n.endsWith('.xml') || n.endsWith('.rels'))) return true;
+  // Common extraction metadata files
+  if (n === '[content_types].xml') return true;
+  if (n.endsWith('.rels') && (path.includes('_rels') || path.includes('docx_extract'))) return true;
+  // Thumbs.db and desktop.ini
+  if (n === 'thumbs.db' || n === 'desktop.ini') return true;
+  return false;
+}
+
 function getDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, 4);

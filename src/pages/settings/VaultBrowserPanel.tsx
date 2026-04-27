@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, Folder, FileText, ChevronDown, ChevronUp } from 'lucide-react';
-import { localVaultService, ManagedLocalFolder, LocalFileReference, FolderCategory } from '../../services/localVaultService';
+import { localVaultService, ManagedLocalFolder, LocalFileReference, FolderCategory, isTechnicalArtifact } from '../../services/localVaultService';
 import { useLocalVaultStore } from '../../store/localVaultStore';
 
 export default function VaultBrowserPanel() {
@@ -46,17 +46,21 @@ export default function VaultBrowserPanel() {
           // Empty search -> list root
           const rootContents = await localVaultService.listFolderContents('');
           if (isActive) {
-            setFolders(rootContents.subfolders);
-            setFiles(rootContents.files);
-            setTotalMatched(rootContents.subfolders.length + rootContents.files.length);
+            const sf = rootContents.subfolders.filter(f => !isTechnicalArtifact(f.relativePath, f.name));
+            const fl = rootContents.files.filter(f => !isTechnicalArtifact(f.relativePath, f.name));
+            setFolders(sf);
+            setFiles(fl);
+            setTotalMatched(sf.length + fl.length);
           }
         } else {
           // Search or filter
           const results = await localVaultService.searchIndex(debouncedQuery, { extensionFilter, categoryFilter: categoryFilter as FolderCategory || undefined });
           if (isActive) {
-            setFolders(results.folders);
-            setFiles(results.files);
-            setTotalMatched(results.totalMatched);
+            const sf = results.folders.filter(f => !isTechnicalArtifact(f.relativePath, f.name));
+            const fl = results.files.filter(f => !isTechnicalArtifact(f.relativePath, f.name));
+            setFolders(sf);
+            setFiles(fl);
+            setTotalMatched(sf.length + fl.length);
           }
         }
       } catch (err) {
