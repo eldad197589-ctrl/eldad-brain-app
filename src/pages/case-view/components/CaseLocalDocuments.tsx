@@ -121,15 +121,67 @@ export default function CaseLocalDocuments({ caseEntity }: CaseLocalDocumentsPro
   const [results, setResults] = useState<(LocalFileReference | ManagedLocalFolder)[]>([]);
   const [totalFound, setTotalFound] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isHydrating, setIsHydrating] = useState(true);
 
   const vaultStatus = useLocalVaultStore(s => s.status);
   const lastIndexedAt = useLocalVaultStore(s => s.lastIndexedAt);
+  const initVault = useLocalVaultStore(s => s.initVault);
 
   const tokens = useMemo(() => buildSearchTokens(caseEntity), [caseEntity]);
 
-  // Guard: don't render if vault not connected or no index
-  if (vaultStatus !== 'connected' || !lastIndexedAt) {
+  // Self-hydrate vault status on mount (works after direct refresh)
+  useEffect(() => {
+    let mounted = true;
+    const hydrate = async () => {
+      await initVault();
+      if (mounted) setIsHydrating(false);
+    };
+    hydrate();
+    return () => { mounted = false; };
+  }, []);
+
+  // Guard: still hydrating
+  if (isHydrating) {
     return null;
+  }
+
+  // Guard: vault not supported or fully disconnected (never connected)
+  if (vaultStatus === 'unsupported' || vaultStatus === 'disconnected') {
+    return null;
+  }
+
+  // Guard: permission needed
+  if (vaultStatus === 'permission_required' || vaultStatus === 'denied') {
+    return (
+      <div style={{
+        marginTop: 24, padding: '16px 20px', borderRadius: 10,
+        background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 8 }}>
+          📂 מסמכים מקומיים
+        </h3>
+        <p style={{ margin: '10px 0 0', fontSize: '0.8rem', color: '#f59e0b' }}>
+          נדרשת הרשאה לתיקיית המוח המקומית. אשר הרשאה בהגדרות.
+        </p>
+      </div>
+    );
+  }
+
+  // Guard: connected but no index yet
+  if (!lastIndexedAt) {
+    return (
+      <div style={{
+        marginTop: 24, padding: '16px 20px', borderRadius: 10,
+        background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 8 }}>
+          📂 מסמכים מקומיים
+        </h3>
+        <p style={{ margin: '10px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+          לא נמצא אינדקס קבצים. עבור להגדרות וסרוק אינדקס.
+        </p>
+      </div>
+    );
   }
 
   // Search effect
