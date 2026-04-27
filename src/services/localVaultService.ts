@@ -222,8 +222,18 @@ export const localVaultService = {
     let scannedFiles = 0;
     let iterations = 0;
     const MAX_DEPTH = 8;
-    const EXCLUDED_DIRS = new Set(['.git', 'node_modules', '.DS_Store', 'Thumbs.db', 'AppData', '$RECYCLE.BIN', 'System Volume Information', 'dist', '.vercel', '.agents', '.gemini', 'src', 'public', 'tests', 'scratch']);
+    const GLOBAL_EXCLUDED_DIRS = new Set(['.git', 'node_modules', '.DS_Store', 'Thumbs.db', 'AppData', '$RECYCLE.BIN', 'System Volume Information']);
+    const APP_EXCLUDED_DIRS = new Set(['src', 'dist', 'public', 'tests', '.vercel', '.agents', '.gemini', 'scratch']);
     const INCLUDED_EXTS = new Set(['pdf', 'doc', 'docx', 'txt', 'html', 'htm', 'xlsx', 'xls', 'csv', 'zip', 'rar', 'jpg', 'jpeg', 'png']);
+
+    const shouldExcludeDirectory = (entryName: string, currentPath: string): boolean => {
+      if (GLOBAL_EXCLUDED_DIRS.has(entryName)) return true;
+      if (currentPath === '' && (entryName === '.agents' || entryName === '.gemini' || entryName.startsWith('parallel_build_'))) return true;
+      if (currentPath === 'brain-app' || currentPath.startsWith('brain-app/')) {
+        if (APP_EXCLUDED_DIRS.has(entryName) || entryName.startsWith('parallel_build_')) return true;
+      }
+      return false;
+    };
 
     const inferCategory = (path: string): FolderCategory => {
       if (path.startsWith('לקוחות/') || path.startsWith('דוד אלדד/') || path.startsWith('סריקות/')) return 'client';
@@ -276,7 +286,7 @@ export const localVaultService = {
           }
 
           if (entry.kind === 'directory') {
-            if (EXCLUDED_DIRS.has(entry.name)) continue;
+            if (shouldExcludeDirectory(entry.name, currentPath)) continue;
             folderCount++;
             scannedFolders++;
             const newPath = currentPath ? `${currentPath}/${entry.name}` : entry.name;
