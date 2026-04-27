@@ -56,9 +56,12 @@ const MAX_RESULTS = 50;
  */
 function buildSearchTokens(caseEntity: CaseEntity): string[] {
   const tokens: string[] = [];
+  
+  // Weak tokens / stopwords that produce too much noise in the root filesystem
+  const WEAK_TOKENS = ['דוד', 'אלדד', 'של', 'עבור', 'מאת', 'משרד', 'חברת'];
 
   if (caseEntity.clientName) {
-    const parts = caseEntity.clientName.split(/\s+/).filter(w => w.length >= 2);
+    const parts = caseEntity.clientName.split(/\s+/).filter(w => w.length >= 2 && !WEAK_TOKENS.includes(w));
     tokens.push(...parts);
   }
   if (caseEntity.officialCaseNumber) {
