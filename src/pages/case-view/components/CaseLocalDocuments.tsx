@@ -140,52 +140,12 @@ export default function CaseLocalDocuments({ caseEntity }: CaseLocalDocumentsPro
     return () => { mounted = false; };
   }, []);
 
-  // Guard: still hydrating
-  if (isHydrating) {
-    return null;
-  }
-
-  // Guard: vault not supported or fully disconnected (never connected)
-  if (vaultStatus === 'unsupported' || vaultStatus === 'disconnected') {
-    return null;
-  }
-
-  // Guard: permission needed
-  if (vaultStatus === 'permission_required' || vaultStatus === 'denied') {
-    return (
-      <div style={{
-        marginTop: 24, padding: '16px 20px', borderRadius: 10,
-        background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
-      }}>
-        <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 8 }}>
-          📂 מסמכים מקומיים
-        </h3>
-        <p style={{ margin: '10px 0 0', fontSize: '0.8rem', color: '#f59e0b' }}>
-          נדרשת הרשאה לתיקיית המוח המקומית. אשר הרשאה בהגדרות.
-        </p>
-      </div>
-    );
-  }
-
-  // Guard: connected but no index yet
-  if (!lastIndexedAt) {
-    return (
-      <div style={{
-        marginTop: 24, padding: '16px 20px', borderRadius: 10,
-        background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
-      }}>
-        <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 8 }}>
-          📂 מסמכים מקומיים
-        </h3>
-        <p style={{ margin: '10px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
-          לא נמצא אינדקס קבצים. עבור להגדרות וסרוק אינדקס.
-        </p>
-      </div>
-    );
-  }
-
-  // Search effect
+  // Search effect — MUST be declared before any conditional returns (React hook rules)
   useEffect(() => {
+    // Guard: skip search if vault not ready
+    if (isHydrating) return;
+    if (vaultStatus !== 'connected') return;
+    if (!lastIndexedAt) return;
     if (!isOpen || tokens.length === 0 || activeCategories.length === 0) {
       setResults([]);
       setTotalFound(0);
@@ -251,7 +211,51 @@ export default function CaseLocalDocuments({ caseEntity }: CaseLocalDocumentsPro
 
     runSearch();
     return () => { isActive = false; };
-  }, [isOpen, tokens, activeCategories]);
+  }, [isHydrating, vaultStatus, lastIndexedAt, isOpen, tokens, activeCategories]);
+
+  // Guard: still hydrating
+  if (isHydrating) {
+    return null;
+  }
+
+  // Guard: vault not supported or fully disconnected (never connected)
+  if (vaultStatus === 'unsupported' || vaultStatus === 'disconnected') {
+    return null;
+  }
+
+  // Guard: permission needed
+  if (vaultStatus === 'permission_required' || vaultStatus === 'denied') {
+    return (
+      <div style={{
+        marginTop: 24, padding: '16px 20px', borderRadius: 10,
+        background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 8 }}>
+          📂 מסמכים מקומיים
+        </h3>
+        <p style={{ margin: '10px 0 0', fontSize: '0.8rem', color: '#f59e0b' }}>
+          נדרשת הרשאה לתיקיית המוח המקומית. אשר הרשאה בהגדרות.
+        </p>
+      </div>
+    );
+  }
+
+  // Guard: connected but no index yet
+  if (!lastIndexedAt) {
+    return (
+      <div style={{
+        marginTop: 24, padding: '16px 20px', borderRadius: 10,
+        background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 8 }}>
+          📂 מסמכים מקומיים
+        </h3>
+        <p style={{ margin: '10px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+          לא נמצא אינדקס קבצים. עבור להגדרות וסרוק אינדקס.
+        </p>
+      </div>
+    );
+  }
 
   const toggleCategory = (cat: FolderCategory) => {
     setActiveCategories(prev =>
