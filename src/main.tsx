@@ -75,6 +75,7 @@ const DocumentChangeAgentPage = lazy(() => import('./pages/document-change-agent
 const RobiumClientHub = lazy(() => import('./pages/clients/RobiumClientHub'))
 const AccountingCoreDashboardWorkspace = lazy(() => import('./accounting-core/ui/components/accounting-core-dashboard-workspace'))
 const TodayControlBoard = lazy(() => import('./work-spine/ui/TodayControlBoard'))
+const ScannedIntakeInspectorPage = lazy(() => import('./pages/internal/ScannedIntakeInspectorPage'))
 const UnifiedIntakeInspectorPage = lazy(() => import('./pages/internal/UnifiedIntakeInspectorPage'))
 
 // Placeholder for pages we'll build later
@@ -145,6 +146,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/documents" element={<DocumentsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/hobbies" element={<HobbiesPage />} />
+            <Route path="/internal/scanned-intake" element={<ScannedIntakeInspectorPage />} />
             <Route path="/internal/unified-intake" element={<UnifiedIntakeInspectorPage />} />
             {/* Flowcharts */}
             <Route path="/flow/:flowId" element={<FlowchartPageWrapper />} />
