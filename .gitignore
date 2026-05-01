@@ -25,3 +25,14 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Local generated/cache/output noise
+.npm-cache/
+output/
+cases/general/final/*.docx
+cases/general/final/*.html
+cases/general/final/*.zip
+vite.config.ts.timestamp-*.mjs
+scratch/
+check.cjs
+check.ts
