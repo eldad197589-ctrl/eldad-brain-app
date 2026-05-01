@@ -77,6 +77,7 @@ const AccountingCoreDashboardWorkspace = lazy(() => import('./accounting-core/ui
 const TodayControlBoard = lazy(() => import('./work-spine/ui/TodayControlBoard'))
 const ScannedIntakeInspectorPage = lazy(() => import('./pages/internal/ScannedIntakeInspectorPage'))
 const UnifiedIntakeInspectorPage = lazy(() => import('./pages/internal/UnifiedIntakeInspectorPage'))
+const BrainDiagnosticsPage = lazy(() => import('./pages/internal/BrainDiagnosticsPage'))
 
 // Placeholder for pages we'll build later
 const ComingSoon = lazy(() => import('./pages/ComingSoon'))
@@ -148,6 +149,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/hobbies" element={<HobbiesPage />} />
             <Route path="/internal/scanned-intake" element={<ScannedIntakeInspectorPage />} />
             <Route path="/internal/unified-intake" element={<UnifiedIntakeInspectorPage />} />
+            <Route path="/internal/brain-diagnostics" element={<BrainDiagnosticsPage />} />
             {/* Flowcharts */}
             <Route path="/flow/:flowId" element={<FlowchartPageWrapper />} />
             {/* Personal */}
