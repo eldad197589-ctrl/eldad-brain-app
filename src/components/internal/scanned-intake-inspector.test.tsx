@@ -230,14 +230,14 @@ describe('Internal Scanned Intake Inspector', () => {
     expect(markup).not.toContain('proposedWorkItem');
   });
 
-  it('renders only the approved local draft controls and no extra form controls', () => {
+  it('renders only approved local draft controls plus local scan review fields', () => {
     const markup = renderToStaticMarkup(React.createElement(ScannedIntakeInspectorPage));
 
     expect((markup.match(/<button/g) ?? []).length).toBe(18);
-    expect((markup.match(/<input/g) ?? []).length).toBe(0);
-    expect((markup.match(/<select/g) ?? []).length).toBe(0);
-    expect((markup.match(/<textarea/g) ?? []).length).toBe(0);
-    expect((markup.match(/type="checkbox"/g) ?? []).length).toBe(0);
+    expect((markup.match(/<input/g) ?? []).length).toBe(24);
+    expect((markup.match(/<select/g) ?? []).length).toBe(40);
+    expect((markup.match(/<textarea/g) ?? []).length).toBe(8);
+    expect((markup.match(/type="checkbox"/g) ?? []).length).toBe(8);
     expect((markup.match(/type="radio"/g) ?? []).length).toBe(0);
   });
 

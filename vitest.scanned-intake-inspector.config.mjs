@@ -8,7 +8,7 @@
 export default {
   test: {
     environment: 'node',
-    include: ['src/components/internal/scanned-intake-inspector.test.tsx'],
+    include: ['src/components/internal/scanned-intake-inspector.test.tsx', 'src/components/internal/manual-scan-review.test.tsx'],
     pool: 'threads',
   },
 };

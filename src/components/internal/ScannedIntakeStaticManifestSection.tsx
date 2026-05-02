@@ -7,6 +7,7 @@
 
 // #region Imports
 import type { CSSProperties } from 'react';
+import ManualScanReview from './ManualScanReview';
 import { SCANNED_INTAKE_STATIC_MANIFEST } from './scanned-intake-static-manifest';
 import type { ScannedIntakeManifestStatus } from './scanned-intake-static-manifest';
 // #endregion
@@ -90,6 +91,7 @@ export default function ScannedIntakeStaticManifestSection() {
               <div style={{ color: '#94a3b8', fontSize: '0.82rem', marginBottom: 6 }}>forbidden actions</div>
               <div style={{ color: '#fca5a5', lineHeight: 1.7 }}>{entry.forbiddenActions.join(', ')}</div>
             </div>
+            <ManualScanReview entry={entry} />
           </article>
         ))}
       </div>
