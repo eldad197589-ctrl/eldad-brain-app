@@ -156,6 +156,21 @@ describe('Internal Scanned Intake Inspector', () => {
     expect(markup).toContain('פעולה מומלצת: אלדד צריך לבדוק את מקור המשימה לפני פתיחה');
   });
 
+  it('renders the static Scan Manifest read-only section with manual review categories and forbidden actions', () => {
+    const markup = renderToStaticMarkup(React.createElement(ScannedIntakeInspectorPage));
+    const requiredManifestText = [
+      'בניית ערר או השגה דימה פיצוי מלחמה מסלול אדום', 'חומר למעמ דוד אלדד 1-2.26', 'חומר למע דוד אלדד 3-4.26',
+      'חשבונות כרטיסי אשראי ודפי בנק אלדד לניתוח', 'טיפול שוטף רוביום', 'הודעות חשובות מגוגל',
+      'מס הכנסה ושומות — תיקיות הודעות ודרישות', 'אוזנה / בכורי פריש / סיירת א.ח — תיקיות לקוח לא מסווגות',
+      'Dima', 'VAT', 'Robium', 'unknown', 'read_only', 'manual review needed', 'delete, move, rename, OCR, persist, createWorkItem',
+    ];
+
+    expect(markup).toContain('Scan Manifest — read-only');
+    expect(markup).toContain('Static manifest only. No scanning, OCR, file movement, persistence, or WorkItem creation.');
+    for (const text of requiredManifestText) expect(markup).toContain(text);
+    expect((markup.match(/data-testid="scan-static-manifest-entry"/g) ?? []).length).toBe(8);
+  });
+
   it('renders the read-only manual decision draft display under task candidates', () => {
     const markup = renderToStaticMarkup(React.createElement(ScannedIntakeInspectorPage));
 
@@ -251,6 +266,8 @@ describe('Internal Scanned Intake Inspector', () => {
       'utf8',
     );
     const localDraftEditorSource = readFileSync(`${projectRoot}/src/components/internal/LocalDraftEditor.tsx`, 'utf8');
+    const staticManifestSectionSource = readFileSync(`${projectRoot}/src/components/internal/ScannedIntakeStaticManifestSection.tsx`, 'utf8');
+    const staticManifestSource = readFileSync(`${projectRoot}/src/components/internal/scanned-intake-static-manifest.ts`, 'utf8');
 
     for (const source of [componentSource, pageSource]) {
       expect(source).not.toContain('node:fs');
@@ -277,6 +294,23 @@ describe('Internal Scanned Intake Inspector', () => {
       expect(source).not.toContain('CeoOffice');
       expect(source).not.toContain('Dashboard');
       expect(source).not.toContain('Sidebar');
+    }
+
+    for (const source of [staticManifestSectionSource, staticManifestSource]) {
+      expect(source).not.toContain('node:fs');
+      expect(source).not.toContain('node:path');
+      expect(source).not.toContain('listScannedFolderFilesRecursive');
+      expect(source).not.toContain('createScannedIntakeStagingCandidates');
+      expect(source).not.toContain('useBrainStore');
+      expect(source).not.toContain('useMatterStore');
+      expect(source).not.toContain('localStorage');
+      expect(source).not.toContain('sessionStorage');
+      expect(source).not.toContain('indexedDB');
+      expect(source).not.toContain('supabase');
+      expect(source).not.toContain('fetch(');
+      expect(source).not.toContain('createWorkItem(');
+      expect(source).not.toContain('createMatter(');
+      expect(source).not.toContain('createDocumentRef(');
     }
 
     expect(snapshotSource).not.toContain('node:fs');
