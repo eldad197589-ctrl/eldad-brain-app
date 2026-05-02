@@ -23,6 +23,8 @@ import VaultBrowserPanel from './VaultBrowserPanel';
 import { Database } from 'lucide-react';
 
 // #region Component
+const liveIntegrationsFrozen = true;
+const freezeMessage = 'Live integrations disabled — requires Agent A approval';
 
 /**
  * Settings page — integration cards for Gmail, Drive, WhatsApp, Gemini.
@@ -61,11 +63,12 @@ export default function Settings() {
 
   /** Refresh statuses */
   useEffect(() => {
-    initVault();
+    if (!liveIntegrationsFrozen) initVault();
   }, [initVault]);
 
   /** Save Google Client ID */
   const handleSaveClientId = () => {
+    if (liveIntegrationsFrozen) return;
     if (!clientId.trim()) return;
     setStoreClientId(clientId.trim());
     setShowClientIdInput(false);
@@ -75,6 +78,7 @@ export default function Settings() {
 
   /** Connect Gmail */
   const handleConnectGmail = async () => {
+    if (liveIntegrationsFrozen) return;
     if (!storeClientId) {
       setShowClientIdInput(true);
       setError('הכנס Google Client ID קודם');
@@ -96,6 +100,7 @@ export default function Settings() {
 
   /** Disconnect Gmail */
   const handleDisconnectGmail = () => {
+    if (liveIntegrationsFrozen) return;
     signOutGoogle();
     setSuccess('Gmail + Drive נותקו');
     setTimeout(() => setSuccess(''), 3000);
@@ -117,6 +122,7 @@ export default function Settings() {
       </div>
 
       {/* Notifications */}
+      <div data-testid="settings-live-freeze-banner" style={{ marginBottom: 16, padding: '12px 18px', borderRadius: 10, background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#fecaca', fontWeight: 800 }}>{freezeMessage}</div>
       {error && <Notification text={error} type="error" />}
       {success && <Notification text={success} type="success" />}
 
@@ -144,6 +150,7 @@ export default function Settings() {
             <input
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
+              disabled={liveIntegrationsFrozen}
               placeholder="xxx.apps.googleusercontent.com"
               style={{
                 flex: 1, padding: '8px 12px', borderRadius: 8,
@@ -152,14 +159,14 @@ export default function Settings() {
                 direction: 'ltr', outline: 'none',
               }}
             />
-            <button onClick={handleSaveClientId} style={btnStyle('#c9a84c')}>שמור</button>
+            <button onClick={handleSaveClientId} disabled={liveIntegrationsFrozen} style={btnStyle('#64748b')}>שמור</button>
           </div>
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
             <code style={{ fontSize: '0.72rem', color: '#64748b' }}>
               {clientId.slice(0, 20)}...
             </code>
-            <button onClick={() => setShowClientIdInput(true)} style={btnStyle('#64748b')}>
+            <button onClick={() => setShowClientIdInput(true)} disabled={liveIntegrationsFrozen} style={btnStyle('#64748b')}>
               שנה
             </button>
           </div>
@@ -185,7 +192,7 @@ export default function Settings() {
               vaultStatus === 'denied' ? 'אין הרשאה לתיקייה' :
               'גישה ישירה למערכת הקבצים ללא העלאה'
             }
-            disabled={vaultStatus === 'unsupported'}
+            disabled
           />
           
           {/* Index Scan Sub-Panel */}
@@ -198,12 +205,12 @@ export default function Settings() {
                 <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#e2e8f0' }}>אינדקס קבצים</span>
                 <div style={{ display: 'flex', gap: 6 }}>
                   {lastIndexedAt && !isScanning && (
-                    <button onClick={clearVaultIndex} style={{ ...btnStyle('#ef4444'), padding: '4px 10px', fontSize: '0.7rem' }}>נקה אינדקס</button>
+                    <button onClick={clearVaultIndex} disabled style={{ ...btnStyle('#64748b'), padding: '4px 10px', fontSize: '0.7rem' }}>נקה אינדקס</button>
                   )}
                   <button 
                     onClick={startIndexScan} 
-                    disabled={isScanning}
-                    style={{ ...btnStyle(isScanning ? '#64748b' : '#34d399'), padding: '4px 10px', fontSize: '0.7rem' }}
+                    disabled
+                    style={{ ...btnStyle('#64748b'), padding: '4px 10px', fontSize: '0.7rem' }}
                   >
                     {isScanning ? '⏳ סורק...' : '🔍 סרוק אינדקס'}
                   </button>
@@ -243,6 +250,7 @@ export default function Settings() {
           loading={loading === 'gmail'}
           onConnect={handleConnectGmail}
           onDisconnect={handleDisconnectGmail}
+          disabled
         />
 
         {/* Drive */}
@@ -255,6 +263,7 @@ export default function Settings() {
           onConnect={handleConnectGmail}
           onDisconnect={handleDisconnectGmail}
           note="מחובר דרך אותו OAuth כמו Gmail"
+          disabled
         />
 
         {/* Gemini */}
@@ -264,8 +273,10 @@ export default function Settings() {
           description="ניתוח מסמכים, סיווג, ניסוח מכתבים"
           connected={aiConfigured}
           loading={false}
-          onConnect={() => window.open('https://aistudio.google.com/apikey', '_blank')}
-          note="VITE_GEMINI_API_KEY ב-.env"
+          onConnect={() => {}}
+          note="Configuration visibility only — not a live connection check."
+          statusText={aiConfigured ? 'Gemini env key detected' : 'Gemini env key missing'}
+          disabled
         />
 
         {/* WhatsApp */}
@@ -299,10 +310,11 @@ interface CardProps {
   note?: string;
   disabled?: boolean;
   connectLabel?: string;
+  statusText?: string;
 }
 
 /** Integration card */
-function IntegrationCard({ icon, title, description, connected, loading, onConnect, onDisconnect, note, disabled, connectLabel }: CardProps) {
+function IntegrationCard({ icon, title, description, connected, loading, onConnect, onDisconnect, note, disabled, connectLabel, statusText }: CardProps) {
   return (
     <div style={{
       padding: '18px 20px', borderRadius: 12,
@@ -326,9 +338,9 @@ function IntegrationCard({ icon, title, description, connected, loading, onConne
       <div style={{ display: 'flex', gap: 8 }}>
         {connected ? (
           <>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#34d399' }}>✅ מחובר</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#34d399' }}>{statusText || '✅ מחובר'}</span>
             {onDisconnect && (
-              <button onClick={onDisconnect} style={btnStyle('#ef4444')}>נתק</button>
+              <button onClick={onDisconnect} disabled={disabled} style={btnStyle(disabled ? '#64748b' : '#ef4444')}>נתק</button>
             )}
           </>
         ) : (
