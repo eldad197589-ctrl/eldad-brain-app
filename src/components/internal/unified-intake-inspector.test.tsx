@@ -38,6 +38,11 @@ const forbiddenSymbols = [
   'localStorage',
   'sessionStorage',
   'indexedDB',
+  'googleapis',
+  'axios',
+  'fetch(',
+  'oauth',
+  'token',
   'supabase',
   'zustand',
   'useBrainStore',
@@ -176,6 +181,30 @@ describe('Unified Intake Inspector', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it('renders the mock Gmail and Drive connector section as read-only candidate preview', () => {
+    const markup = renderToStaticMarkup(React.createElement(UnifiedIntakeInspectorPage));
+
+    expect(markup).toContain('Mock Gmail / Drive — read-only / no live connection');
+    expect(markup).toContain('No live Gmail/Drive connection. No OAuth. No sync. No promotion.');
+    expect(markup).toContain('Gmail mock status');
+    expect(markup).toContain('Drive mock status');
+    expect((markup.match(/mock only \/ live disabled \/ OAuth disabled/g) ?? []).length).toBe(2);
+    expect((markup.match(/data-testid="mock-gmail-drive-candidate"/g) ?? []).length).toBe(5);
+    expect(markup).toContain('Mock Dima war-compensation material');
+    expect(markup).toContain('Mock VAT reporting documents');
+    expect(markup).toContain('mock-tsila-summary.pdf');
+    expect(markup).toContain('mock-dima-bundle');
+    expect(markup).toContain('email_message');
+    expect(markup).toContain('email_attachment');
+    expect(markup).toContain('drive_file');
+    expect(markup).toContain('drive_folder');
+    expect(markup).not.toContain('>Connect<');
+    expect(markup).not.toContain('>Sync<');
+    expect(markup).not.toContain('>Fetch<');
+    expect(markup).not.toContain('>Create<');
+    expect(markup).not.toContain('>Promote<');
+  });
+
   it('renders local review controls for every unified intake candidate across all sources', () => {
     const markup = renderToStaticMarkup(React.createElement(UnifiedIntakeInspectorPage));
 
@@ -206,9 +235,9 @@ describe('Unified Intake Inspector', () => {
     expect((markup.match(/professionalStatus=not_reviewed/g) ?? []).length).toBe(8);
     expect((markup.match(/matterResolutionStatus=unresolved/g) ?? []).length).toBe(8);
     expect((markup.match(/subjectResolutionStatus=unresolved/g) ?? []).length).toBe(8);
-    expect((markup.match(/ocr=not_processed/g) ?? []).length).toBe(9);
-    expect((markup.match(/classification=not_classified/g) ?? []).length).toBe(9);
-    expect((markup.match(/review=not_reviewed/g) ?? []).length).toBe(9);
+    expect((markup.match(/ocr=not_processed/g) ?? []).length).toBe(16);
+    expect((markup.match(/classification=not_classified/g) ?? []).length).toBe(16);
+    expect((markup.match(/review=not_reviewed/g) ?? []).length).toBe(16);
   });
 
   it('does not render action buttons or operational action labels', () => {
@@ -309,9 +338,15 @@ describe('Unified Intake Inspector', () => {
   it('keeps the inspector and static fixtures free of real connectors, stores, persistence, and creation imports', () => {
     const inspectedSources = [
       `${projectRoot}/src/components/internal/UnifiedIntakeInspector.tsx`,
+      `${projectRoot}/src/components/internal/MockGmailDriveUnifiedIntakeSection.tsx`,
       `${projectRoot}/src/components/internal/unified-intake-review/UnifiedIntakeLocalReview.tsx`,
       `${projectRoot}/src/pages/internal/UnifiedIntakeInspectorPage.tsx`,
       `${projectRoot}/src/work-spine/intake/unified-intake-static-fixtures.ts`,
+      `${projectRoot}/src/work-spine/intake/mock/mock-gmail-drive-types.ts`,
+      `${projectRoot}/src/work-spine/intake/mock/mock-gmail-data.ts`,
+      `${projectRoot}/src/work-spine/intake/mock/mock-drive-data.ts`,
+      `${projectRoot}/src/work-spine/intake/mock/mock-gmail-to-unified-intake.ts`,
+      `${projectRoot}/src/work-spine/intake/mock/mock-drive-to-unified-intake.ts`,
     ].map((path) => readFileSync(path, 'utf8'));
 
     for (const source of inspectedSources) {

@@ -12,6 +12,7 @@ import type {
   UnifiedIntakeStaticSourceSection,
 } from '../../work-spine/intake/unified-intake-static-fixtures';
 import type { UnifiedIntakeCandidate, UnifiedIntakeEvidenceRef } from '../../work-spine/intake/unified-intake-registry';
+import MockGmailDriveUnifiedIntakeSection from './MockGmailDriveUnifiedIntakeSection';
 import { UnifiedIntakeLocalReview } from './unified-intake-review/UnifiedIntakeLocalReview';
 // #endregion
 
@@ -139,6 +140,8 @@ export default function UnifiedIntakeInspector({ snapshot }: UnifiedIntakeInspec
           {snapshot.safetyStatus}: candidates are staging-only, evidence is not processed, classification is not performed, and all identity/matter fields remain unresolved.
         </p>
       </div>
+
+      <MockGmailDriveUnifiedIntakeSection />
 
       <div data-testid="unified-intake-source-list" style={{ display: 'grid', gap: 16 }}>
         {snapshot.sources.map((source) => (
