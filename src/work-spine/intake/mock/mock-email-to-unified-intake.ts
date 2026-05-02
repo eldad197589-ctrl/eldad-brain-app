@@ -1,27 +1,27 @@
 /* ============================================
-   FILE: mock-gmail-to-unified-intake.ts
-   PURPOSE: Pure mock Gmail mapper into Unified Intake candidates and evidence refs.
-   DEPENDENCIES: email-to-unified-intake, mock-gmail-data, mock-gmail-drive-types
-   EXPORTS: createUnifiedIntakeFromMockGmailMessages, MOCK_GMAIL_UNIFIED_INTAKE_OUTPUT
+   FILE: mock-email-to-unified-intake.ts
+   PURPOSE: Pure mock email mapper into Unified Intake candidates and evidence refs.
+   DEPENDENCIES: email-to-unified-intake, mock-email-data, mock-email-drive-types
+   EXPORTS: createUnifiedIntakeFromMockEmailMessages, MOCK_EMAIL_UNIFIED_INTAKE_OUTPUT
    ============================================ */
 
 // #region Imports
 import type { EmailIntakeMessageInput } from '../email-to-unified-intake';
 import { createUnifiedIntakeFromEmailMessages } from '../email-to-unified-intake';
 import type { EmailSourceMetadata } from '../unified-intake-registry';
-import { MOCK_GMAIL_MESSAGES } from './mock-gmail-data';
-import type { MockGmailMessage, MockUnifiedIntakeOutput } from './mock-gmail-drive-types';
+import { MOCK_EMAIL_MESSAGES } from './mock-email-data';
+import type { MockEmailMessage, MockUnifiedIntakeOutput } from './mock-email-drive-types';
 // #endregion
 
 // #region Helpers
-const toEmailIntakeInput = (message: MockGmailMessage): EmailIntakeMessageInput => ({
+const toEmailIntakeInput = (message: MockEmailMessage): EmailIntakeMessageInput => ({
   messageId: message.messageId,
   threadId: message.threadId,
-  provider: 'gmail',
+  provider: message.provider,
   accountEmail: message.accountEmail,
   mailbox: message.mailbox,
   folder: message.folder,
-  label: message.labelNames.join(', ') || 'Mock Gmail',
+  label: message.labelNames.join(', ') || 'Mock Email',
   labelIds: message.labelIds,
   labelNames: message.labelNames,
   systemFolder: 'inbox',
@@ -44,12 +44,12 @@ const toEmailIntakeInput = (message: MockGmailMessage): EmailIntakeMessageInput 
 
 // #region Public API
 /**
- * Maps static mock Gmail messages into Unified Intake candidates and evidence refs only.
+ * Maps static mock email messages into Unified Intake candidates and evidence refs only.
  *
- * This mapper is in-memory and does not connect to Gmail, request credentials, persist, or create operational records.
+ * This mapper is in-memory and does not connect to email providers, request credentials, persist, or create operational records.
  */
-export function createUnifiedIntakeFromMockGmailMessages(
-  messages: readonly MockGmailMessage[] = MOCK_GMAIL_MESSAGES,
+export function createUnifiedIntakeFromMockEmailMessages(
+  messages: readonly MockEmailMessage[] = MOCK_EMAIL_MESSAGES,
 ): MockUnifiedIntakeOutput<EmailSourceMetadata> {
   const result = createUnifiedIntakeFromEmailMessages(messages.map(toEmailIntakeInput));
 
@@ -59,5 +59,5 @@ export function createUnifiedIntakeFromMockGmailMessages(
   };
 }
 
-export const MOCK_GMAIL_UNIFIED_INTAKE_OUTPUT = createUnifiedIntakeFromMockGmailMessages();
+export const MOCK_EMAIL_UNIFIED_INTAKE_OUTPUT = createUnifiedIntakeFromMockEmailMessages();
 // #endregion

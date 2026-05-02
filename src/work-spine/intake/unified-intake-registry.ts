@@ -105,7 +105,7 @@ export interface ScanSourceMetadata {
 // #endregion
 
 // #region Email Metadata
-export type EmailProvider = 'gmail' | 'outlook' | 'other';
+export type EmailProvider = 'gmail' | 'outlook' | 'microsoft365' | 'imap' | 'exchange' | 'other';
 
 export type EmailSystemFolder =
   | 'inbox'

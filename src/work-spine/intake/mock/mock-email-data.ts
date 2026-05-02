@@ -1,27 +1,29 @@
 /* ============================================
-   FILE: mock-gmail-data.ts
-   PURPOSE: Static mock Gmail messages for Unified Intake preview.
-   DEPENDENCIES: mock-gmail-drive-types
-   EXPORTS: MOCK_GMAIL_CONNECTOR_STATUS, MOCK_GMAIL_MESSAGES
+   FILE: mock-email-data.ts
+   PURPOSE: Static mock email messages for Unified Intake preview.
+   DEPENDENCIES: mock-email-drive-types
+   EXPORTS: MOCK_EMAIL_CONNECTOR_STATUS, MOCK_EMAIL_MESSAGES
    ============================================ */
 
 // #region Imports
-import type { MockConnectorStatus, MockGmailMessage } from './mock-gmail-drive-types';
+import type { MockConnectorStatus, MockEmailMessage } from './mock-email-drive-types';
 // #endregion
 
 // #region Static Data
-export const MOCK_GMAIL_CONNECTOR_STATUS: MockConnectorStatus = {
-  connectorName: 'Gmail',
+export const MOCK_EMAIL_CONNECTOR_STATUS: MockConnectorStatus = {
+  connectorName: 'Email',
+  emailProvider: 'gmail',
   mode: 'mock_only',
   liveStatus: 'live_disabled',
   credentialStatus: 'OAuth disabled',
   safetyLabel: 'candidate_and_evidence_only',
 };
 
-export const MOCK_GMAIL_MESSAGES: readonly MockGmailMessage[] = [
+export const MOCK_EMAIL_MESSAGES: readonly MockEmailMessage[] = [
   {
-    messageId: 'mock-gmail-message-dima-1',
-    threadId: 'mock-gmail-thread-dima-1',
+    messageId: 'mock-email-message-dima-1',
+    threadId: 'mock-email-thread-dima-1',
+    provider: 'gmail',
     accountEmail: 'mock-office@example.test',
     mailbox: 'Mock Inbox',
     folder: 'Inbox',
@@ -35,7 +37,7 @@ export const MOCK_GMAIL_MESSAGES: readonly MockGmailMessage[] = [
     sentAt: '2026-04-21T08:55:00.000Z',
     attachments: [
       {
-        attachmentId: 'mock-gmail-attachment-dima-appeal',
+        attachmentId: 'mock-email-attachment-dima-appeal',
         fileName: 'mock-dima-appeal-source.pdf',
         mimeType: 'application/pdf',
         sizeBytes: 245000,
@@ -46,8 +48,9 @@ export const MOCK_GMAIL_MESSAGES: readonly MockGmailMessage[] = [
     isImportant: true,
   },
   {
-    messageId: 'mock-gmail-message-vat-1',
-    threadId: 'mock-gmail-thread-vat-1',
+    messageId: 'mock-email-message-vat-1',
+    threadId: 'mock-email-thread-vat-1',
+    provider: 'gmail',
     accountEmail: 'mock-office@example.test',
     mailbox: 'Mock Inbox',
     folder: 'Inbox',
@@ -61,7 +64,7 @@ export const MOCK_GMAIL_MESSAGES: readonly MockGmailMessage[] = [
     sentAt: '2026-04-22T10:28:00.000Z',
     attachments: [
       {
-        attachmentId: 'mock-gmail-attachment-vat-bookkeeping',
+        attachmentId: 'mock-email-attachment-vat-bookkeeping',
         fileName: 'mock-vat-bookkeeping.xlsx',
         mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         sizeBytes: 98000,

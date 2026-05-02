@@ -181,15 +181,18 @@ describe('Unified Intake Inspector', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it('renders the mock Gmail and Drive connector section as read-only candidate preview', () => {
+  it('renders the mock Email and Drive connector section as read-only candidate preview', () => {
     const markup = renderToStaticMarkup(React.createElement(UnifiedIntakeInspectorPage));
 
-    expect(markup).toContain('Mock Gmail / Drive — read-only / no live connection');
-    expect(markup).toContain('No live Gmail/Drive connection. No OAuth. No sync. No promotion.');
-    expect(markup).toContain('Gmail mock status');
+    expect(markup).toContain('Mock Email / Drive — read-only / no live connection');
+    expect(markup).toContain('No live Email/Drive connection. No OAuth. No sync. No promotion.');
+    expect(markup).toContain('Email mock status');
+    expect(markup).toContain('Email provider: gmail');
+    expect(markup).toContain('Live email disabled');
+    expect(markup).toContain('OAuth disabled');
     expect(markup).toContain('Drive mock status');
     expect((markup.match(/mock only \/ live disabled \/ OAuth disabled/g) ?? []).length).toBe(2);
-    expect((markup.match(/data-testid="mock-gmail-drive-candidate"/g) ?? []).length).toBe(5);
+    expect((markup.match(/data-testid="mock-email-drive-candidate"/g) ?? []).length).toBe(5);
     expect(markup).toContain('Mock Dima war-compensation material');
     expect(markup).toContain('Mock VAT reporting documents');
     expect(markup).toContain('mock-tsila-summary.pdf');
@@ -338,14 +341,14 @@ describe('Unified Intake Inspector', () => {
   it('keeps the inspector and static fixtures free of real connectors, stores, persistence, and creation imports', () => {
     const inspectedSources = [
       `${projectRoot}/src/components/internal/UnifiedIntakeInspector.tsx`,
-      `${projectRoot}/src/components/internal/MockGmailDriveUnifiedIntakeSection.tsx`,
+      `${projectRoot}/src/components/internal/MockEmailDriveUnifiedIntakeSection.tsx`,
       `${projectRoot}/src/components/internal/unified-intake-review/UnifiedIntakeLocalReview.tsx`,
       `${projectRoot}/src/pages/internal/UnifiedIntakeInspectorPage.tsx`,
       `${projectRoot}/src/work-spine/intake/unified-intake-static-fixtures.ts`,
-      `${projectRoot}/src/work-spine/intake/mock/mock-gmail-drive-types.ts`,
-      `${projectRoot}/src/work-spine/intake/mock/mock-gmail-data.ts`,
+      `${projectRoot}/src/work-spine/intake/mock/mock-email-drive-types.ts`,
+      `${projectRoot}/src/work-spine/intake/mock/mock-email-data.ts`,
       `${projectRoot}/src/work-spine/intake/mock/mock-drive-data.ts`,
-      `${projectRoot}/src/work-spine/intake/mock/mock-gmail-to-unified-intake.ts`,
+      `${projectRoot}/src/work-spine/intake/mock/mock-email-to-unified-intake.ts`,
       `${projectRoot}/src/work-spine/intake/mock/mock-drive-to-unified-intake.ts`,
     ].map((path) => readFileSync(path, 'utf8'));
 

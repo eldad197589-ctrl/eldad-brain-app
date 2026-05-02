@@ -1,6 +1,6 @@
 /* ============================================
-   FILE: mock-gmail-drive-to-unified-intake.test.ts
-   PURPOSE: Focused tests for static mock Gmail and Drive Unified Intake mapping.
+   FILE: mock-email-drive-to-unified-intake.test.ts
+   PURPOSE: Focused tests for static mock Email and Drive Unified Intake mapping.
    DEPENDENCIES: vitest, fs, mock mappers
    EXPORTS: None
    ============================================ */
@@ -9,29 +9,30 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { MOCK_DRIVE_UNIFIED_INTAKE_OUTPUT, createUnifiedIntakeFromMockDriveItems } from './mock-drive-to-unified-intake';
-import { MOCK_GMAIL_UNIFIED_INTAKE_OUTPUT, createUnifiedIntakeFromMockGmailMessages } from './mock-gmail-to-unified-intake';
+import { MOCK_EMAIL_UNIFIED_INTAKE_OUTPUT, createUnifiedIntakeFromMockEmailMessages } from './mock-email-to-unified-intake';
 // #endregion
 
 // #region Constants
 const runtimeFiles = [
-  'mock-gmail-drive-types.ts',
-  'mock-gmail-data.ts',
+  'mock-email-drive-types.ts',
+  'mock-email-data.ts',
   'mock-drive-data.ts',
-  'mock-gmail-to-unified-intake.ts',
+  'mock-email-to-unified-intake.ts',
   'mock-drive-to-unified-intake.ts',
 ];
 // #endregion
 
 // #region Tests
-describe('Mock Gmail / Drive Unified Intake mapping', () => {
-  it('maps mock Gmail messages to Unified Intake candidates and evidence only', () => {
-    const output = createUnifiedIntakeFromMockGmailMessages();
+describe('Mock Email / Drive Unified Intake mapping', () => {
+  it('maps mock email messages to Unified Intake candidates and evidence only', () => {
+    const output = createUnifiedIntakeFromMockEmailMessages();
 
-    expect(output).toEqual(MOCK_GMAIL_UNIFIED_INTAKE_OUTPUT);
+    expect(output).toEqual(MOCK_EMAIL_UNIFIED_INTAKE_OUTPUT);
     expect(Object.keys(output)).toEqual(['candidates', 'evidenceRefs']);
     expect(output.candidates.length).toBe(2);
     expect(output.evidenceRefs.length).toBe(4);
     expect(output.candidates.every((candidate) => candidate.sourceType === 'email')).toBe(true);
+    expect(output.candidates.every((candidate) => candidate.sourceMetadata.provider === 'gmail')).toBe(true);
     expect(output.candidates.every((candidate) => candidate.candidateStatus === 'staging_candidate')).toBe(true);
     expect(output.evidenceRefs.map((evidence) => evidence.evidenceKind)).toEqual([
       'email_message',

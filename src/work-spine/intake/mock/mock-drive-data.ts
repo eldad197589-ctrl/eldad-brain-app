@@ -1,12 +1,12 @@
 /* ============================================
    FILE: mock-drive-data.ts
    PURPOSE: Static mock Drive files and folders for Unified Intake preview.
-   DEPENDENCIES: mock-gmail-drive-types
+   DEPENDENCIES: mock-email-drive-types
    EXPORTS: MOCK_DRIVE_CONNECTOR_STATUS, MOCK_DRIVE_FILES, MOCK_DRIVE_FOLDERS
    ============================================ */
 
 // #region Imports
-import type { MockConnectorStatus, MockDriveFile, MockDriveFolder } from './mock-gmail-drive-types';
+import type { MockConnectorStatus, MockDriveFile, MockDriveFolder } from './mock-email-drive-types';
 // #endregion
 
 // #region Static Data

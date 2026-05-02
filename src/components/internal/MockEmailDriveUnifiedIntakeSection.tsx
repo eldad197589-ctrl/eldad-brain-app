@@ -1,20 +1,20 @@
 /* ============================================
-   FILE: MockGmailDriveUnifiedIntakeSection.tsx
-   PURPOSE: Read-only mock Gmail and Drive connector preview for Unified Intake.
-   DEPENDENCIES: React types, mock Gmail/Drive Unified Intake outputs
-   EXPORTS: MockGmailDriveUnifiedIntakeSection (default)
+   FILE: MockEmailDriveUnifiedIntakeSection.tsx
+   PURPOSE: Read-only mock Email and Drive connector preview for Unified Intake.
+   DEPENDENCIES: React types, mock Email/Drive Unified Intake outputs
+   EXPORTS: MockEmailDriveUnifiedIntakeSection (default)
    ============================================ */
 
 // #region Imports
 import type { CSSProperties } from 'react';
 import { MOCK_DRIVE_CONNECTOR_STATUS } from '../../work-spine/intake/mock/mock-drive-data';
 import { MOCK_DRIVE_UNIFIED_INTAKE_OUTPUT } from '../../work-spine/intake/mock/mock-drive-to-unified-intake';
-import { MOCK_GMAIL_CONNECTOR_STATUS } from '../../work-spine/intake/mock/mock-gmail-data';
-import { MOCK_GMAIL_UNIFIED_INTAKE_OUTPUT } from '../../work-spine/intake/mock/mock-gmail-to-unified-intake';
+import { MOCK_EMAIL_CONNECTOR_STATUS } from '../../work-spine/intake/mock/mock-email-data';
+import { MOCK_EMAIL_UNIFIED_INTAKE_OUTPUT } from '../../work-spine/intake/mock/mock-email-to-unified-intake';
 import type {
   MockConnectorStatus,
   MockUnifiedIntakeOutput,
-} from '../../work-spine/intake/mock/mock-gmail-drive-types';
+} from '../../work-spine/intake/mock/mock-email-drive-types';
 import type {
   EmailSourceMetadata,
   GoogleDriveSourceMetadata,
@@ -85,7 +85,7 @@ const evidenceForCandidate = (
 
 // #region Subcomponents
 const MockConnectorPanel = ({ status, output }: MockConnectorPanelProps) => (
-  <article data-testid="mock-gmail-drive-connector-panel" style={cardStyle}>
+  <article data-testid="mock-email-drive-connector-panel" style={cardStyle}>
     <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
       <div>
         <div style={labelStyle}>{status.connectorName} mock status</div>
@@ -95,9 +95,25 @@ const MockConnectorPanel = ({ status, output }: MockConnectorPanelProps) => (
     </div>
 
     <div style={gridStyle}>
+      {status.emailProvider ? (
+        <div>
+          <div style={labelStyle}>Email provider</div>
+          <strong style={{ color: '#bfdbfe' }}>Email provider: {status.emailProvider}</strong>
+        </div>
+      ) : null}
       <div>
         <div style={labelStyle}>Allowed output</div>
         <strong style={{ color: '#bbf7d0' }}>{status.safetyLabel}</strong>
+      </div>
+      <div>
+        <div style={labelStyle}>Live status</div>
+        <strong style={{ color: '#fde68a' }}>
+          {status.connectorName === 'Email' ? 'Live email disabled' : 'Live Drive disabled'}
+        </strong>
+      </div>
+      <div>
+        <div style={labelStyle}>Credentials</div>
+        <strong style={{ color: '#fde68a' }}>{status.credentialStatus}</strong>
       </div>
       <div>
         <div style={labelStyle}>Mapped candidates</div>
@@ -114,7 +130,7 @@ const MockConnectorPanel = ({ status, output }: MockConnectorPanelProps) => (
         const refs = evidenceForCandidate(candidate, output.evidenceRefs);
 
         return (
-          <section key={candidate.candidateId} data-testid="mock-gmail-drive-candidate" style={cardStyle}>
+          <section key={candidate.candidateId} data-testid="mock-email-drive-candidate" style={cardStyle}>
             <div>
               <div style={labelStyle}>Mapped candidate</div>
               <strong style={{ color: '#f8fafc' }}>{candidate.sourceLabel}</strong>
@@ -153,20 +169,20 @@ const MockConnectorPanel = ({ status, output }: MockConnectorPanelProps) => (
 // #endregion
 
 // #region Component
-/** MockGmailDriveUnifiedIntakeSection — Shows static mock connector output without live connection or promotion. */
-export default function MockGmailDriveUnifiedIntakeSection() {
+/** MockEmailDriveUnifiedIntakeSection — Shows static mock connector output without live connection or promotion. */
+export default function MockEmailDriveUnifiedIntakeSection() {
   return (
-    <section data-testid="mock-gmail-drive-unified-intake-section" style={sectionStyle}>
+    <section data-testid="mock-email-drive-unified-intake-section" style={sectionStyle}>
       <div>
         <span style={badgeStyle}>read-only mock connector preview</span>
-        <h2 style={{ margin: '10px 0 0', color: '#f8fafc' }}>Mock Gmail / Drive — read-only / no live connection</h2>
-        <p data-testid="mock-gmail-drive-safety-notice" style={{ margin: '8px 0 0', color: '#fde68a', lineHeight: 1.7 }}>
-          No live Gmail/Drive connection. No OAuth. No sync. No promotion.
+        <h2 style={{ margin: '10px 0 0', color: '#f8fafc' }}>Mock Email / Drive — read-only / no live connection</h2>
+        <p data-testid="mock-email-drive-safety-notice" style={{ margin: '8px 0 0', color: '#fde68a', lineHeight: 1.7 }}>
+          No live Email/Drive connection. No OAuth. No sync. No promotion.
         </p>
       </div>
 
       <div style={{ display: 'grid', gap: 12 }}>
-        <MockConnectorPanel status={MOCK_GMAIL_CONNECTOR_STATUS} output={MOCK_GMAIL_UNIFIED_INTAKE_OUTPUT} />
+        <MockConnectorPanel status={MOCK_EMAIL_CONNECTOR_STATUS} output={MOCK_EMAIL_UNIFIED_INTAKE_OUTPUT} />
         <MockConnectorPanel status={MOCK_DRIVE_CONNECTOR_STATUS} output={MOCK_DRIVE_UNIFIED_INTAKE_OUTPUT} />
       </div>
     </section>

@@ -1,12 +1,13 @@
 /* ============================================
-   FILE: mock-gmail-drive-types.ts
-   PURPOSE: Static mock Gmail and Drive connector contracts for Unified Intake preview.
+   FILE: mock-email-drive-types.ts
+   PURPOSE: Static mock Email and Drive connector contracts for Unified Intake preview.
    DEPENDENCIES: unified-intake-registry types
-   EXPORTS: Mock Gmail/Drive input and output contracts
+   EXPORTS: Mock Email/Drive input and output contracts
    ============================================ */
 
 // #region Imports
 import type {
+  EmailProvider,
   EmailSourceMetadata,
   GoogleDriveFileKind,
   GoogleDriveSourceMetadata,
@@ -16,7 +17,7 @@ import type {
 // #endregion
 
 // #region Types
-export type MockConnectorName = 'Gmail' | 'Drive';
+export type MockConnectorName = 'Email' | 'Drive';
 export type MockConnectorMode = 'mock_only';
 export type MockConnectorLiveStatus = 'live_disabled';
 export type MockConnectorCredentialStatus = 'OAuth disabled';
@@ -24,24 +25,26 @@ export type MockConnectorCredentialStatus = 'OAuth disabled';
 /** Static safety status for a mock connector preview. */
 export interface MockConnectorStatus {
   connectorName: MockConnectorName;
+  emailProvider?: EmailProvider;
   mode: MockConnectorMode;
   liveStatus: MockConnectorLiveStatus;
   credentialStatus: MockConnectorCredentialStatus;
   safetyLabel: 'candidate_and_evidence_only';
 }
 
-/** Static mock Gmail attachment metadata. */
-export interface MockGmailAttachment {
+/** Static mock email attachment metadata. */
+export interface MockEmailAttachment {
   attachmentId: string;
   fileName: string;
   mimeType: string;
   sizeBytes: number;
 }
 
-/** Static mock Gmail message metadata used for candidate-only mapping. */
-export interface MockGmailMessage {
+/** Static mock email message metadata used for candidate-only mapping. */
+export interface MockEmailMessage {
   messageId: string;
   threadId: string;
+  provider: EmailProvider;
   accountEmail: string;
   mailbox: string;
   folder: string;
@@ -53,7 +56,7 @@ export interface MockGmailMessage {
   snippet: string;
   receivedAt: string;
   sentAt: string;
-  attachments: readonly MockGmailAttachment[];
+  attachments: readonly MockEmailAttachment[];
   isRead: boolean;
   isStarred: boolean;
   isImportant: boolean;

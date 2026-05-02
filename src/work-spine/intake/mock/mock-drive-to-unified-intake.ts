@@ -1,7 +1,7 @@
 /* ============================================
    FILE: mock-drive-to-unified-intake.ts
    PURPOSE: Pure mock Drive mapper into Unified Intake candidates and evidence refs.
-   DEPENDENCIES: google-drive-to-unified-intake, mock-drive-data, mock-gmail-drive-types
+   DEPENDENCIES: google-drive-to-unified-intake, mock-drive-data, mock-email-drive-types
    EXPORTS: createUnifiedIntakeFromMockDriveItems, MOCK_DRIVE_UNIFIED_INTAKE_OUTPUT
    ============================================ */
 
@@ -10,7 +10,7 @@ import type { GoogleDriveIntakeItemInput } from '../google-drive-to-unified-inta
 import { createUnifiedIntakeFromGoogleDriveItems } from '../google-drive-to-unified-intake';
 import type { GoogleDriveSourceMetadata } from '../unified-intake-registry';
 import { MOCK_DRIVE_FILES, MOCK_DRIVE_FOLDERS } from './mock-drive-data';
-import type { MockDriveFile, MockDriveFolder, MockUnifiedIntakeOutput } from './mock-gmail-drive-types';
+import type { MockDriveFile, MockDriveFolder, MockUnifiedIntakeOutput } from './mock-email-drive-types';
 // #endregion
 
 // #region Helpers
