@@ -26,6 +26,7 @@ const requiredSourceTypes = [
   'manual',
   'uploaded_file',
 ];
+const stage3SourceTypes = ['email', 'drive', 'scan', 'manual_upload', 'manual_text', 'unknown'];
 const forbiddenImportPatterns = [
   /from\s+['"][^'"]*gmailService[^'"]*['"]/,
   /from\s+['"][^'"]*driveService[^'"]*['"]/,
@@ -209,6 +210,47 @@ describe('Unified Intake Inspector', () => {
     expect(markup).not.toContain('>Promote<');
   });
 
+  it('renders the Stage 3 static Unified Intake source preview for all six source types', () => {
+    const markup = renderToStaticMarkup(React.createElement(UnifiedIntakeInspectorPage));
+
+    expect(markup).toContain('Unified Intake Source Preview — static / read-only');
+    expect(markup).toContain('Static preview only');
+    expect(markup).toContain('No real provider connected');
+    expect(markup).toContain('No operational action can be created from this preview');
+    expect((markup.match(/data-testid="unified-intake-source-preview-card"/g) ?? []).length).toBe(6);
+
+    for (const sourceType of stage3SourceTypes) {
+      expect(markup).toContain(`>${sourceType}<`);
+    }
+
+    expect(markup).toContain('src-email-101');
+    expect(markup).toContain('src-drive-202');
+    expect(markup).toContain('src-scan-303');
+    expect(markup).toContain('src-up-404');
+    expect(markup).toContain('src-txt-505');
+    expect(markup).toContain('src-unk-606');
+    expect(markup).toContain('client@example.com');
+    expect(markup).toContain('Invoice for April');
+    expect(markup).toContain('payloadSummary metadata only');
+  });
+
+  it('renders Stage 3 source boundary flags and no source preview action buttons', () => {
+    const markup = renderToStaticMarkup(React.createElement(UnifiedIntakeInspectorPage));
+
+    expect((markup.match(/allowedMode: local_preview_only/g) ?? []).length).toBe(6);
+    expect((markup.match(/canCreateWorkItem: false/g) ?? []).length).toBe(6);
+    expect((markup.match(/canCreateMatter: false/g) ?? []).length).toBe(6);
+    expect((markup.match(/canCreateDocumentRef: false/g) ?? []).length).toBe(6);
+    expect((markup.match(/requiresEldadApproval: true/g) ?? []).length).toBe(6);
+    expect((markup.match(/operationalActionBlocked: true/g) ?? []).length).toBe(6);
+    expect(markup).not.toContain('>Create<');
+    expect(markup).not.toContain('>Route<');
+    expect(markup).not.toContain('>Approve<');
+    expect(markup).not.toContain('>Sync<');
+    expect(markup).not.toContain('>Fix<');
+    expect(markup).not.toContain('>Delete<');
+  });
+
   it('renders local review controls for every unified intake candidate across all sources', () => {
     const markup = renderToStaticMarkup(React.createElement(UnifiedIntakeInspectorPage));
 
@@ -344,6 +386,7 @@ describe('Unified Intake Inspector', () => {
   it('keeps the inspector and static fixtures free of real connectors, stores, persistence, and creation imports', () => {
     const inspectedSources = [
       `${projectRoot}/src/components/internal/UnifiedIntakeInspector.tsx`,
+      `${projectRoot}/src/components/internal/UnifiedIntakeSourcePreviewSection.tsx`,
       `${projectRoot}/src/components/internal/MockEmailDriveUnifiedIntakeSection.tsx`,
       `${projectRoot}/src/components/internal/unified-intake-review/UnifiedIntakeLocalReview.tsx`,
       `${projectRoot}/src/pages/internal/UnifiedIntakeInspectorPage.tsx`,
@@ -368,6 +411,35 @@ describe('Unified Intake Inspector', () => {
       expect(source).not.toContain('run-create-work-item');
       expect(source).not.toContain('node:fs');
       expect(source).not.toContain('node:path');
+    }
+  });
+
+  it('keeps the Stage 4 source preview free of store, API, and knowledge service imports', () => {
+    const previewSources = [
+      `${projectRoot}/src/components/internal/UnifiedIntakeSourcePreviewSection.tsx`,
+      `${projectRoot}/src/work-spine/intake/unified-intake-source-seed.ts`,
+      `${projectRoot}/src/work-spine/intake/unified-intake-source-types.ts`,
+    ].map((path) => readFileSync(path, 'utf8'));
+    const forbiddenPreviewSymbols = [
+      'useBrainStore',
+      'useMatterStore',
+      'brainStore',
+      'matterStore',
+      'fetch',
+      'googleapis',
+      'Supabase',
+      'supabase',
+      'Gemini',
+      'KnowledgeSearch',
+      'RAG',
+      'gmailService',
+      'driveService',
+    ];
+
+    for (const source of previewSources) {
+      for (const symbol of forbiddenPreviewSymbols) {
+        expect(source).not.toContain(symbol);
+      }
     }
   });
 
