@@ -160,6 +160,7 @@ describe('Unified Intake Inspector', () => {
     expect((markup.match(/data-testid="unified-intake-candidate-card"/g) ?? []).length).toBe(8);
     expect((markup.match(/data-testid="unified-intake-evidence-list"/g) ?? []).length).toBe(8);
     expect((markup.match(/data-testid="unified-intake-local-review"/g) ?? []).length).toBe(8);
+    expect((markup.match(/data-testid="universal-routing-approval-gate"/g) ?? []).length).toBe(1);
 
     for (const sourceType of requiredSourceTypes) {
       expect(markup).toContain(`>${sourceType}<`);
@@ -229,6 +230,8 @@ describe('Unified Intake Inspector', () => {
     expect(markup).toContain('promotion remains blocked');
     expect(markup).toContain('Agent A required before any real implementation');
     expect(markup).toContain('Approval gate: blocked until Eldad approval');
+    expect(markup).toContain('Routing Approval Gate — mock / local only');
+    expect(markup).toContain('operationalActionBlocked=true');
   });
 
   it('renders locked safety statuses for every displayed candidate and evidence ref', () => {
