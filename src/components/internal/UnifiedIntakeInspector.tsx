@@ -13,6 +13,7 @@ import type {
 } from '../../work-spine/intake/unified-intake-static-fixtures';
 import type { UnifiedIntakeCandidate, UnifiedIntakeEvidenceRef } from '../../work-spine/intake/unified-intake-registry';
 import MockEmailDriveUnifiedIntakeSection from './MockEmailDriveUnifiedIntakeSection';
+import UniversalRoutingSuggestionSection from './UniversalRoutingSuggestionSection';
 import { UnifiedIntakeLocalReview } from './unified-intake-review/UnifiedIntakeLocalReview';
 // #endregion
 
@@ -142,6 +143,8 @@ export default function UnifiedIntakeInspector({ snapshot }: UnifiedIntakeInspec
       </div>
 
       <MockEmailDriveUnifiedIntakeSection />
+
+      <UniversalRoutingSuggestionSection />
 
       <div data-testid="unified-intake-source-list" style={{ display: 'grid', gap: 16 }}>
         {snapshot.sources.map((source) => (
