@@ -1,11 +1,11 @@
 /* ============================================
    FILE: learning-types.ts
-   PURPOSE: Static Brain Learning System contracts and approval boundaries.
+   PURPOSE: Static Brain Learning System contracts, taxonomy axes, and approval boundaries.
    DEPENDENCIES: None
-   EXPORTS: Learning statuses, domains, candidate, evidence, decision, and approval contracts
+   EXPORTS: Learning statuses, taxonomy axes, candidate, evidence, decision, and approval contracts
    ============================================ */
 
-// #region Status And Domain Constants
+// #region Status And Taxonomy Constants
 /** Learning statuses available before any operational knowledge binding. */
 export const LEARNING_STATUSES = [
   'draft',
@@ -19,23 +19,68 @@ export const LEARNING_STATUSES = [
 /** Status for a learning candidate inside the Brain Learning System. */
 export type LearningStatus = (typeof LEARNING_STATUSES)[number];
 
-/** Professional domains that learning candidates may be classified under. */
+/** Professional knowledge domains that learning candidates may be classified under. */
 export const KNOWLEDGE_DOMAINS = [
   'מע"מ',
-  'חוות דעת',
+  'מס הכנסה',
+  'מיסוי',
   'דיני עבודה',
   'שכר',
   'פיצויי מלחמה',
   'הנהלת חשבונות',
-  'הצהרות הון',
-  'החזרי מס',
-  'מכתבים',
-  'ניהול לקוחות',
-  'רוביום',
 ] as const;
 
 /** Domain label for professional learning candidates. */
 export type KnowledgeDomain = (typeof KNOWLEDGE_DOMAINS)[number];
+
+/** Professional workflows or processes that a learning candidate may support. */
+export const LEARNING_WORKFLOWS = [
+  'דיווח מע"מ',
+  'דוח כספי',
+  'הצהרת הון',
+  'החזר מס',
+  'חוות דעת',
+  'ביטול קנס',
+  'מילוי טפסים',
+] as const;
+
+/** Workflow/process label for learning candidates. */
+export type LearningWorkflow = (typeof LEARNING_WORKFLOWS)[number];
+
+/** Output artifact types that a learning candidate may help produce. */
+export const LEARNING_OUTPUT_TYPES = [
+  'מכתב',
+  'טופס',
+  'דוח',
+  'חישוב',
+  'חוות דעת',
+  'אקסל',
+  'PDF',
+  'הודעה ללקוח',
+] as const;
+
+/** Output type label for learning candidates. */
+export type LearningOutputType = (typeof LEARNING_OUTPUT_TYPES)[number];
+
+/** Entity, client, or case tags that learning candidates may be associated with. */
+export const LEARNING_ENTITY_TAGS = [
+  'דימה',
+  'צילה',
+  'דוד אלדד',
+  'רוביום',
+  'בבילון',
+  'א.א. עוגנים',
+  'כללי / ללא לקוח',
+] as const;
+
+/** Entity/client/case tag for learning candidates. */
+export type LearningEntityTag = (typeof LEARNING_ENTITY_TAGS)[number];
+
+/** Source channels from which learning evidence may originate. */
+export const LEARNING_SOURCE_CHANNELS = ['סריקה', 'Email', 'Drive', 'אזור אישי', 'ידני'] as const;
+
+/** Source channel tag for learning candidates. */
+export type LearningSourceChannel = (typeof LEARNING_SOURCE_CHANNELS)[number];
 // #endregion
 
 // #region Evidence Contracts
@@ -93,8 +138,16 @@ export interface EldadDecisionLogEntry {
   readonly source: string;
   /** Approval timestamp for approval decisions; null for non-approval decisions. */
   readonly approvedAt: string | null;
-  /** Where the decision applies. */
-  readonly appliesTo: readonly KnowledgeDomain[];
+  /** Knowledge domains where the decision applies. */
+  readonly appliesToKnowledgeDomains: readonly KnowledgeDomain[];
+  /** Workflows where the decision applies. */
+  readonly appliesToWorkflows: readonly LearningWorkflow[];
+  /** Output types where the decision applies. */
+  readonly appliesToOutputTypes: readonly LearningOutputType[];
+  /** Entities/clients/cases where the decision applies. */
+  readonly appliesToEntities: readonly LearningEntityTag[];
+  /** Source channels where the decision applies. */
+  readonly appliesToSourceChannels: readonly LearningSourceChannel[];
   /** Actor who made the decision. */
   readonly decidedBy: 'Eldad';
 }
@@ -141,8 +194,16 @@ export interface LearningCandidate {
   readonly candidateId: string;
   /** Human-readable title. */
   readonly title: string;
-  /** Professional knowledge domain. */
-  readonly domain: KnowledgeDomain;
+  /** Professional knowledge domains. */
+  readonly knowledgeDomains: readonly KnowledgeDomain[];
+  /** Professional workflows/processes. */
+  readonly workflows: readonly LearningWorkflow[];
+  /** Output artifact types. */
+  readonly outputTypes: readonly LearningOutputType[];
+  /** Related entities/clients/cases. */
+  readonly entities: readonly LearningEntityTag[];
+  /** Evidence source channels. */
+  readonly sourceChannels: readonly LearningSourceChannel[];
   /** Candidate status in the learning workflow. */
   readonly status: LearningStatus;
   /** Non-binding learning hypothesis. */

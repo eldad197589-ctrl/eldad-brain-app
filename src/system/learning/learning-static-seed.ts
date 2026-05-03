@@ -15,7 +15,11 @@ export const LEARNING_STATIC_SEED = [
   {
     candidateId: 'learning-seed-vat-review-001',
     title: 'מע"מ review pattern candidate',
-    domain: 'מע"מ',
+    knowledgeDomains: ['מע"מ', 'הנהלת חשבונות'],
+    workflows: ['דיווח מע"מ'],
+    outputTypes: ['דוח', 'PDF'],
+    entities: ['דוד אלדד'],
+    sourceChannels: ['סריקה'],
     status: 'needs_source',
     hypothesis: 'VAT workflow signals should remain candidates until source evidence is reviewed.',
     sourceEvidence: [
@@ -45,7 +49,11 @@ export const LEARNING_STATIC_SEED = [
   {
     candidateId: 'learning-seed-opinion-workflow-001',
     title: 'חוות דעת workflow corpus candidate',
-    domain: 'חוות דעת',
+    knowledgeDomains: ['מיסוי'],
+    workflows: ['חוות דעת'],
+    outputTypes: ['חוות דעת', 'PDF'],
+    entities: ['כללי / ללא לקוח'],
+    sourceChannels: ['ידני'],
     status: 'pending_eldad_review',
     hypothesis: 'Expert opinion work can become a learning corpus only after Eldad review.',
     sourceEvidence: [
@@ -75,7 +83,11 @@ export const LEARNING_STATIC_SEED = [
   {
     candidateId: 'learning-seed-war-compensation-001',
     title: 'פיצויי מלחמה evidence pattern candidate',
-    domain: 'פיצויי מלחמה',
+    knowledgeDomains: ['פיצויי מלחמה', 'מס הכנסה'],
+    workflows: ['מילוי טפסים', 'ביטול קנס'],
+    outputTypes: ['חישוב', 'מכתב'],
+    entities: ['דימה'],
+    sourceChannels: ['סריקה', 'ידני'],
     status: 'draft',
     hypothesis: 'War compensation patterns must stay draft until multi-source evidence is checked.',
     sourceEvidence: [
