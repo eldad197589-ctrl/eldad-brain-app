@@ -1,5 +1,18 @@
-export type IntakeSourceType = 'email' | 'drive' | 'scan' | 'manual_upload' | 'manual_text' | 'unknown';
+/* ====
+   FILE: unified-intake-source-types.ts
+   PURPOSE: Static Unified Intake source contracts.
+   DEPENDENCIES: None
+   EXPORTS: Unified Intake source types and boundary flags
+   ==== */
 
+// #region Source Types
+/** Ordered list of allowed Unified Intake source types. */
+export const INTAKE_SOURCE_TYPES = ['email', 'drive', 'scan', 'manual_upload', 'manual_text', 'unknown', 'protocol'] as const;
+
+export type IntakeSourceType = (typeof INTAKE_SOURCE_TYPES)[number];
+// #endregion
+
+// #region Boundary Types
 export interface IntakeBoundaryFlags {
   allowedMode: 'local_preview_only';
   canCreateWorkItem: false;
@@ -25,3 +38,4 @@ export interface UnifiedIntakeSource {
   payloadSummary: IntakePayloadSummary;
   boundaryFlags: IntakeBoundaryFlags;
 }
+// #endregion
