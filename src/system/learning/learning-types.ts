@@ -21,6 +21,9 @@ export type LearningStatus = (typeof LEARNING_STATUSES)[number];
 
 /** Professional knowledge domains that learning candidates may be classified under. */
 export const KNOWLEDGE_DOMAINS = [
+  'vat',
+  'bookkeeping',
+  'international_tax',
   'מע"מ',
   'מס הכנסה',
   'מיסוי',
@@ -35,6 +38,10 @@ export type KnowledgeDomain = (typeof KNOWLEDGE_DOMAINS)[number];
 
 /** Professional workflows or processes that a learning candidate may support. */
 export const LEARNING_WORKFLOWS = [
+  'monthly_vat_reconciliation',
+  'document_ingestion',
+  'invoice_classification',
+  'expense_recognition',
   'דיווח מע"מ',
   'דוח כספי',
   'הצהרת הון',
@@ -49,6 +56,9 @@ export type LearningWorkflow = (typeof LEARNING_WORKFLOWS)[number];
 
 /** Output artifact types that a learning candidate may help produce. */
 export const LEARNING_OUTPUT_TYPES = [
+  'architectural_rule',
+  'process_boundary',
+  'tax_treatment_rule',
   'מכתב',
   'טופס',
   'דוח',
@@ -64,6 +74,7 @@ export type LearningOutputType = (typeof LEARNING_OUTPUT_TYPES)[number];
 
 /** Entity, client, or case tags that learning candidates may be associated with. */
 export const LEARNING_ENTITY_TAGS = [
+  'universal',
   'דימה',
   'צילה',
   'דוד אלדד',
@@ -77,7 +88,7 @@ export const LEARNING_ENTITY_TAGS = [
 export type LearningEntityTag = (typeof LEARNING_ENTITY_TAGS)[number];
 
 /** Source channels from which learning evidence may originate. */
-export const LEARNING_SOURCE_CHANNELS = ['סריקה', 'Email', 'Drive', 'אזור אישי', 'ידני'] as const;
+export const LEARNING_SOURCE_CHANNELS = ['eldad_decision_log', 'סריקה', 'Email', 'Drive', 'אזור אישי', 'ידני'] as const;
 
 /** Source channel tag for learning candidates. */
 export type LearningSourceChannel = (typeof LEARNING_SOURCE_CHANNELS)[number];
@@ -194,6 +205,8 @@ export interface LearningCandidate {
   readonly candidateId: string;
   /** Human-readable title. */
   readonly title: string;
+  /** Short metadata-only summary; never raw source content. */
+  readonly summary: string;
   /** Professional knowledge domains. */
   readonly knowledgeDomains: readonly KnowledgeDomain[];
   /** Professional workflows/processes. */

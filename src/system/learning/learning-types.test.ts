@@ -74,6 +74,7 @@ const approvedDecision: EldadDecisionLogEntry = {
 const mockApprovedCandidate: LearningCandidate = {
   candidateId: 'learning-candidate-approved-mock-001',
   title: 'Approved mock VAT learning candidate',
+  summary: 'Short mock summary for the approved candidate fixture.',
   knowledgeDomains: ['מע"מ'],
   workflows: ['דיווח מע"מ'],
   outputTypes: ['דוח'],
@@ -131,6 +132,9 @@ describe('Brain Learning System type contracts', () => {
     ]);
 
     expect(KNOWLEDGE_DOMAINS).toEqual([
+      'vat',
+      'bookkeeping',
+      'international_tax',
       'מע"מ',
       'מס הכנסה',
       'מיסוי',
@@ -141,6 +145,10 @@ describe('Brain Learning System type contracts', () => {
     ]);
 
     expect(LEARNING_WORKFLOWS).toEqual([
+      'monthly_vat_reconciliation',
+      'document_ingestion',
+      'invoice_classification',
+      'expense_recognition',
       'דיווח מע"מ',
       'דוח כספי',
       'הצהרת הון',
@@ -151,6 +159,9 @@ describe('Brain Learning System type contracts', () => {
     ]);
 
     expect(LEARNING_OUTPUT_TYPES).toEqual([
+      'architectural_rule',
+      'process_boundary',
+      'tax_treatment_rule',
       'מכתב',
       'טופס',
       'דוח',
@@ -162,6 +173,7 @@ describe('Brain Learning System type contracts', () => {
     ]);
 
     expect(LEARNING_ENTITY_TAGS).toEqual([
+      'universal',
       'דימה',
       'צילה',
       'דוד אלדד',
@@ -171,7 +183,7 @@ describe('Brain Learning System type contracts', () => {
       'כללי / ללא לקוח',
     ]);
 
-    expect(LEARNING_SOURCE_CHANNELS).toEqual(['סריקה', 'Email', 'Drive', 'אזור אישי', 'ידני']);
+    expect(LEARNING_SOURCE_CHANNELS).toEqual(['eldad_decision_log', 'סריקה', 'Email', 'Drive', 'אזור אישי', 'ידני']);
   });
 
   it('requires every static candidate to carry all five taxonomy axes', () => {
@@ -205,6 +217,49 @@ describe('Brain Learning System type contracts', () => {
     expect(LEARNING_STATIC_SEED.every(hasRequiredEvidence)).toBe(true);
     expect(LEARNING_STATIC_SEED.every(candidate => candidate.approvalBoundary.canBindKnowledge === false)).toBe(true);
     expect(LEARNING_STATIC_SEED.every(candidate => candidate.status !== 'approved_by_eldad')).toBe(true);
+  });
+
+  it('adds the approved VAT insight candidates as metadata-only static seeds', () => {
+    const vatInsightIds = [
+      'learning-insight-2026-04-21-vat-ingestion-vs-claiming',
+      'learning-insight-2026-04-28-google-play-vat-treatment',
+    ];
+    const vatInsightCandidates = LEARNING_STATIC_SEED.filter(candidate =>
+      vatInsightIds.includes(candidate.candidateId),
+    );
+
+    expect(vatInsightCandidates.map(candidate => candidate.candidateId)).toEqual(vatInsightIds);
+    expect(vatInsightCandidates.every(candidate => candidate.summary.length > 0)).toBe(true);
+    expect(vatInsightCandidates.every(candidate => candidate.summary.includes('Metadata-only'))).toBe(true);
+    expect(vatInsightCandidates.every(hasFiveTaxonomyAxes)).toBe(true);
+    expect(vatInsightCandidates.every(candidate => candidate.approvalBoundary.approvedByEldad === false)).toBe(true);
+    expect(vatInsightCandidates.every(candidate => candidate.bindingUse === 'none')).toBe(true);
+    expect(vatInsightCandidates.every(candidate => ['pending_eldad_review', 'needs_source'].includes(candidate.status))).toBe(true);
+  });
+
+  it('keeps approved VAT insight seeds metadata-only without markdown body fields', () => {
+    const vatInsightCandidates = LEARNING_STATIC_SEED.filter(candidate =>
+      candidate.candidateId.startsWith('learning-insight-2026-04'),
+    );
+    const forbiddenBodyFields = ['body', 'content', 'markdown', 'markdownBody', 'rawContent'];
+
+    expect(vatInsightCandidates).toHaveLength(2);
+    expect(
+      vatInsightCandidates.every(candidate =>
+        candidate.sourceEvidence.every(
+          evidence =>
+            evidence.sourceReference.startsWith('insights/') &&
+            evidence.allowedAccess === 'metadata_only' &&
+            evidence.containsPrivateMaterial === false,
+        ),
+      ),
+    ).toBe(true);
+
+    for (const candidate of vatInsightCandidates) {
+      for (const field of forbiddenBodyFields) {
+        expect(Object.prototype.hasOwnProperty.call(candidate, field)).toBe(false);
+      }
+    }
   });
 
   it('records decision log entries with what, why, source, approvedAt, and appliesTo fields', () => {
