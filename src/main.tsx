@@ -80,6 +80,7 @@ const UnifiedIntakeInspectorPage = lazy(() => import('./pages/internal/UnifiedIn
 const BrainDiagnosticsPage = lazy(() => import('./pages/internal/BrainDiagnosticsPage'))
 const LearningInboxPage = lazy(() => import('./pages/internal/LearningInboxPage'))
 const ApprovalGatePreview = lazy(() => import('./pages/internal/approval-gate-preview/ApprovalGatePreview'))
+const ManualPreviewWorkbench = lazy(() => import('./pages/internal/manual-preview-workbench/ManualPreviewWorkbench'))
 
 // Placeholder for pages we'll build later
 const ComingSoon = lazy(() => import('./pages/ComingSoon'))
@@ -154,6 +155,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/internal/brain-diagnostics" element={<BrainDiagnosticsPage />} />
             <Route path="/internal/learning-inbox" element={<LearningInboxPage />} />
             <Route path="/internal/approval-gate-preview" element={<ApprovalGatePreview />} />
+            <Route path="/internal/manual-preview-workbench" element={<ManualPreviewWorkbench />} />
             {/* Flowcharts */}
             <Route path="/flow/:flowId" element={<FlowchartPageWrapper />} />
             {/* Personal */}
