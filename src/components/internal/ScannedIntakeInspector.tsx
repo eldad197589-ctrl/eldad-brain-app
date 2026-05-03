@@ -17,6 +17,7 @@ import {
   type ManualDecisionMissingBeforePreview,
 } from '../../work-spine/intake/manual-decision-draft';
 import LocalDraftEditor from './LocalDraftEditor';
+import ScansManifestPreviewSection from './ScansManifestPreviewSection';
 import ScannedIntakeStaticManifestSection from './ScannedIntakeStaticManifestSection';
 // #endregion
 
@@ -152,6 +153,7 @@ export default function ScannedIntakeInspector({ snapshot, taskCandidatesSnapsho
       </div>
 
       <ScannedIntakeStaticManifestSection />
+      <ScansManifestPreviewSection />
 
       <div style={panelStyle}>
         <h2 style={{ marginTop: 0, color: '#f8fafc' }}>קבוצות מועמדים</h2>
