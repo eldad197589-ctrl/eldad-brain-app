@@ -78,6 +78,7 @@ const TodayControlBoard = lazy(() => import('./work-spine/ui/TodayControlBoard')
 const ScannedIntakeInspectorPage = lazy(() => import('./pages/internal/ScannedIntakeInspectorPage'))
 const UnifiedIntakeInspectorPage = lazy(() => import('./pages/internal/UnifiedIntakeInspectorPage'))
 const BrainDiagnosticsPage = lazy(() => import('./pages/internal/BrainDiagnosticsPage'))
+const LearningInboxPage = lazy(() => import('./pages/internal/LearningInboxPage'))
 
 // Placeholder for pages we'll build later
 const ComingSoon = lazy(() => import('./pages/ComingSoon'))
@@ -150,6 +151,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/internal/scanned-intake" element={<ScannedIntakeInspectorPage />} />
             <Route path="/internal/unified-intake" element={<UnifiedIntakeInspectorPage />} />
             <Route path="/internal/brain-diagnostics" element={<BrainDiagnosticsPage />} />
+            <Route path="/internal/learning-inbox" element={<LearningInboxPage />} />
             {/* Flowcharts */}
             <Route path="/flow/:flowId" element={<FlowchartPageWrapper />} />
             {/* Personal */}
