@@ -15,6 +15,7 @@ import type { UnifiedIntakeCandidate, UnifiedIntakeEvidenceRef } from '../../wor
 import MockEmailDriveUnifiedIntakeSection from './MockEmailDriveUnifiedIntakeSection';
 import UniversalRoutingApprovalGate from './UniversalRoutingApprovalGate';
 import UniversalRoutingSuggestionSection from './UniversalRoutingSuggestionSection';
+import UnifiedProviderPreviewSection from './UnifiedProviderPreviewSection';
 import UnifiedIntakeSourcePreviewSection from './UnifiedIntakeSourcePreviewSection';
 import { UnifiedIntakeLocalReview } from './unified-intake-review/UnifiedIntakeLocalReview';
 // #endregion
@@ -147,6 +148,8 @@ export default function UnifiedIntakeInspector({ snapshot }: UnifiedIntakeInspec
       <MockEmailDriveUnifiedIntakeSection />
 
       <UnifiedIntakeSourcePreviewSection />
+
+      <UnifiedProviderPreviewSection />
 
       <UniversalRoutingSuggestionSection />
 
