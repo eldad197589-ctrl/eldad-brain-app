@@ -10,6 +10,7 @@ export default {
     environment: 'node',
     include: [
       'src/work-spine/providers/gmail/gmail-adapter.test.ts',
+      'src/work-spine/providers/gmail/gmail-metadata-to-unified-intake-source.test.ts',
       'src/work-spine/providers/gmail/gmail-metadata-normalizer.test.ts',
       'src/work-spine/providers/gmail/gmail-provider-types.test.ts',
       'src/work-spine/providers/gmail/gmail-scope-allowlist.test.ts',
