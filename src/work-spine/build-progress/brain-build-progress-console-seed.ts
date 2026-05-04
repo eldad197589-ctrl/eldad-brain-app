@@ -75,6 +75,8 @@ const progressItem = (
   whatWasBuilt: string,
   whatEldadCanSee: string,
   nextSafeStep: string,
+  whatIsStillBlocked: readonly string[] = COMMON_BLOCKED,
+  responsibleAgent = 'Codex ראשי',
 ): BrainBuildProgressItem => ({
   progressItemId,
   title,
@@ -88,9 +90,9 @@ const progressItem = (
   surfaceClassification,
   whatWasBuilt,
   whatEldadCanSee,
-  whatIsStillBlocked: COMMON_BLOCKED,
+  whatIsStillBlocked,
   nextSafeStep,
-  responsibleAgent: 'Codex ראשי',
+  responsibleAgent,
   safetyStatus: BRAIN_BUILD_PROGRESS_SAFETY_STATUS,
   blockedActions: BRAIN_BUILD_BLOCKED_ACTIONS,
 });
@@ -153,14 +155,14 @@ const builtRoadmapStage = (
 // #region Static Data
 /** Latest committed build-state summary shown above the full progress history. */
 export const BRAIN_BUILD_LATEST_CHANGE_SUMMARY = {
-  title: 'תיקון עברית מלא למסך התקדמות בניית המוח',
-  relatedCommit: '0132154',
-  whereToSee: BRAIN_BUILD_PROGRESS_ROUTE,
-  whatChanged: 'המסך עבר לתצוגה עברית מלאה: כותרות, מדדים, סטטוסים, שדות, שמות פריטים ופעולות חסומות.',
-  proofOfLife: `המסך מציג UI עברי מלא ושומר על האזהרה: ${BRAIN_BUILD_PROGRESS_WARNING}`,
-  stillBlocked: ['אין פעולה חיה', 'אין שמירה', 'אין חיבור ספק', 'אין יצירת משימה', 'אין יצירת תיק', 'אין DocumentRef', 'אין persistence'],
-  nextSafeStep: 'ביקורת חזותית בלבד לפני הרחבה נוספת.',
-  safetyStatus: 'סיכום התקדמות לקריאה בלבד',
+  title: 'תיקון יציבות אתחול Work Spine',
+  relatedCommit: 'e6c15e9',
+  whereToSee: `המערכת עולה דרך ${BRAIN_BUILD_PROGRESS_ROUTE} לאחר תיקון bootstrap`,
+  whatChanged: 'תהליך האתחול של Work Spine הפך לעמיד ל־localStorage לא עקבי. אינדקס WorkItems נבנה מחדש מרשומות קיימות, וזריעת הדמו אינה קורסת על פריטים קיימים.',
+  proofOfLife: `המסך ${BRAIN_BUILD_PROGRESS_ROUTE} נטען לאחר אתחול חוזר, ללא קריסת duplicate WorkItem.`,
+  stillBlocked: ['אין יצירת WorkItem אמיתי ללא אישור', 'אין Matter', 'אין DocumentRef', 'אין provider', 'אין persistence חדש', 'אין פעולה חיה'],
+  nextSafeStep: 'להמשיך לשלב מצב המוח הוויזואלי לאחר בדיקת Runtime יציבה.',
+  safetyStatus: 'תיקון יציבות אתחול לקריאה בלבד בלוח ההתקדמות',
   safetyNotes: ['מידע בנייה פנימי אמיתי לקריאה בלבד', 'לא מוכנות תפעולית', 'לא אימות מקור', 'אין חיבור ספקים', 'אין הרשאת פעולה או שמירה'],
 } as const;
 
@@ -178,6 +180,24 @@ export const BRAIN_BUILD_PROGRESS_ITEMS: readonly BrainBuildProgressItem[] = [
   progressItem('progress-hypothetical-task-shape-preview-v1', 'תצוגת צורת משימה היפותטית', 'scanned_evidence', 'manual_workbench', '160f271', MANUAL_WORKBENCH_ROUTE, 'סריקות דימה', 'תצוגת צורת משימה היפותטית מוצגת תחת מועמדי סריקה תואמים.', 'built_and_visible', 'visible_static_preview', 'preview_only', 'נוספה תצוגת צורת משימה היפותטית לסריקות.', 'אלדד רואה דגלי יכולת שליליים ופעולות חסומות.', 'להשאיר את צורת המשימה נפרדת מאובייקטים אמיתיים.'),
   progressItem('progress-intake-signal-summary-v1', 'סיכום רמזי קלט', 'intake', 'manual_workbench', 'ee3a06f', MANUAL_WORKBENCH_ROUTE, 'צילה שכר', 'סיכום רמזי קלט ידני מציג רמזי טקסט ושלבים חסומים.', 'built_and_visible', 'visible_static_preview', 'preview_only', 'נוסף סיכום רמזי קלט ידני לקריאה בלבד.', 'אלדד רואה ניסוח רמזים ללא טענות תוכן.', 'להשאיר את שפת הסיכום מוגבלת לרמזי טקסט ידניים.'),
   progressItem('progress-visual-brain-surface-inventory-v1', 'מלאי משטחי מוח חזותיים', 'visual_surface', 'surface_inventory', 'edf165d', null, 'commit:edf165d', 'רשומות מלאי משטחים חזותיים סטטיות קיימות כהקשר בקרת פרויקט.', 'built_not_visible', 'not_visible_as_screen', 'static_visual', 'נוסף מלאי משטחי מוח חזותיים סטטי.', 'אלדד רואה אותו דרך מסך ההתקדמות הזה לאחר שהוא מוצג.', 'להשתמש במפה הזו לבחירת פרוסת ביקורת חזותית מאוחרת יותר.'),
+  progressItem(
+    'progress-work-spine-bootstrap-idempotency-fix-v1',
+    'תיקון יציבות אתחול Work Spine',
+    'proof',
+    'proof_inventory',
+    'e6c15e9',
+    BRAIN_BUILD_PROGRESS_ROUTE,
+    'רענון /internal/brain-build-progress לאחר localStorage לא עקבי',
+    'המסך נטען בדפדפן רגיל גם כאשר localStorage של Work Spine אינו עקבי.',
+    'built_and_visible',
+    'visible_static_preview',
+    'preview_only',
+    'תהליך bootstrap של Work Spine תוקן כך שלא יפיל את האפליקציה במקרה של רשומות מקומיות קיימות ואינדקס חסר.',
+    'המסך עולה ללא מסך כחול לאחר רענון, והמערכת ממשיכה לרנדר את מסך ההתקדמות.',
+    'להמשיך לשלב מצב המוח הוויזואלי לאחר בדיקת Runtime יציבה.',
+    ['אין יצירת WorkItem אמיתי ללא אישור', 'אין שימוש ב־Matter', 'אין DocumentRef', 'אין חיבור ספקים', 'אין פעולה חיה'],
+    'Codex ראשי + Gravity א׳',
+  ),
 ];
 
 /** Static roadmap for build-stage planning only. */

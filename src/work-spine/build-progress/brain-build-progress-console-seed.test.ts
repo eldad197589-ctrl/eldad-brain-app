@@ -58,6 +58,7 @@ const REQUIRED_PROGRESS_IDS = [
   'progress-hypothetical-task-shape-preview-v1',
   'progress-intake-signal-summary-v1',
   'progress-visual-brain-surface-inventory-v1',
+  'progress-work-spine-bootstrap-idempotency-fix-v1',
 ] as const;
 
 const REQUIRED_ROADMAP_STAGE_TITLES = [
@@ -136,8 +137,8 @@ const serializedRoadmapText = (): string => JSON.stringify(BRAIN_BUILD_STAGE_ROA
 
 // #region Tests
 describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
-  it('exports exactly the 12 approved build progress items', () => {
-    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(12);
+  it('exports exactly the 13 approved build progress items', () => {
+    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(13);
     expect(progressIds()).toEqual(REQUIRED_PROGRESS_IDS);
   });
 
@@ -152,16 +153,19 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
   });
 
   it('exports the latest committed change summary for the top console section', () => {
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('תיקון עברית מלא למסך התקדמות בניית המוח');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('0132154');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee).toBe(BRAIN_BUILD_PROGRESS_ROUTE);
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain(BRAIN_BUILD_PROGRESS_WARNING);
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('תיקון יציבות אתחול Work Spine');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('e6c15e9');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee).toContain(BRAIN_BUILD_PROGRESS_ROUTE);
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('localStorage');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('duplicate WorkItem');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain(BRAIN_BUILD_PROGRESS_ROUTE);
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין פעולה חיה');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין יצירת משימה');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין יצירת תיק');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין יצירת WorkItem אמיתי ללא אישור');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין Matter');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין DocumentRef');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין persistence');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe('סיכום התקדמות לקריאה בלבד');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין provider');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין persistence חדש');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe('תיקון יציבות אתחול לקריאה בלבד בלוח ההתקדמות');
   });
 
   it('includes every required field and static safety marker', () => {
@@ -181,6 +185,26 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
 
     expect(relatedCommits).toContain('ee3a06f');
     expect(relatedCommits).toContain('edf165d');
+    expect(relatedCommits).toContain('e6c15e9');
+  });
+
+  it('includes the Work Spine bootstrap idempotency fix checkpoint', () => {
+    const checkpoint = BRAIN_BUILD_PROGRESS_ITEMS.find(
+      (progressItem) => progressItem.progressItemId === 'progress-work-spine-bootstrap-idempotency-fix-v1',
+    );
+
+    expect(checkpoint).toBeDefined();
+    expect(checkpoint!.title).toBe('תיקון יציבות אתחול Work Spine');
+    expect(checkpoint!.relatedCommit).toBe('e6c15e9');
+    expect(checkpoint!.visibleRoute).toBe(BRAIN_BUILD_PROGRESS_ROUTE);
+    expect(checkpoint!.currentStatus).toBe('built_and_visible');
+    expect(checkpoint!.proofStatus).toBe('visible_static_preview');
+    expect(checkpoint!.surfaceClassification).toBe('preview_only');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין יצירת WorkItem אמיתי ללא אישור');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין שימוש ב־Matter');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין DocumentRef');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין חיבור ספקים');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין פעולה חיה');
   });
 
   it('keeps proof scenarios and blocked actions visible in the static data', () => {

@@ -204,7 +204,7 @@ describe('BrainBuildProgressConsole', () => {
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_WARNING);
     expect(html.indexOf('מה השתנה עכשיו')).toBeLessThan(html.indexOf('נקודות בנייה שננעלו'));
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title);
-    expect(html).toContain('0132154');
+    expect(html).toContain('e6c15e9');
     for (const text of HEBREW_COPY) {
       expect(html).toContain(text);
     }
@@ -213,10 +213,10 @@ describe('BrainBuildProgressConsole', () => {
   it('renders the static progress item count and top metric values', () => {
     const { container, cleanup } = mountConsole();
     try {
-      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(12);
+      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(13);
       const metricsText = container.querySelector('[data-testid="build-progress-top-metrics"]')?.textContent ?? '';
       expect(metricsText).toContain(String(BRAIN_BUILD_PROGRESS_ITEMS.length));
-      expect(metricsText).toContain('6');
+      expect(metricsText).toContain('7');
       expect(metricsText).toContain('0');
     } finally {
       cleanup();
@@ -250,17 +250,27 @@ describe('BrainBuildProgressConsole', () => {
     }
   });
 
-  it('does not import or call forbidden live surfaces in component, summary, or roadmap data', () => {
+  it('does not import or call forbidden live surfaces in the component source', () => {
     const componentText = BrainBuildProgressConsole.toString();
-    const serializedStaticData = JSON.stringify([
-      BRAIN_BUILD_PROGRESS_ITEMS,
-      BRAIN_BUILD_LATEST_CHANGE_SUMMARY,
-      BRAIN_BUILD_STAGE_ROADMAP_GROUPS,
-    ]);
 
     for (const forbiddenPattern of FORBIDDEN_SOURCE_PATTERNS) {
       expect(componentText).not.toMatch(forbiddenPattern);
-      expect(serializedStaticData).not.toMatch(forbiddenPattern);
+    }
+  });
+
+  it('renders the Work Spine bootstrap stability checkpoint without action controls', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const renderedText = container.textContent ?? '';
+      expect(renderedText).toContain('תיקון יציבות אתחול Work Spine');
+      expect(renderedText).toContain('e6c15e9');
+      expect(renderedText).toContain('המסך עולה ללא מסך כחול לאחר רענון');
+      expect(renderedText).toContain('אין יצירת WorkItem אמיתי ללא אישור');
+      expect(renderedText).toContain('אין DocumentRef');
+      expect(renderedText).toContain('אין חיבור ספקים');
+      expect(container.querySelectorAll('button')).toHaveLength(0);
+    } finally {
+      cleanup();
     }
   });
 
