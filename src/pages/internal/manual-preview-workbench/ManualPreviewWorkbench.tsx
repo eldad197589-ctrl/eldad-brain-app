@@ -6,8 +6,9 @@
    ============================================ */
 
 // #region Dependencies
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { ChangeEvent } from 'react';
+import VatMappingTablePreview from './VatMappingTablePreview';
 import { EVIDENCE_FILE_OPERATION_BLOCK_POLICY, EVIDENCE_FOLDER_RELATIONSHIP_POLICY } from '../../../work-spine/evidence/evidence-spine-policy';
 import { OUTPUT_PREVIEW_TYPE_REGISTRY, STATIC_OUTPUT_PREVIEWS } from '../../../work-spine/output-preview/output-preview-seed';
 import { REAL_ACTIONS_POLICY_MAP } from '../../../work-spine/policy/real-actions-policy-map';
@@ -479,6 +480,8 @@ export default function ManualPreviewWorkbench() {
   const [form, setForm] = useState<ManualPreviewFormState>(INITIAL_FORM_STATE);
   const previewSections = buildPreviewSections(form);
   const previewReady = hasPreviewInput(form);
+  const searchableText = useMemo(() => buildSearchableText(form), [form]);
+  const batchAwareness = useMemo(() => detectBatchAwareness(form), [form]);
 
   const updateText = (field: keyof ManualPreviewFormState) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((current) => ({ ...current, [field]: event.target.value }));
@@ -517,9 +520,16 @@ export default function ManualPreviewWorkbench() {
         </form>
 
         {previewReady ? (
-          <section aria-label="preview cascade" style={{ display: 'grid', gap: 14 }}>
-            {previewSections.map((section) => <PreviewCard key={section.title} section={section} />)}
-          </section>
+          <>
+            <section aria-label="preview cascade" style={{ display: 'grid', gap: 14 }}>
+              {previewSections.map((section) => <PreviewCard key={section.title} section={section} />)}
+            </section>
+            <VatMappingTablePreview
+              hasBatchSignal={batchAwareness.hasBatchSignal}
+              hasDuplicateRisk={batchAwareness.hasDuplicateRisk}
+              searchableText={searchableText}
+            />
+          </>
         ) : null}
       </section>
     </main>
