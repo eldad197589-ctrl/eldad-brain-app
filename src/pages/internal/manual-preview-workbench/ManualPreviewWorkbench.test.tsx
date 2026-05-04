@@ -30,14 +30,28 @@ const ALLOWED_SOURCE_TYPES = ['manual_text', 'scan', 'email', 'drive', 'protocol
 
 const REQUIRED_PREVIEW_SECTIONS = [
   'Intake Preview',
+  'Practical Work Summary',
+  'Professional Classification',
   'Routing Suggestion',
+  'VAT / Bookkeeping Guidance',
   'Approval Preview / Simulation',
   'Operational Preview',
   'Output Suggestion',
   'QC Summary',
+  'Evidence Checklist',
   'Evidence Hints',
   'Learning Hints',
+  'Suggested Next Step For Eldad',
+  'Safety Panel',
 ] as const;
+
+const VAT_INVOICE_INPUT = {
+  title: 'חשבונית בזק לחודש 04/2026',
+  sourceType: 'scan',
+  metadataSummary: 'חשבונית ספק שנסרקה לצורך בדיקת מע״מ והנהלת חשבונות',
+  clientOrCaseLabel: 'דוד אלדד מע״מ',
+  domainLabel: 'VAT',
+} as const;
 
 const FORBIDDEN_BUTTON_LABELS = [
   'Sa' + 've',
@@ -130,6 +144,14 @@ const changeField = (
   });
 };
 
+const fillVatInvoiceInput = (container: HTMLElement): void => {
+  changeField(container, '#manual-preview-title', VAT_INVOICE_INPUT.title);
+  changeField(container, '#manual-preview-source-type', VAT_INVOICE_INPUT.sourceType);
+  changeField(container, '#manual-preview-summary', VAT_INVOICE_INPUT.metadataSummary);
+  changeField(container, '#manual-preview-client', VAT_INVOICE_INPUT.clientOrCaseLabel);
+  changeField(container, '#manual-preview-domain', VAT_INVOICE_INPUT.domainLabel);
+};
+
 const getButtonLabels = (container: HTMLElement): string[] =>
   Array.from(container.querySelectorAll<HTMLButtonElement>('button')).map(
     (button) => button.textContent?.trim() ?? '',
@@ -165,8 +187,7 @@ describe('ManualPreviewWorkbench', () => {
   it('entering metadata produces every preview section', () => {
     const { container, cleanup } = mountWorkbench();
 
-    changeField(container, '#manual-preview-title', 'Internal salary intake');
-    changeField(container, '#manual-preview-summary', 'Manual metadata summary');
+    fillVatInvoiceInput(container);
 
     REQUIRED_PREVIEW_SECTIONS.forEach((sectionTitle) => {
       expect(container.textContent).toContain(sectionTitle);
@@ -177,7 +198,7 @@ describe('ManualPreviewWorkbench', () => {
   it('marks every preview section with PREVIEW', () => {
     const { container, cleanup } = mountWorkbench();
 
-    changeField(container, '#manual-preview-title', 'Internal salary intake');
+    fillVatInvoiceInput(container);
     const previewSections = container.querySelectorAll('[data-testid="manual-preview-section"]');
 
     expect(previewSections).toHaveLength(REQUIRED_PREVIEW_SECTIONS.length);
@@ -194,6 +215,37 @@ describe('ManualPreviewWorkbench', () => {
 
     expect(container.textContent).toContain('Approval Preview / Simulation');
     expect(container.textContent).toContain('[סימולציה]');
+    cleanup();
+  });
+
+  it('renders practical VAT bookkeeping guidance for the exact invoice input', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillVatInvoiceInput(container);
+
+    [
+      'Practical Work Summary',
+      'VAT / Bookkeeping Guidance',
+      'Evidence Checklist',
+      'QC Summary',
+      'Suggested Next Step For Eldad',
+      'Safety Panel',
+      'invoice date',
+      'supplier identity',
+      'VAT amount',
+      'period matching',
+      'duplicate check',
+      'בדוק אם החשבונית שייכת לתקופת המע״מ הנכונה',
+      'ודא שהחשבונית לא נקלטה כבר',
+      'no persistence',
+      'no provider connection',
+      'no file access',
+      'no operational object created',
+      'no official accounting entry created',
+      'no document filed',
+    ].forEach((expectedText) => {
+      expect(container.textContent).toContain(expectedText);
+    });
     cleanup();
   });
 
@@ -237,7 +289,20 @@ describe('ManualPreviewWorkbench', () => {
   it('keeps click behavior limited to Reset and Clear', () => {
     const { container, cleanup } = mountWorkbench();
 
-    changeField(container, '#manual-preview-title', 'Temporary preview');
+    fillVatInvoiceInput(container);
+    expect(container.textContent).toContain('Intake Preview');
+
+    const resetButton = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(
+      (button) => button.textContent === 'Reset',
+    );
+    expect(resetButton).toBeDefined();
+
+    act(() => {
+      resetButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    expect(container.textContent).not.toContain('Intake Preview');
+
+    fillVatInvoiceInput(container);
     expect(container.textContent).toContain('Intake Preview');
 
     const clearButton = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(

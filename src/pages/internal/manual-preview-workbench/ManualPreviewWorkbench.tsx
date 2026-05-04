@@ -32,8 +32,8 @@ interface ManualPreviewFormState {
 interface PreviewSection {
   /** Display title. */
   title: string;
-  /** Display body. */
-  body: string;
+  /** Display guidance lines. */
+  body: readonly string[];
   /** Optional marker for local simulation. */
   simulation?: boolean;
 }
@@ -133,21 +133,151 @@ const inputStyle = {
 const hasPreviewInput = (form: ManualPreviewFormState): boolean =>
   Boolean(form.title.trim() || form.metadataSummary.trim() || form.clientOrCaseLabel.trim());
 
+const includesAny = (value: string, terms: readonly string[]): boolean =>
+  terms.some((term) => value.includes(term.toLowerCase()));
+
+const isVatBookkeepingCandidate = (form: ManualPreviewFormState): boolean => {
+  const searchable = [
+    form.title,
+    form.sourceType,
+    form.metadataSummary,
+    form.clientOrCaseLabel,
+    form.domainLabel,
+  ].join(' ').toLowerCase();
+
+  return includesAny(searchable, ['vat', 'מע"מ', 'מע״מ', 'הנהלת חשבונות', 'חשבונית', 'ספק']);
+};
+
+const detectLikelyDocumentType = (form: ManualPreviewFormState, vatCandidate: boolean): string => {
+  if (vatCandidate) return 'supplier invoice / VAT bookkeeping evidence';
+  if (form.sourceType === 'protocol') return 'meeting protocol metadata';
+  if (form.sourceType === 'email') return 'email metadata intake';
+  if (form.sourceType === 'drive') return 'drive document metadata';
+  if (form.sourceType === 'scan') return 'scanned document metadata';
+  return 'manual text metadata';
+};
+
+const detectConfidenceLabel = (form: ManualPreviewFormState, vatCandidate: boolean): 'low' | 'medium' | 'high' => {
+  if (vatCandidate && form.title.trim() && form.metadataSummary.trim()) return 'high';
+  if (form.title.trim() || form.metadataSummary.trim()) return 'medium';
+  return 'low';
+};
+
+const detectOutputSuggestions = (form: ManualPreviewFormState, vatCandidate: boolean): string => {
+  if (vatCandidate && form.sourceType === 'scan') return 'scan_intake_report + VAT_review_memo + evidence_summary';
+  if (vatCandidate) return 'VAT_review_memo + task_summary';
+  if (form.sourceType === 'protocol') return 'protocol_action_summary + task_summary';
+  return 'task_summary + evidence_summary';
+};
+
+const buildVatGuidance = (vatCandidate: boolean): readonly string[] =>
+  vatCandidate
+    ? [
+        'VAT relevance warning: this looks relevant to bookkeeping and period review.',
+        'Bookkeeping classification suggestion: supplier expense invoice candidate.',
+        'Required checks: invoice date, supplier identity, VAT amount, business/private/mixed expense, period matching, duplicate check.',
+        'Preview only, not accounting advice; Eldad review required before any professional conclusion.',
+      ]
+    : [
+        'No VAT/bookkeeping signal detected yet.',
+        'Add tax, invoice, supplier, amount, or period metadata if this belongs to VAT review.',
+      ];
+
 const buildPreviewSections = (form: ManualPreviewFormState): readonly PreviewSection[] => {
   const title = form.title.trim() || 'Untitled manual preview';
   const domain = form.domainLabel.trim() || 'Unassigned domain';
   const client = form.clientOrCaseLabel.trim() || 'No client or case label';
   const summary = form.metadataSummary.trim() || 'No metadata summary entered';
+  const vatCandidate = isVatBookkeepingCandidate(form);
+  const likelyDocumentType = detectLikelyDocumentType(form, vatCandidate);
+  const confidenceLabel = detectConfidenceLabel(form, vatCandidate);
+  const outputSuggestion = detectOutputSuggestions(form, vatCandidate);
 
   return [
-    { title: 'Intake Preview', body: `${form.sourceType} | ${title} | ${summary}` },
-    { title: 'Routing Suggestion', body: `${domain} | ${client} | local preview route only` },
-    { title: 'Approval Preview / Simulation', body: 'metadata_preview_only | local review required', simulation: true },
-    { title: 'Operational Preview', body: 'hypothetical preview bundle | all real effects blocked' },
-    { title: 'Output Suggestion', body: `preview draft suggestion for ${title}` },
-    { title: 'QC Summary', body: 'manual review required | no durable decision' },
-    { title: 'Evidence Hints', body: `${client} | source trace hint only` },
-    { title: 'Learning Hints', body: `${domain} | non-binding observation hint` },
+    {
+      title: 'Intake Preview',
+      body: [`${form.sourceType} | ${title} | ${summary}`],
+    },
+    {
+      title: 'Practical Work Summary',
+      body: [
+        `Appears to be: ${likelyDocumentType}.`,
+        `Why it matters: ${client} may need a reviewed, source-traced bookkeeping/evidence decision.`,
+        'What Eldad should check next: amount, date, supplier, VAT period, and whether this item already exists elsewhere.',
+      ],
+    },
+    {
+      title: 'Professional Classification',
+      body: [
+        `suggested domain: ${domain}`,
+        `likely document type: ${likelyDocumentType}`,
+        `likely workflow family: ${vatCandidate ? 'VAT / bookkeeping review' : 'manual intake triage'}`,
+        `confidence label: ${confidenceLabel}`,
+      ],
+    },
+    { title: 'Routing Suggestion', body: [`${domain} | ${client} | local preview route only`] },
+    {
+      title: 'VAT / Bookkeeping Guidance',
+      body: buildVatGuidance(vatCandidate),
+    },
+    {
+      title: 'Approval Preview / Simulation',
+      body: ['metadata_preview_only | local review required', 'No durable approval state is created from this screen.'],
+      simulation: true,
+    },
+    {
+      title: 'Operational Preview',
+      body: ['hypothetical preview bundle | all real effects blocked', 'No operational object is created.'],
+    },
+    {
+      title: 'Output Suggestion',
+      body: [`Suggested preview output: ${outputSuggestion}`, `Based on ${form.sourceType}, ${domain}, and the entered metadata only.`],
+    },
+    {
+      title: 'QC Summary',
+      body: [
+        'QC Warnings: missing amount, missing supplier, missing date, missing original file, source entered manually, no persistence.',
+      ],
+    },
+    {
+      title: 'Evidence Checklist',
+      body: [
+        'source trace needed',
+        'original document needed',
+        'supplier name needed',
+        'amount/date/VAT fields needed',
+        'proof of payment if relevant',
+        'client/case label verification',
+      ],
+    },
+    {
+      title: 'Evidence Hints',
+      body: [`${client} | source trace hint only`, 'Keep the real document in the official source location outside this preview.'],
+    },
+    {
+      title: 'Learning Hints',
+      body: [`${domain} | non-binding observation hint`, 'This does not write to memory or a knowledge log.'],
+    },
+    {
+      title: 'Suggested Next Step For Eldad',
+      body: [
+        'בדוק אם החשבונית שייכת לתקופת המע״מ הנכונה',
+        'ודא שהחשבונית לא נקלטה כבר',
+        'הוסף סכום, תאריך וספק אם רוצים להפיק תצוגה מדויקת יותר',
+        'אם זה מסמך אמיתי — שמור אותו בתיק המקור הרשמי מחוץ למערכת עד שיהיה Gate לקבצים',
+      ],
+    },
+    {
+      title: 'Safety Panel',
+      body: [
+        'no persistence',
+        'no provider connection',
+        'no file access',
+        'no operational object created',
+        'no official accounting entry created',
+        'no document filed',
+      ],
+    },
   ];
 };
 // #endregion
@@ -168,7 +298,9 @@ function PreviewCard({ section }: PreviewCardProps) {
         {section.title}
         <PreviewBadge simulation={section.simulation} />
       </h3>
-      <p style={{ margin: 0, color: '#cbd5e1', lineHeight: 1.6 }}>{section.body}</p>
+      <ul style={{ margin: 0, paddingInlineStart: 18, color: '#cbd5e1', lineHeight: 1.6 }}>
+        {section.body.map((line) => <li key={line}>{line}</li>)}
+      </ul>
     </article>
   );
 }
