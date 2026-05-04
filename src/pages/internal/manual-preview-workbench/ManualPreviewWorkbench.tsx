@@ -9,6 +9,7 @@
 import { useState, useMemo } from 'react';
 import type { ChangeEvent } from 'react';
 import BrainKnowledgeInventoryPreview from './BrainKnowledgeInventoryPreview';
+import IntakeSignalSummary from './IntakeSignalSummary';
 import ScannedEvidenceBatchPreview from './ScannedEvidenceBatchPreview';
 import VatMappingTablePreview from './VatMappingTablePreview';
 import { EVIDENCE_FILE_OPERATION_BLOCK_POLICY, EVIDENCE_FOLDER_RELATIONSHIP_POLICY } from '../../../work-spine/evidence/evidence-spine-policy';
@@ -522,7 +523,7 @@ export default function ManualPreviewWorkbench() {
         </form>
 
         {previewReady ? (
-          <>
+          <> <IntakeSignalSummary searchableText={searchableText} />
             <section aria-label="preview cascade" style={{ display: 'grid', gap: 14 }}>
               {previewSections.map((section) => <PreviewCard key={section.title} section={section} />)}
             </section>

@@ -15,6 +15,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import BrainKnowledgeInventoryPreview from './BrainKnowledgeInventoryPreview';
 import HypotheticalScannedTaskShapePreview from './HypotheticalScannedTaskShapePreview';
+import IntakeSignalSummary from './IntakeSignalSummary';
 import ManualPreviewWorkbench from './ManualPreviewWorkbench';
 import ScannedEvidenceApprovalGatePreview from './ScannedEvidenceApprovalGatePreview';
 import ScannedEvidenceBatchPreview from './ScannedEvidenceBatchPreview';
@@ -82,6 +83,14 @@ const SCANNED_APPROVAL_WARNING_TEXT =
   'תצוגת אישור בלבד — לא נוצרת משימה, לא נשלח דבר, ולא מתבצעת פעולה.';
 const HYPOTHETICAL_TASK_SHAPE_WARNING_TEXT =
   'תצוגת משימה היפותטית בלבד — לא נוצרה משימה, לא נוצר WorkItem, לא נוצר Matter, לא נוצר DocumentRef, ולא נשמר דבר.';
+const INTAKE_SIGNAL_GLOBAL_WARNING_TEXT =
+  'סיכום רמזי קלט בלבד — זוהו מילים/רמזים בטקסט ידני. לא בוצע ניתוח תוכן, לא נקראו קבצים, לא הופעל OCR, לא אומת מקור, לא בוצע חישוב, לא בוצעה התאמה, ולא נוצרה משימה או רשומה.';
+const DIMA_SIGNAL_SUMMARY_TEXT =
+  'הקלט מכיל רמז לסריקות ולתיק דימה. מוצגת אצוות סריקות סטטית והקשר דימה סטטי/חלקי בלבד. לא נקראה תיקייה, לא נקראו קבצים, לא הופעל OCR, ולא נוצרה משימה.';
+const TSILA_SIGNAL_SUMMARY_TEXT =
+  'הקלט מכיל רמז לצילה ולהקשר שכר. מוצג הקשר ידוע בלבד, לא ראיה מחייבת. לא בוצע חישוב שכר, לא נקראו תלושים, ולא הופקה מסקנה מקצועית.';
+const VAT_SIGNAL_SUMMARY_TEXT =
+  'הקלט מכיל רמז למע״מ, מייבן ובזק. מוצג הקשר VAT סטטי בלבד. אין גישה חיה למייבן, לא בוצעה התאמה, לא בוצע חישוב, ולא נרשמה פקודת הנהלת חשבונות.';
 
 const FORBIDDEN_BUTTON_LABELS = [
   'Sa' + 've',
@@ -202,6 +211,67 @@ const FORBIDDEN_HYPOTHETICAL_SOURCE_TERMS = [
   'Mat' + 'ter;',
   'Document' + 'Ref;',
 ] as const;
+
+const REQUIRED_INTAKE_SIGNAL_BADGES = [
+  'זיהוי רמזים בלבד',
+  'PREVIEW ONLY',
+  'No source content read',
+  'No OCR',
+  'No live provider',
+  'No calculation',
+  'No reconciliation',
+  'No task or record creation',
+  'Requires Eldad review',
+] as const;
+
+const REQUIRED_INTAKE_SIGNAL_FLAGS = [
+  'previewOnly:true',
+  'staticOnly:true',
+  'manualSignalsOnly:true',
+  'contentRead:false',
+  'ocrRun:false',
+  'sourceVerified:false',
+  'calculationPerformed:false',
+  'reconciliationPerformed:false',
+  'liveProviderConnected:false',
+  'canCreateTask:false',
+  'canCreateRecord:false',
+  'canPersist:false',
+] as const;
+
+const BANNED_INTAKE_SIGNAL_POSITIVE_WORDING = [
+  'הבין',
+  'ניתח',
+  'זוהו מסמכים',
+  'זוהה דוח',
+  'נקלט',
+  'שויך',
+  'מוכן',
+  'אושר',
+  'נפתח תיק',
+  'connected',
+  'fetched',
+  'synced',
+  'verified',
+  'ready',
+  'operational',
+] as const;
+
+const FORBIDDEN_INTAKE_SIGNAL_SOURCE_TERMS = [
+  'pro' + 'vider/',
+  'A' + 'PI',
+  'O' + 'Auth',
+  'from "f' + 's"',
+  "from 'f" + "s'",
+  'use' + 'Store',
+  'persistence/',
+  'Supa' + 'base',
+  'D' + 'B',
+  'runtime/',
+  'Work' + 'Item;',
+  'Mat' + 'ter;',
+  'Document' + 'Ref;',
+] as const;
 // #endregion
 
 // #region Types
@@ -293,6 +363,9 @@ const getApprovalPreviews = (container: HTMLElement): HTMLElement[] =>
 const getHypotheticalTaskShapePreviews = (container: HTMLElement): HTMLElement[] =>
   Array.from(container.querySelectorAll<HTMLElement>('[data-testid="hypothetical-scanned-task-shape-preview"]'));
 
+const getIntakeSignalSummary = (container: HTMLElement): HTMLElement | null =>
+  container.querySelector<HTMLElement>('[data-testid="intake-signal-summary"]');
+
 const getKnowledgeInventoryRecords = (container: HTMLElement): HTMLElement[] =>
   Array.from(container.querySelectorAll<HTMLElement>('[data-testid="brain-knowledge-inventory-record"]'));
 // #endregion
@@ -368,6 +441,116 @@ describe('ManualPreviewWorkbench', () => {
     expect(container.textContent).toContain('תצוגת אישור / סימולציה');
     expect(container.textContent).toContain('[סימולציה]');
     cleanup();
+  });
+
+  it('renders exact Intake Signal Summary global warning and badges', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'סריקות דימה');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'סריקות דימה לבדיקה סטטית בלבד');
+    changeField(container, '#manual-preview-client', 'דימה');
+    changeField(container, '#manual-preview-domain', 'כללי');
+
+    const signalSummary = getIntakeSignalSummary(container);
+    expect(signalSummary).not.toBeNull();
+    expect(signalSummary?.textContent).toContain(INTAKE_SIGNAL_GLOBAL_WARNING_TEXT);
+    expect(signalSummary?.textContent).toContain('סיכום רמזי קלט');
+    REQUIRED_INTAKE_SIGNAL_BADGES.forEach((badge) => {
+      expect(signalSummary?.textContent).toContain(badge);
+    });
+    cleanup();
+  });
+
+  it('renders required Intake Signal Summary safety flags', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'סריקות דימה');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'סריקות דימה לבדיקה סטטית בלבד');
+    changeField(container, '#manual-preview-client', 'דימה');
+    changeField(container, '#manual-preview-domain', 'כללי');
+
+    const signalSummaryText = getIntakeSignalSummary(container)?.textContent?.replace(/\s+/g, '') ?? '';
+    REQUIRED_INTAKE_SIGNAL_FLAGS.forEach((flag) => {
+      expect(signalSummaryText).toContain(flag);
+    });
+    expect(signalSummaryText).toContain('nextSafeStep:eldad_review_required');
+    cleanup();
+  });
+
+  it('summarizes Dima scans as manual signals without document-detection wording', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'סריקות דימה');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'סריקות דימה לבדיקה סטטית בלבד');
+    changeField(container, '#manual-preview-client', 'דימה');
+    changeField(container, '#manual-preview-domain', 'כללי');
+
+    const signalSummary = getIntakeSignalSummary(container);
+    expect(signalSummary?.textContent).toContain(DIMA_SIGNAL_SUMMARY_TEXT);
+    expect(signalSummary?.textContent).toContain('הקלט מכיל רמז');
+    expect(signalSummary?.textContent).not.toContain('זוהו מסמכים');
+    cleanup();
+  });
+
+  it('summarizes Tsila payroll as known context without payroll calculation', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'צילה שכר');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'צילה שכר בהקשר ידוע בלבד');
+    changeField(container, '#manual-preview-client', 'צילה');
+    changeField(container, '#manual-preview-domain', 'שכר');
+
+    const signalSummary = getIntakeSignalSummary(container);
+    expect(signalSummary?.textContent).toContain(TSILA_SIGNAL_SUMMARY_TEXT);
+    expect(signalSummary?.textContent).toContain('לא בוצע חישוב שכר');
+    expect(signalSummary?.textContent).toContain('לא נקראו תלושים');
+    cleanup();
+  });
+
+  it('summarizes VAT Maven Bezeq as static context without live access or reconciliation', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'מע״מ מייבן בזק');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'מע״מ מייבן בזק בתצוגה סטטית');
+    changeField(container, '#manual-preview-client', 'דוד אלדד');
+    changeField(container, '#manual-preview-domain', 'VAT');
+
+    const signalSummary = getIntakeSignalSummary(container);
+    expect(signalSummary?.textContent).toContain(VAT_SIGNAL_SUMMARY_TEXT);
+    expect(signalSummary?.textContent).toContain('אין גישה חיה למייבן');
+    expect(signalSummary?.textContent).toContain('לא בוצעה התאמה');
+    expect(signalSummary?.textContent).toContain('לא בוצע חישוב');
+    cleanup();
+  });
+
+  it('keeps Intake Signal Summary free of positive banned wording and action controls', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'סריקות דימה');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'סריקות דימה לבדיקה סטטית בלבד');
+    changeField(container, '#manual-preview-client', 'דימה');
+    changeField(container, '#manual-preview-domain', 'כללי');
+
+    const signalSummary = getIntakeSignalSummary(container);
+    expect(signalSummary?.querySelector('button')).toBeNull();
+    BANNED_INTAKE_SIGNAL_POSITIVE_WORDING.forEach((wording) => {
+      expect(signalSummary?.textContent).not.toContain(wording);
+    });
+    cleanup();
+  });
+
+  it('keeps Intake Signal Summary source free of runtime and object imports', () => {
+    const componentText = IntakeSignalSummary.toString();
+
+    FORBIDDEN_INTAKE_SIGNAL_SOURCE_TERMS.forEach((term) => {
+      expect(componentText).not.toContain(term);
+    });
   });
 
   it('renders practical VAT bookkeeping guidance for the exact invoice input', () => {
