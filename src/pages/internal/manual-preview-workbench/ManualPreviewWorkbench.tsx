@@ -8,6 +8,7 @@
 // #region Dependencies
 import { useState, useMemo } from 'react';
 import type { ChangeEvent } from 'react';
+import ScannedEvidenceBatchPreview from './ScannedEvidenceBatchPreview';
 import VatMappingTablePreview from './VatMappingTablePreview';
 import { EVIDENCE_FILE_OPERATION_BLOCK_POLICY, EVIDENCE_FOLDER_RELATIONSHIP_POLICY } from '../../../work-spine/evidence/evidence-spine-policy';
 import { OUTPUT_PREVIEW_TYPE_REGISTRY, STATIC_OUTPUT_PREVIEWS } from '../../../work-spine/output-preview/output-preview-seed';
@@ -529,6 +530,7 @@ export default function ManualPreviewWorkbench() {
               hasDuplicateRisk={batchAwareness.hasDuplicateRisk}
               searchableText={searchableText}
             />
+            <ScannedEvidenceBatchPreview searchableText={searchableText} />
           </>
         ) : null}
       </section>

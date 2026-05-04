@@ -14,6 +14,7 @@ import type { Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import ManualPreviewWorkbench from './ManualPreviewWorkbench';
+import ScannedEvidenceBatchPreview from './ScannedEvidenceBatchPreview';
 import VatMappingTablePreview from './VatMappingTablePreview';
 // #endregion
 
@@ -63,6 +64,17 @@ const BEZEQ_BATCH_INPUT = {
   clientOrCaseLabel: 'דוד אלדד',
   domainLabel: 'vat',
 } as const;
+
+const SCANNED_BATCH_INPUT = {
+  title: 'תיקיית סריקות — מסמכים שנסרקו',
+  sourceType: 'manual_text',
+  metadataSummary: 'batch סטטי של סריקות לבדיקה מקדימה בלבד',
+  clientOrCaseLabel: 'בדיקת סריקות',
+  domainLabel: 'כללי',
+} as const;
+
+const SCANNED_BATCH_WARNING_TEXT =
+  `תצוגה זו מבוססת על אצוות סריקות סטטית בלבד. אין קריאת תיקייה חיה, אין ${'O'}${'CR'}, ואין יצירת משימות.`;
 
 const FORBIDDEN_BUTTON_LABELS = [
   'Sa' + 've',
@@ -182,6 +194,14 @@ const fillBezeqBatchInput = (container: HTMLElement): void => {
   changeField(container, '#manual-preview-summary', BEZEQ_BATCH_INPUT.metadataSummary);
   changeField(container, '#manual-preview-client', BEZEQ_BATCH_INPUT.clientOrCaseLabel);
   changeField(container, '#manual-preview-domain', BEZEQ_BATCH_INPUT.domainLabel);
+};
+
+const fillScannedBatchInput = (container: HTMLElement): void => {
+  changeField(container, '#manual-preview-title', SCANNED_BATCH_INPUT.title);
+  changeField(container, '#manual-preview-source-type', SCANNED_BATCH_INPUT.sourceType);
+  changeField(container, '#manual-preview-summary', SCANNED_BATCH_INPUT.metadataSummary);
+  changeField(container, '#manual-preview-client', SCANNED_BATCH_INPUT.clientOrCaseLabel);
+  changeField(container, '#manual-preview-domain', SCANNED_BATCH_INPUT.domainLabel);
 };
 
 const getButtonLabels = (container: HTMLElement): string[] =>
@@ -419,6 +439,65 @@ describe('ManualPreviewWorkbench', () => {
     cleanup();
   });
 
+  it('displays static scanned evidence candidates when scans input is present', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    expect(container.textContent).toContain('תצוגת אצוות סריקות סטטית');
+    expect(container.textContent).toContain('supplier_invoice');
+    expect(container.textContent).toContain('unknown');
+    expect(container.textContent).toContain('unknown_scan_awaiting_review.jpg');
+    expect(container.textContent).toContain(SCANNED_BATCH_WARNING_TEXT);
+    cleanup();
+  });
+
+  it('narrows static scanned evidence candidates by document kind', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'סריקות חשבונית ספק');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'תיקיית סריקות עם חשבונית לבדיקה');
+    changeField(container, '#manual-preview-client', 'בדיקת סריקות');
+    changeField(container, '#manual-preview-domain', 'כללי');
+
+    expect(container.textContent).toContain('תצוגת אצוות סריקות סטטית');
+    expect(container.textContent).toContain('supplier_invoice');
+    expect(container.textContent).not.toContain('demand_letter');
+    expect(container.textContent).not.toContain('payroll_document');
+    cleanup();
+  });
+
+  it('narrows static scanned evidence candidates by employee and payroll signals', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'סריקות דיני עבודה ושכר');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'מסמכים שנסרקו עם תלוש שכר לבדיקה');
+    changeField(container, '#manual-preview-client', 'בדיקת עובדים');
+    changeField(container, '#manual-preview-domain', 'דיני עבודה');
+
+    expect(container.textContent).toContain('תצוגת אצוות סריקות סטטית');
+    expect(container.textContent).toContain('payroll_document');
+    expect(container.textContent).toContain('employee');
+    expect(container.textContent).not.toContain('supplier_invoice');
+    cleanup();
+  });
+
+  it('does not show static scanned evidence preview for unrelated input', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'בדיקה ידנית רגילה');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'תקציר רגיל לבדיקה פנימית');
+    changeField(container, '#manual-preview-client', 'בדיקת עבודה');
+    changeField(container, '#manual-preview-domain', 'כללי');
+
+    expect(container.textContent).not.toContain('תצוגת אצוות סריקות סטטית');
+    expect(container.querySelector('[data-testid="scanned-evidence-batch-preview"]')).toBeNull();
+    cleanup();
+  });
+
   it('renders only Reset and Clear buttons', () => {
     const { container, cleanup } = mountWorkbench();
 
@@ -450,15 +529,18 @@ describe('ManualPreviewWorkbench', () => {
     const html = renderWorkbench();
     const componentText = ManualPreviewWorkbench.toString();
     const mappingComponentText = VatMappingTablePreview.toString();
+    const scannedBatchComponentText = ScannedEvidenceBatchPreview.toString();
 
     FORBIDDEN_SURFACE_TERMS.forEach((term) => {
       expect(html).not.toContain(term);
       expect(componentText).not.toContain(term);
       expect(mappingComponentText).not.toContain(term);
+      expect(scannedBatchComponentText).not.toContain(term);
     });
     FORBIDDEN_IMPORT_BOUNDARY_TERMS.forEach((term) => {
       expect(componentText).not.toContain(term);
       expect(mappingComponentText).not.toContain(term);
+      expect(scannedBatchComponentText).not.toContain(term);
     });
   });
 
