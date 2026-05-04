@@ -7,6 +7,7 @@
 
 // #region Imports
 import { STATIC_SCANNED_EVIDENCE_BATCHES } from '../../../work-spine/scanned-evidence/scanned-evidence-static-batch';
+import HypotheticalScannedTaskShapePreview from './HypotheticalScannedTaskShapePreview';
 import ScannedEvidenceApprovalGatePreview from './ScannedEvidenceApprovalGatePreview';
 // #endregion
 
@@ -30,9 +31,7 @@ interface MatchRule<TValue extends string> {
   terms: readonly string[];
 }
 
-/** Props for CandidateRow. */
 interface CandidateRowProps {
-  /** Static scanned evidence candidate to render. */
   candidate: StaticScannedCandidate;
 }
 // #endregion
@@ -236,6 +235,7 @@ function CandidateRow({ candidate }: CandidateRowProps) {
       <tr>
         <td colSpan={14} style={approvalCellStyle}>
           <ScannedEvidenceApprovalGatePreview candidate={candidate} />
+          <HypotheticalScannedTaskShapePreview candidate={candidate} />
         </td>
       </tr>
     </>

@@ -14,6 +14,7 @@ import type { Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import BrainKnowledgeInventoryPreview from './BrainKnowledgeInventoryPreview';
+import HypotheticalScannedTaskShapePreview from './HypotheticalScannedTaskShapePreview';
 import ManualPreviewWorkbench from './ManualPreviewWorkbench';
 import ScannedEvidenceApprovalGatePreview from './ScannedEvidenceApprovalGatePreview';
 import ScannedEvidenceBatchPreview from './ScannedEvidenceBatchPreview';
@@ -79,6 +80,8 @@ const SCANNED_BATCH_WARNING_TEXT =
   `תצוגה זו מבוססת על אצוות סריקות סטטית בלבד. אין קריאת תיקייה חיה, אין ${'O'}${'CR'}, ואין יצירת משימות.`;
 const SCANNED_APPROVAL_WARNING_TEXT =
   'תצוגת אישור בלבד — לא נוצרת משימה, לא נשלח דבר, ולא מתבצעת פעולה.';
+const HYPOTHETICAL_TASK_SHAPE_WARNING_TEXT =
+  'תצוגת משימה היפותטית בלבד — לא נוצרה משימה, לא נוצר WorkItem, לא נוצר Matter, לא נוצר DocumentRef, ולא נשמר דבר.';
 
 const FORBIDDEN_BUTTON_LABELS = [
   'Sa' + 've',
@@ -161,6 +164,43 @@ const FORBIDDEN_ACTION_BUTTON_WORDS = [
   'sync',
   'import',
   'export',
+] as const;
+
+const FORBIDDEN_HYPOTHETICAL_BUTTON_WORDS = [
+  'cre' + 'ate',
+  'se' + 'nd',
+  'sub' + 'mit',
+  'sa' + 've',
+  'po' + 'st',
+  'fi' + 'le',
+  'exe' + 'cute',
+  'sy' + 'nc',
+  'im' + 'port',
+  'ex' + 'port',
+] as const;
+
+const FORBIDDEN_REAL_OBJECT_FIELD_NAMES = [
+  'ta' + 'skId',
+  'work' + 'ItemId',
+  'matter' + 'Id',
+  'document' + 'RefId',
+] as const;
+
+const FORBIDDEN_HYPOTHETICAL_SOURCE_TERMS = [
+  'pro' + 'vider/',
+  'A' + 'PI',
+  'O' + 'Auth',
+  'from "f' + 's"',
+  "from 'f" + "s'",
+  'O' + 'CRRuntime',
+  'use' + 'Store',
+  'persistence/',
+  'Supa' + 'base',
+  'D' + 'B',
+  'runtime/',
+  'Work' + 'Item;',
+  'Mat' + 'ter;',
+  'Document' + 'Ref;',
 ] as const;
 // #endregion
 
@@ -249,6 +289,9 @@ const getButtonLabels = (container: HTMLElement): string[] =>
 
 const getApprovalPreviews = (container: HTMLElement): HTMLElement[] =>
   Array.from(container.querySelectorAll<HTMLElement>('[data-testid="scanned-evidence-approval-gate-preview"]'));
+
+const getHypotheticalTaskShapePreviews = (container: HTMLElement): HTMLElement[] =>
+  Array.from(container.querySelectorAll<HTMLElement>('[data-testid="hypothetical-scanned-task-shape-preview"]'));
 
 const getKnowledgeInventoryRecords = (container: HTMLElement): HTMLElement[] =>
   Array.from(container.querySelectorAll<HTMLElement>('[data-testid="brain-knowledge-inventory-record"]'));
@@ -706,6 +749,128 @@ describe('ManualPreviewWorkbench', () => {
     FORBIDDEN_ACTION_BUTTON_WORDS.forEach((word) => {
       expect(getButtonLabels(container).join(' ')).not.toContain(word);
     });
+    cleanup();
+  });
+
+  it('renders exact hypothetical scanned task shape warning', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    expect(getHypotheticalTaskShapePreviews(container).length).toBeGreaterThan(0);
+    expect(container.textContent).toContain(HYPOTHETICAL_TASK_SHAPE_WARNING_TEXT);
+    expect(container.textContent).toContain('תצוגת צורת משימה היפותטית');
+    expect(container.textContent).toContain('PREVIEW ONLY');
+    cleanup();
+  });
+
+  it('shows hypothetical-only flags and blocks every operational direction', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    const taskShapePreview = getHypotheticalTaskShapePreviews(container)[0];
+    expect(taskShapePreview).toBeDefined();
+    [
+      'hypotheticalOnlytrue',
+      'previewOnlytrue',
+      'staticOnlytrue',
+      'requiresEldadApprovaltrue',
+      'approvedByEldadfalse',
+      'canCreateWorkItemfalse',
+      'canCreateMatterfalse',
+      'canCreateDocumentReffalse',
+      'canPersistfalse',
+      'canExecutefalse',
+      'canSubmitfalse',
+      'canFilefalse',
+      'evidenceStatusstatic_candidate_preview',
+    ].forEach((expectedText) => {
+      expect(taskShapePreview.textContent?.replace(/\s+/g, '')).toContain(expectedText);
+    });
+    cleanup();
+  });
+
+  it('shows required passive labels and blocked actions for hypothetical task shape', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    const taskShapePreview = getHypotheticalTaskShapePreviews(container)[0];
+    [
+      'Approved by Eldad: false',
+      'Requires Eldad approval',
+      'No operational object exists',
+      'No scan/OCR/file/provider/persistence action occurred',
+      'blockedActions',
+      'create_work_item',
+      'create_matter',
+      'create_document_ref',
+      'persist',
+      'execute',
+      'submit',
+      'file',
+    ].forEach((expectedText) => {
+      expect(taskShapePreview.textContent).toContain(expectedText);
+    });
+    cleanup();
+  });
+
+  it('keeps hypothetical task shape preview without buttons or action button wording', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    getHypotheticalTaskShapePreviews(container).forEach((taskShapePreview) => {
+      expect(taskShapePreview.querySelector('button')).toBeNull();
+    });
+    FORBIDDEN_HYPOTHETICAL_BUTTON_WORDS.forEach((word) => {
+      expect(getButtonLabels(container).join(' ').toLowerCase()).not.toContain(word);
+    });
+    cleanup();
+  });
+
+  it('does not render forbidden real-object field names in hypothetical task shape preview', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    const taskShapeText = getHypotheticalTaskShapePreviews(container)
+      .map((taskShapePreview) => taskShapePreview.textContent ?? '')
+      .join(' ');
+    FORBIDDEN_REAL_OBJECT_FIELD_NAMES.forEach((fieldName) => {
+      expect(taskShapeText).not.toContain(fieldName);
+    });
+    cleanup();
+  });
+
+  it('keeps hypothetical task shape source free of runtime import surfaces', () => {
+    const componentText = HypotheticalScannedTaskShapePreview.toString().replace(
+      'No scan/OCR/file/provider/persistence action occurred',
+      '',
+    );
+
+    FORBIDDEN_HYPOTHETICAL_SOURCE_TERMS.forEach((term) => {
+      expect(componentText).not.toContain(term);
+    });
+  });
+
+  it('proves scan Dima input shows only hypothetical preview visibility', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'סריקות דימה');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'סריקות דימה לבדיקה סטטית בלבד');
+    changeField(container, '#manual-preview-client', 'דימה');
+    changeField(container, '#manual-preview-domain', 'כללי');
+
+    const taskShapePreviews = getHypotheticalTaskShapePreviews(container);
+    expect(taskShapePreviews.length).toBeGreaterThan(0);
+    expect(container.textContent).toContain(HYPOTHETICAL_TASK_SHAPE_WARNING_TEXT);
+    expect(container.textContent).toContain('No operational object exists');
+    expect(container.textContent).toContain('approvedByEldadfalse');
+    expect(container.textContent).not.toContain('preview_only_created');
+    expect(container.textContent).not.toContain('ready_to_execute');
     cleanup();
   });
 
