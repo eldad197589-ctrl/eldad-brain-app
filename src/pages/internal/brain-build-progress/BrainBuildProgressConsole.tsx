@@ -7,22 +7,111 @@ import {
   BRAIN_BUILD_PROGRESS_WARNING,
 } from '../../../work-spine/build-progress/brain-build-progress-console-seed';
 import type {
+  BrainBuildBlockedAction,
+  BrainBuildProofStatus,
   BrainBuildProgressItem,
+  BrainBuildProgressDomain,
   BrainBuildProgressLayer,
+  BrainBuildProgressSafetyStatus,
+  BrainBuildProgressStatus,
+  BrainBuildSurfaceClassification,
 } from '../../../work-spine/build-progress/brain-build-progress-console-types';
 // #endregion
 
 // #region Constants
 const SAFETY_NOTICES = [
-  ['Progress visible does not mean opera', 'tional read', 'iness'].join(''),
-  ['Committed means code exists, not that it is professionally cor', 'rect'].join(''),
-  ['No pro', 'vider connection'].join(''),
-  'No source verification',
-  ['No task, filing, submission, or per', 'sistence action'].join(''),
-  ['Agent A gate required before live or opera', 'tional work'].join(''),
+  'תצוגת התקדמות אינה מוכנות תפעולית',
+  'Commit אומר שקוד קיים, לא שהוא נכון מקצועית',
+  'אין חיבור ספקים',
+  'אין אימות מקור',
+  'אין משימה, תיוק, הגשה או שמירה',
+  'נדרש שער Agent A לפני עבודה חיה או תפעולית',
 ] as const;
 
-const liveActionMetricLabel = ['live actions ac', 'tive'].join('');
+const DETAIL_LABELS = {
+  relatedCommit: 'Commit קשור',
+  visibleRoute: 'איפה רואים',
+  proofScenario: 'הוכחת תצוגה',
+  whatWasBuilt: 'מה נבנה',
+  whatEldadCanSee: 'מה אלדד רואה',
+  nextSafeStep: 'השלב הבטוח הבא',
+  safetyStatus: 'סטטוס בטיחות',
+  currentStatus: 'סטטוס נוכחי',
+  proofStatus: 'סטטוס הוכחה',
+  surfaceClassification: 'סיווג משטח',
+  domain: 'תחום',
+  layer: 'שכבה',
+  responsibleAgent: 'סוכן אחראי',
+} as const;
+
+const STATUS_LABELS: Record<BrainBuildProgressStatus, string> = {
+  built_and_visible: 'נבנה ונראה במסך',
+  built_not_visible: 'נבנה אך טרם מוצג במסך',
+  blocked: 'חסום',
+  planned: 'מתוכנן',
+};
+
+const PROOF_STATUS_LABELS: Record<BrainBuildProofStatus, string> = {
+  visible_static_preview: 'הוכחת תצוגה סטטית',
+  static_reference_recorded: 'נרשם כמקור סטטי',
+  not_visible_as_screen: 'לא מוצג כמסך עצמאי',
+  blocked_by_design: 'חסום בתכנון',
+};
+
+const SURFACE_CLASSIFICATION_LABELS: Record<BrainBuildSurfaceClassification, string> = {
+  preview_only: 'תצוגה מקדימה בלבד',
+  static_visual: 'חזותי סטטי',
+  live_mutation_capable: 'בעל יכולת שינוי חיה',
+  unknown_needs_audit: 'לא ידוע, נדרש Audit',
+};
+
+const SAFETY_STATUS_LABELS: Record<BrainBuildProgressSafetyStatus, string> = {
+  static_progress_console_only: 'לוח התקדמות סטטי בלבד',
+};
+
+const BLOCKED_ACTION_LABELS: Record<BrainBuildBlockedAction, string> = {
+  execute: 'הרצה חסומה',
+  submit: 'הגשה חסומה',
+  send: 'שליחה חסומה',
+  post: 'רישום/פרסום חסום',
+  file: 'תיוק חסום',
+  create_operational_record: 'יצירת רשומה תפעולית חסומה',
+  create_work_item: 'יצירת משימת עבודה חסומה',
+  create_matter: 'יצירת תיק חסומה',
+  create_document_ref: 'יצירת הפניית מסמך חסומה',
+  persist: 'שמירה חסומה',
+  external_connection: 'חיבור חיצוני חסום',
+  source_content_read: 'קריאת תוכן מקור חסומה',
+  agent_autonomy: 'אוטונומיית סוכן חסומה',
+};
+
+const STILL_BLOCKED_LABELS: Record<string, string> = {
+  'no live source access': 'אין גישה חיה למקור',
+  'no source content reading': 'אין קריאת תוכן מקור',
+  'no task or record creation': 'אין יצירת משימה או רשומה',
+  'no filing or submission': 'אין תיוק או הגשה',
+  'no retained state write': 'אין כתיבה למצב שמור',
+};
+
+const DOMAIN_LABELS: Record<BrainBuildProgressDomain, string> = {
+  vat: 'מע״מ',
+  scanned_evidence: 'ראיות סריקה',
+  approval: 'אישור',
+  knowledge: 'ידע',
+  proof: 'הוכחה',
+  intake: 'קלט',
+  visual_surface: 'משטח חזותי',
+};
+
+const LAYER_LABELS: Record<BrainBuildProgressLayer, string> = {
+  manual_workbench: 'המסך הידני',
+  static_evidence: 'ראיות סטטיות',
+  scanned_intake: 'קלט סריקות',
+  approval_gate: 'שער אישור',
+  knowledge_inventory: 'מלאי ידע',
+  proof_inventory: 'מלאי הוכחות',
+  surface_inventory: 'מלאי משטחים',
+};
 // #endregion
 
 // #region Helpers
@@ -38,12 +127,21 @@ const groupProgressItems = (): readonly [BrainBuildProgressLayer, readonly Brain
 const visibleProofScreenCount = (): number =>
   BRAIN_BUILD_PROGRESS_ITEMS.filter((progressItem) => progressItem.currentStatus === 'built_and_visible').length;
 
-const renderList = (items: readonly string[], testId: string) => (
+const translatedStillBlocked = (items: readonly string[]): readonly string[] =>
+  items.map((item) => STILL_BLOCKED_LABELS[item] ?? item);
+
+const translatedBlockedActions = (items: readonly BrainBuildBlockedAction[]): readonly string[] =>
+  items.map((item) => BLOCKED_ACTION_LABELS[item]);
+
+const renderList = (items: readonly string[], testId: string, label?: string) => (
+  <section aria-label={label}>
+    {label ? <h4 style={{ margin: '12px 0 4px' }}>{label}</h4> : null}
   <ul data-testid={testId} style={{ margin: '8px 0 0', paddingInlineStart: 20 }}>
     {items.map((item) => (
       <li key={item}>{item}</li>
     ))}
   </ul>
+  </section>
 );
 // #endregion
 
@@ -77,7 +175,7 @@ function ProgressHeader() {
     <section aria-label="מסך התקדמות בניית המוח" style={{ background: 'rgba(15, 23, 42, 0.72)', border: '1px solid rgba(148, 163, 184, 0.22)', borderRadius: 12, padding: 20 }}>
       <p style={{ color: '#fbbf24', fontWeight: 700, margin: 0 }}>{BRAIN_BUILD_PROGRESS_WARNING}</p>
       <h1 style={{ fontSize: 28, margin: '12px 0 8px' }}>מסך התקדמות בניית המוח</h1>
-      <p style={{ color: '#b6c2d1', margin: 0 }}>Brain Build Progress Console · {BRAIN_BUILD_PROGRESS_ROUTE}</p>
+      <p style={{ color: '#b6c2d1', margin: 0 }}>מסך התקדמות בניית המוח · {BRAIN_BUILD_PROGRESS_ROUTE}</p>
       {renderList(SAFETY_NOTICES, 'build-progress-safety-notices')}
     </section>
   );
@@ -86,9 +184,9 @@ function ProgressHeader() {
 function ProgressMetrics() {
   return (
     <section data-testid="build-progress-top-metrics" style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', marginTop: 18 }}>
-      <MetricCard label="committed checkpoints count" value={BRAIN_BUILD_PROGRESS_ITEMS.length} />
-      <MetricCard label="visible proof screens count" value={visibleProofScreenCount()} />
-      <MetricCard label={liveActionMetricLabel} value={0} />
+      <MetricCard label="נקודות בנייה שננעלו" value={BRAIN_BUILD_PROGRESS_ITEMS.length} />
+      <MetricCard label="הוכחות תצוגה פעילות" value={visibleProofScreenCount()} />
+      <MetricCard label="פעולות חיות פעילות" value={0} />
     </section>
   );
 }
@@ -104,13 +202,19 @@ function MetricCard({ label, value }: MetricCardProps) {
 
 function ProgressDetails({ progressItem }: ProgressItemCardProps) {
   const details = [
-    ['relatedCommit', progressItem.relatedCommit],
-    ['visibleRoute', progressItem.visibleRoute ?? 'אין מסך עצמאי'],
-    ['proofScenario', `${progressItem.proofScenario.input} · ${progressItem.proofScenario.expectedVisibleResult}`],
-    ['whatWasBuilt', progressItem.whatWasBuilt],
-    ['whatEldadCanSee', progressItem.whatEldadCanSee],
-    ['nextSafeStep', progressItem.nextSafeStep],
-    ['safetyStatus', progressItem.safetyStatus],
+    [DETAIL_LABELS.domain, DOMAIN_LABELS[progressItem.domain]],
+    [DETAIL_LABELS.layer, LAYER_LABELS[progressItem.layer]],
+    [DETAIL_LABELS.relatedCommit, progressItem.relatedCommit],
+    [DETAIL_LABELS.visibleRoute, progressItem.visibleRoute ?? 'אין מסך עצמאי'],
+    [DETAIL_LABELS.proofScenario, `${progressItem.proofScenario.input} · ${progressItem.proofScenario.expectedVisibleResult}`],
+    [DETAIL_LABELS.currentStatus, STATUS_LABELS[progressItem.currentStatus]],
+    [DETAIL_LABELS.proofStatus, PROOF_STATUS_LABELS[progressItem.proofStatus]],
+    [DETAIL_LABELS.surfaceClassification, SURFACE_CLASSIFICATION_LABELS[progressItem.surfaceClassification]],
+    [DETAIL_LABELS.whatWasBuilt, progressItem.whatWasBuilt],
+    [DETAIL_LABELS.whatEldadCanSee, progressItem.whatEldadCanSee],
+    [DETAIL_LABELS.nextSafeStep, progressItem.nextSafeStep],
+    [DETAIL_LABELS.responsibleAgent, progressItem.responsibleAgent],
+    [DETAIL_LABELS.safetyStatus, SAFETY_STATUS_LABELS[progressItem.safetyStatus]],
   ] as const;
 
   return (
@@ -129,10 +233,12 @@ function ProgressItemCard({ progressItem }: ProgressItemCardProps) {
   return (
     <article key={progressItem.progressItemId} data-testid="build-progress-item" style={{ background: 'rgba(17, 24, 39, 0.88)', border: '1px solid rgba(148, 163, 184, 0.18)', borderRadius: 10, padding: 16 }}>
       <h3 style={{ margin: '0 0 8px' }}>{progressItem.title}</h3>
-      <p style={{ margin: '0 0 10px', color: '#cbd5e1' }}>{progressItem.currentStatus} · {progressItem.proofStatus} · {progressItem.surfaceClassification}</p>
+      <p style={{ margin: '0 0 10px', color: '#cbd5e1' }}>
+        {STATUS_LABELS[progressItem.currentStatus]} · {PROOF_STATUS_LABELS[progressItem.proofStatus]} · {SURFACE_CLASSIFICATION_LABELS[progressItem.surfaceClassification]}
+      </p>
       <ProgressDetails progressItem={progressItem} />
-      {renderList(progressItem.whatIsStillBlocked, 'build-progress-still-blocked')}
-      {renderList(progressItem.blockedActions, 'build-progress-blocked-actions')}
+      {renderList(translatedStillBlocked(progressItem.whatIsStillBlocked), 'build-progress-still-blocked', 'מה עדיין חסום')}
+      {renderList(translatedBlockedActions(progressItem.blockedActions), 'build-progress-blocked-actions', 'פעולות חסומות')}
     </article>
   );
 }
@@ -140,7 +246,7 @@ function ProgressItemCard({ progressItem }: ProgressItemCardProps) {
 function ProgressLayerSection({ layer, progressItems }: ProgressLayerSectionProps) {
   return (
     <section data-testid="build-progress-layer" style={{ marginTop: 24 }}>
-      <h2 style={{ color: '#93c5fd', fontSize: 20 }}>{layer}</h2>
+      <h2 style={{ color: '#93c5fd', fontSize: 20 }}>{LAYER_LABELS[layer]}</h2>
       <div style={{ display: 'grid', gap: 14 }}>
         {progressItems.map((progressItem) => <ProgressItemCard key={progressItem.progressItemId} progressItem={progressItem} />)}
       </div>

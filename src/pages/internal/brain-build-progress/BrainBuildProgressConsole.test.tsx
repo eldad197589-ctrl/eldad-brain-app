@@ -27,12 +27,97 @@ reactActEnvironment.IS_REACT_ACT_ENVIRONMENT = true;
 
 // #region Constants
 const REQUIRED_SAFETY_NOTICES = [
-  'Progress visible does not mean operational readiness',
-  'Committed means code exists, not that it is professionally correct',
-  'No provider connection',
-  'No source verification',
-  'No task, filing, submission, or persistence action',
-  'Agent A gate required before live or operational work',
+  'תצוגת התקדמות אינה מוכנות תפעולית',
+  'Commit אומר שקוד קיים, לא שהוא נכון מקצועית',
+  'אין חיבור ספקים',
+  'אין אימות מקור',
+  'אין משימה, תיוק, הגשה או שמירה',
+  'נדרש שער Agent A לפני עבודה חיה או תפעולית',
+] as const;
+
+const REQUIRED_HEBREW_FIELD_LABELS = [
+  'Commit קשור',
+  'איפה רואים',
+  'הוכחת תצוגה',
+  'מה נבנה',
+  'מה אלדד רואה',
+  'השלב הבטוח הבא',
+  'סטטוס בטיחות',
+  'סטטוס נוכחי',
+  'סטטוס הוכחה',
+  'סיווג משטח',
+  'תחום',
+  'שכבה',
+  'סוכן אחראי',
+  'פעולות חסומות',
+] as const;
+
+const REQUIRED_HEBREW_STATUS_VALUES = [
+  'נבנה ונראה במסך',
+  'נבנה אך טרם מוצג במסך',
+  'הוכחת תצוגה סטטית',
+  'נרשם כמקור סטטי',
+  'לא מוצג כמסך עצמאי',
+  'תצוגה מקדימה בלבד',
+  'חזותי סטטי',
+  'לוח התקדמות סטטי בלבד',
+] as const;
+
+const REQUIRED_HEBREW_BLOCKED_ACTIONS = [
+  'אין גישה חיה למקור',
+  'אין קריאת תוכן מקור',
+  'אין יצירת משימה או רשומה',
+  'אין תיוק או הגשה',
+  'אין כתיבה למצב שמור',
+  'הרצה חסומה',
+  'הגשה חסומה',
+  'שליחה חסומה',
+  'רישום/פרסום חסום',
+  'תיוק חסום',
+  'יצירת רשומה תפעולית חסומה',
+  'יצירת משימת עבודה חסומה',
+  'יצירת תיק חסומה',
+  'יצירת הפניית מסמך חסומה',
+  'שמירה חסומה',
+  'חיבור חיצוני חסום',
+  'קריאת תוכן מקור חסומה',
+  'אוטונומיית סוכן חסומה',
+] as const;
+
+const REQUIRED_HEBREW_ITEM_TITLES = [
+  'תצוגת טבלת מיפוי מע״מ',
+  'מאגר ראיות מע״מ סטטי',
+  'אצוות ראיות סריקה סטטית',
+  'תצוגת אצוות סריקות',
+  'תצוגת שער אישור',
+  'מלאי ידע שלב 1',
+  'תצוגת מלאי ידע',
+  'רשימת בדיקת הוכחת תצוגה סטטית',
+  'מועמדי ידע בטוחים שלב 2',
+  'תצוגת צורת משימה היפותטית',
+  'סיכום רמזי קלט',
+  'מלאי משטחי מוח חזותיים',
+] as const;
+
+const FORBIDDEN_VISIBLE_INTERNAL_LABELS = [
+  'relatedCommit',
+  'visibleRoute',
+  'proofScenario',
+  'whatWasBuilt',
+  'whatEldadCanSee',
+  'nextSafeStep',
+  'safetyStatus',
+  'built_and_visible',
+  'built_not_visible',
+  'visible_static_preview',
+  'static_reference_recorded',
+  'preview_only',
+  'static_progress_console_only',
+  'execute',
+  'submit',
+  'create_work_item',
+  'create_matter',
+  'create_document_ref',
 ] as const;
 
 const BANNED_ACTION_WORDING = [
@@ -139,33 +224,57 @@ describe('BrainBuildProgressConsole', () => {
       expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(12);
       const metricsText = container.querySelector('[data-testid="build-progress-top-metrics"]')?.textContent ?? '';
 
-      expect(metricsText).toContain('committed checkpoints count');
+      expect(metricsText).toContain('נקודות בנייה שננעלו');
       expect(metricsText).toContain('12');
-      expect(metricsText).toContain('visible proof screens count');
+      expect(metricsText).toContain('הוכחות תצוגה פעילות');
       expect(metricsText).toContain('6');
-      expect(metricsText).toContain('live actions active');
+      expect(metricsText).toContain('פעולות חיות פעילות');
       expect(metricsText).toContain('0');
     } finally {
       cleanup();
     }
   });
 
-  it('shows visible route, proof scenario, blocked actions, and recent commits', () => {
+  it('shows visible route, proof scenario, blocked actions, and recent commits in Hebrew-first copy', () => {
     const html = renderConsole();
 
     expect(html).toContain('/internal/manual-preview-workbench');
     expect(html).toContain('סריקות דימה');
     expect(html).toContain('ee3a06f');
     expect(html).toContain('edf165d');
-    expect(html).toContain('execute');
-    expect(html).toContain('external_connection');
+    expect(html).toContain('הרצה חסומה');
+    expect(html).toContain('חיבור חיצוני חסום');
   });
 
-  it('renders the required safety notices', () => {
+  it('renders the required Hebrew safety notices, labels, statuses, and item titles', () => {
     const html = renderConsole();
 
     for (const notice of REQUIRED_SAFETY_NOTICES) {
       expect(html).toContain(notice);
+    }
+
+    for (const label of REQUIRED_HEBREW_FIELD_LABELS) {
+      expect(html).toContain(label);
+    }
+
+    for (const status of REQUIRED_HEBREW_STATUS_VALUES) {
+      expect(html).toContain(status);
+    }
+
+    for (const blockedAction of REQUIRED_HEBREW_BLOCKED_ACTIONS) {
+      expect(html).toContain(blockedAction);
+    }
+
+    for (const title of REQUIRED_HEBREW_ITEM_TITLES) {
+      expect(html).toContain(title);
+    }
+  });
+
+  it('does not render raw English or internal progress labels', () => {
+    const renderedText = renderConsole();
+
+    for (const internalLabel of FORBIDDEN_VISIBLE_INTERNAL_LABELS) {
+      expect(renderedText).not.toContain(internalLabel);
     }
   });
 
