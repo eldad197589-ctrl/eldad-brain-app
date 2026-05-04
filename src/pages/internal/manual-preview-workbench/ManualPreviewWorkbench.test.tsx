@@ -13,6 +13,7 @@ import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
+import BrainKnowledgeInventoryPreview from './BrainKnowledgeInventoryPreview';
 import ManualPreviewWorkbench from './ManualPreviewWorkbench';
 import ScannedEvidenceApprovalGatePreview from './ScannedEvidenceApprovalGatePreview';
 import ScannedEvidenceBatchPreview from './ScannedEvidenceBatchPreview';
@@ -154,6 +155,12 @@ const FORBIDDEN_ACTION_BUTTON_WORDS = [
   'שלח',
   'הגש',
   'שמור',
+  'post',
+  'file',
+  'execute',
+  'sync',
+  'import',
+  'export',
 ] as const;
 // #endregion
 
@@ -242,6 +249,9 @@ const getButtonLabels = (container: HTMLElement): string[] =>
 
 const getApprovalPreviews = (container: HTMLElement): HTMLElement[] =>
   Array.from(container.querySelectorAll<HTMLElement>('[data-testid="scanned-evidence-approval-gate-preview"]'));
+
+const getKnowledgeInventoryRecords = (container: HTMLElement): HTMLElement[] =>
+  Array.from(container.querySelectorAll<HTMLElement>('[data-testid="brain-knowledge-inventory-record"]'));
 // #endregion
 
 // #region Tests
@@ -532,6 +542,134 @@ describe('ManualPreviewWorkbench', () => {
     cleanup();
   });
 
+  it('shows Dima as partial_static and scanned intake as committed_static for scan Dima input', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'סריקות דימה');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'סריקות דימה לבדיקה סטטית בלבד');
+    changeField(container, '#manual-preview-client', 'דימה');
+    changeField(container, '#manual-preview-domain', 'כללי');
+
+    expect(getKnowledgeInventoryRecords(container)).toHaveLength(2);
+    expect(container.textContent).toContain('Dima case work context');
+    expect(container.textContent).toContain('partial_static');
+    expect(container.textContent).toContain('הקשר חלקי בלבד — נדרש אימות מקור');
+    expect(container.textContent).toContain('Static scanned intake evidence batch');
+    expect(container.textContent).toContain('committed_static');
+    expect(container.textContent).toContain('Static historical inventory only. Not approved or binding knowledge.');
+    cleanup();
+  });
+
+  it('shows Tsila payroll context as known_context_only only when Tsila and payroll are both present', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'צילה שכר');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'הקשר ידוע בלבד לתיק צילה ושכר');
+    changeField(container, '#manual-preview-client', 'צילה');
+    changeField(container, '#manual-preview-domain', 'שכר');
+
+    expect(getKnowledgeInventoryRecords(container)).toHaveLength(1);
+    expect(container.textContent).toContain('Tsila wage-rights and payroll context');
+    expect(container.textContent).toContain('known_context_only');
+    expect(container.textContent).toContain('הקשר ידוע בלבד — לא ראיה מחייבת');
+    cleanup();
+  });
+
+  it('shows VAT static evidence with no-live-Maven warning for VAT Maven Bezeq input', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'מע״מ מייבן בזק');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'בדיקת מע״מ מייבן בזק בתצוגה סטטית');
+    changeField(container, '#manual-preview-client', 'דוד אלדד');
+    changeField(container, '#manual-preview-domain', 'VAT');
+
+    expect(getKnowledgeInventoryRecords(container)).toHaveLength(1);
+    expect(container.textContent).toContain('VAT static evidence and bookkeeping reconciliation examples');
+    expect(container.textContent).toContain('vat_evidence');
+    expect(container.textContent).toContain('אין גישה חיה למייבן. אין חיבור ספק. רמז סטטי בלבד.');
+    cleanup();
+  });
+
+  it('shows static scanned intake only for scans input alone', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'סריקות');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'scan batch');
+    changeField(container, '#manual-preview-client', 'כללי');
+    changeField(container, '#manual-preview-domain', 'כללי');
+
+    expect(getKnowledgeInventoryRecords(container)).toHaveLength(1);
+    expect(container.textContent).toContain('Static scanned intake evidence batch');
+    expect(container.textContent).not.toContain('VAT static evidence');
+    expect(container.textContent).not.toContain('Dima case work context');
+    cleanup();
+  });
+
+  it('does not trigger VAT or red-route knowledge from the substring in documents', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'מסמכים כלליים');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'רשימת מסמכים כלליים ללא מסלול מקצועי');
+    changeField(container, '#manual-preview-client', 'כללי');
+    changeField(container, '#manual-preview-domain', 'כללי');
+
+    expect(container.textContent).toContain('ידע קשור שכבר קיים במוח');
+    expect(getKnowledgeInventoryRecords(container)).toHaveLength(0);
+    expect(container.textContent).not.toContain('VAT static evidence');
+    expect(container.textContent).not.toContain('War compensation red route knowledge');
+    cleanup();
+  });
+
+  it('does not overmatch payroll knowledge from payroll alone', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'שכר');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'בדיקה כללית');
+    changeField(container, '#manual-preview-client', 'כללי');
+    changeField(container, '#manual-preview-domain', 'שכר');
+
+    expect(getKnowledgeInventoryRecords(container)).toHaveLength(0);
+    expect(container.textContent).not.toContain('Tsila wage-rights and payroll context');
+    expect(container.textContent).not.toContain('Attendance and payroll calculation context');
+    cleanup();
+  });
+
+  it('shows blockedActions and all safety flags for every displayed knowledge record', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'סריקות דימה מע״מ מייבן בזק צילה שכר');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'סריקות דימה וגם מע״מ מייבן בזק וגם צילה שכר');
+    changeField(container, '#manual-preview-client', 'דימה צילה');
+    changeField(container, '#manual-preview-domain', 'VAT');
+
+    const records = getKnowledgeInventoryRecords(container);
+    expect(records.length).toBeGreaterThan(0);
+    records.forEach((record) => {
+      [
+        'blockedActions:',
+        'previewOnly:true',
+        'staticOnly:true',
+        'bindingKnowledge:false',
+        'canExecute:false',
+        'canPersist:false',
+        'sourceVerified:false',
+        'requiredVerification:',
+        'sourceLocation:',
+        'sourceTrace:',
+      ].forEach((expectedText) => {
+        expect(record.textContent).toContain(expectedText);
+      });
+    });
+    cleanup();
+  });
+
   it('displays approval preview for scanned evidence candidates', () => {
     const { container, cleanup } = mountWorkbench();
 
@@ -604,6 +742,7 @@ describe('ManualPreviewWorkbench', () => {
     const mappingComponentText = VatMappingTablePreview.toString();
     const scannedBatchComponentText = ScannedEvidenceBatchPreview.toString();
     const scannedApprovalComponentText = ScannedEvidenceApprovalGatePreview.toString();
+    const knowledgeInventoryComponentText = BrainKnowledgeInventoryPreview.toString();
 
     FORBIDDEN_SURFACE_TERMS.forEach((term) => {
       expect(html).not.toContain(term);
@@ -611,12 +750,14 @@ describe('ManualPreviewWorkbench', () => {
       expect(mappingComponentText).not.toContain(term);
       expect(scannedBatchComponentText).not.toContain(term);
       expect(scannedApprovalComponentText).not.toContain(term);
+      expect(knowledgeInventoryComponentText).not.toContain(term);
     });
     FORBIDDEN_IMPORT_BOUNDARY_TERMS.forEach((term) => {
       expect(componentText).not.toContain(term);
       expect(mappingComponentText).not.toContain(term);
       expect(scannedBatchComponentText).not.toContain(term);
       expect(scannedApprovalComponentText).not.toContain(term);
+      expect(knowledgeInventoryComponentText).not.toContain(term);
     });
     FORBIDDEN_APPROVAL_SOURCE_TERMS.forEach((term) => {
       expect(scannedApprovalComponentText).not.toContain(term);

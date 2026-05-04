@@ -8,6 +8,7 @@
 // #region Dependencies
 import { useState, useMemo } from 'react';
 import type { ChangeEvent } from 'react';
+import BrainKnowledgeInventoryPreview from './BrainKnowledgeInventoryPreview';
 import ScannedEvidenceBatchPreview from './ScannedEvidenceBatchPreview';
 import VatMappingTablePreview from './VatMappingTablePreview';
 import { EVIDENCE_FILE_OPERATION_BLOCK_POLICY, EVIDENCE_FOLDER_RELATIONSHIP_POLICY } from '../../../work-spine/evidence/evidence-spine-policy';
@@ -531,6 +532,7 @@ export default function ManualPreviewWorkbench() {
               searchableText={searchableText}
             />
             <ScannedEvidenceBatchPreview searchableText={searchableText} />
+            <BrainKnowledgeInventoryPreview searchableText={searchableText} />
           </>
         ) : null}
       </section>
