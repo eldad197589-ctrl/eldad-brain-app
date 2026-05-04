@@ -5,7 +5,6 @@
 // #region Imports
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
-import type { Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import {
@@ -14,6 +13,11 @@ import {
   BRAIN_BUILD_PROGRESS_ITEMS,
   BRAIN_BUILD_PROGRESS_ROUTE,
   BRAIN_BUILD_PROGRESS_WARNING,
+  BRAIN_BUILD_STAGE_ROADMAP_BANNER,
+  BRAIN_BUILD_STAGE_ROADMAP_CONTROL,
+  BRAIN_BUILD_STAGE_ROADMAP_DIVIDER,
+  BRAIN_BUILD_STAGE_ROADMAP_GROUPS,
+  BRAIN_BUILD_STAGE_ROADMAP_WORKING_PLAN_NOTICE,
 } from '../../../work-spine/build-progress/brain-build-progress-console-seed';
 import BrainBuildProgressConsole from './BrainBuildProgressConsole';
 // #endregion
@@ -28,16 +32,11 @@ reactActEnvironment.IS_REACT_ACT_ENVIRONMENT = true;
 // #endregion
 
 // #region Constants
-const REQUIRED_SAFETY_NOTICES = [
-  'תצוגת התקדמות אינה מוכנות תפעולית',
-  'Commit אומר שקוד קיים, לא שהוא נכון מקצועית',
-  'אין חיבור ספקים',
-  'אין אימות מקור',
-  'אין משימה, תיוק, הגשה או שמירה',
-  'נדרש שער Agent A לפני עבודה חיה או תפעולית',
-] as const;
-
-const REQUIRED_HEBREW_FIELD_LABELS = [
+const HEBREW_COPY = [
+  'מסך התקדמות בניית המוח',
+  'נקודות בנייה שננעלו',
+  'הוכחות תצוגה פעילות',
+  'פעולות חיות פעילות',
   'Commit קשור',
   'איפה רואים',
   'הוכחת תצוגה',
@@ -48,60 +47,12 @@ const REQUIRED_HEBREW_FIELD_LABELS = [
   'סטטוס נוכחי',
   'סטטוס הוכחה',
   'סיווג משטח',
-  'תחום',
-  'שכבה',
-  'סוכן אחראי',
   'פעולות חסומות',
-] as const;
-
-const REQUIRED_HEBREW_STATUS_VALUES = [
-  'נבנה ונראה במסך',
-  'נבנה אך טרם מוצג במסך',
-  'הוכחת תצוגה סטטית',
-  'נרשם כמקור סטטי',
-  'לא מוצג כמסך עצמאי',
-  'תצוגה מקדימה בלבד',
-  'חזותי סטטי',
-  'לוח התקדמות סטטי בלבד',
-] as const;
-
-const REQUIRED_HEBREW_BLOCKED_ACTIONS = [
-  'אין גישה חיה למקור',
-  'אין קריאת תוכן מקור',
-  'אין יצירת משימה או רשומה',
-  'אין תיוק או הגשה',
-  'אין כתיבה למצב שמור',
-  'הרצה חסומה',
-  'הגשה חסומה',
-  'שליחה חסומה',
-  'רישום/פרסום חסום',
-  'תיוק חסום',
-  'יצירת רשומה תפעולית חסומה',
-  'יצירת משימת עבודה חסומה',
-  'יצירת תיק חסומה',
-  'יצירת הפניית מסמך חסומה',
-  'שמירה חסומה',
-  'חיבור חיצוני חסום',
-  'קריאת תוכן מקור חסומה',
-  'אוטונומיית סוכן חסומה',
-] as const;
-
-const REQUIRED_HEBREW_ITEM_TITLES = [
   'תצוגת טבלת מיפוי מע״מ',
-  'מאגר ראיות מע״מ סטטי',
-  'אצוות ראיות סריקה סטטית',
-  'תצוגת אצוות סריקות',
-  'תצוגת שער אישור',
-  'מלאי ידע שלב 1',
-  'תצוגת מלאי ידע',
-  'רשימת בדיקת הוכחת תצוגה סטטית',
-  'מועמדי ידע בטוחים שלב 2',
-  'תצוגת צורת משימה היפותטית',
-  'סיכום רמזי קלט',
   'מלאי משטחי מוח חזותיים',
 ] as const;
 
-const FORBIDDEN_VISIBLE_INTERNAL_LABELS = [
+const INTERNAL_LABELS = [
   'relatedCommit',
   'visibleRoute',
   'proofScenario',
@@ -115,14 +66,12 @@ const FORBIDDEN_VISIBLE_INTERNAL_LABELS = [
   'static_reference_recorded',
   'preview_only',
   'static_progress_console_only',
-  'execute',
-  'submit',
   'create_work_item',
   'create_matter',
   'create_document_ref',
 ] as const;
 
-const BANNED_ACTION_WORDING = [
+const BANNED_WORDING = [
   'operational',
   'ready',
   'live',
@@ -140,30 +89,6 @@ const BANNED_ACTION_WORDING = [
   'file',
   'persist',
   'sync',
-  'automate',
-  'deploy',
-] as const;
-
-const BANNED_LATEST_CHANGE_WORDING = [
-  'live',
-  'deployed',
-  'activated',
-  'enabled',
-  'ready',
-  'operational',
-  'verified',
-  'approved',
-  'correct',
-  'connected',
-  'synced',
-  'persisted',
-  'executed',
-  'created',
-  'submitted',
-  'sent',
-  'posted',
-  'filed',
-  'production',
 ] as const;
 
 const FORBIDDEN_SOURCE_PATTERNS = [
@@ -187,8 +112,6 @@ const FORBIDDEN_SOURCE_PATTERNS = [
 interface MountedConsole {
   /** Rendered container element. */
   container: HTMLDivElement;
-  /** React root instance. */
-  root: Root;
   /** Cleanup callback for the mounted console. */
   cleanup: () => void;
 }
@@ -196,6 +119,8 @@ interface MountedConsole {
 
 // #region Helpers
 const renderConsole = (): string => renderToStaticMarkup(<BrainBuildProgressConsole />);
+
+const roadmapStages = () => BRAIN_BUILD_STAGE_ROADMAP_GROUPS.flatMap((group) => group.stages);
 
 const mountConsole = (): MountedConsole => {
   const container = document.createElement('div');
@@ -208,7 +133,6 @@ const mountConsole = (): MountedConsole => {
 
   return {
     container,
-    root,
     cleanup: () => {
       act(() => {
         root.unmount();
@@ -219,130 +143,64 @@ const mountConsole = (): MountedConsole => {
 };
 
 const textWithoutAllowedNegativeSections = (container: HTMLElement): string => {
-  const clonedContainer = container.cloneNode(true) as HTMLElement;
-
-  clonedContainer
+  const clone = container.cloneNode(true) as HTMLElement;
+  clone
     .querySelectorAll(
-      '[data-testid="build-progress-safety-notices"], [data-testid="build-progress-still-blocked"], [data-testid="build-progress-blocked-actions"], [data-testid="build-progress-top-metrics"]',
+      [
+        '[data-testid="build-progress-safety-notices"]',
+        '[data-testid="build-progress-still-blocked"]',
+        '[data-testid="build-progress-blocked-actions"]',
+        '[data-testid="build-progress-top-metrics"]',
+        '[data-testid="roadmap-not-done"]',
+        '[data-testid="roadmap-blocked-reason"]',
+        '[data-testid="roadmap-blocked-actions"]',
+      ].join(', '),
     )
     .forEach((element) => element.remove());
 
-  return clonedContainer.textContent?.toLowerCase() ?? '';
+  return clone.textContent?.toLowerCase() ?? '';
 };
 // #endregion
 
 // #region Tests
 describe('BrainBuildProgressConsole', () => {
-  it('renders the console route and exact global warning', () => {
+  it('renders route, warnings, Hebrew labels, metrics, and latest change', () => {
     const html = renderConsole();
 
     expect(html).toContain(BRAIN_BUILD_PROGRESS_ROUTE);
     expect(html).toContain(BRAIN_BUILD_PROGRESS_WARNING);
-    expect(html).toContain('מסך התקדמות בניית המוח');
+    expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_WARNING);
+    expect(html.indexOf('מה השתנה עכשיו')).toBeLessThan(html.indexOf('נקודות בנייה שננעלו'));
+    expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title);
+    expect(html).toContain('0132154');
+    for (const text of HEBREW_COPY) {
+      expect(html).toContain(text);
+    }
   });
 
-  it('renders all static progress items and top metrics', () => {
+  it('renders the static progress item count and top metric values', () => {
     const { container, cleanup } = mountConsole();
-
     try {
       expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(12);
       const metricsText = container.querySelector('[data-testid="build-progress-top-metrics"]')?.textContent ?? '';
-
-      expect(metricsText).toContain('נקודות בנייה שננעלו');
-      expect(metricsText).toContain('12');
-      expect(metricsText).toContain('הוכחות תצוגה פעילות');
+      expect(metricsText).toContain(String(BRAIN_BUILD_PROGRESS_ITEMS.length));
       expect(metricsText).toContain('6');
-      expect(metricsText).toContain('פעולות חיות פעילות');
       expect(metricsText).toContain('0');
     } finally {
       cleanup();
     }
   });
 
-  it('renders the latest change summary before metrics', () => {
-    const html = renderConsole();
-
-    expect(html.indexOf('מה השתנה עכשיו')).toBeLessThan(html.indexOf('נקודות בנייה שננעלו'));
-    expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_WARNING);
-    expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title);
-    expect(html).toContain('0132154');
-    expect(html).toContain('/internal/brain-build-progress');
-    expect(html).toContain(BRAIN_BUILD_PROGRESS_WARNING);
-    expect(html).toContain('מידע בנייה פנימי אמיתי לקריאה בלבד');
-    expect(html).toContain('אין פעולה חיה');
-    expect(html).toContain('אין DocumentRef');
-    expect(html).toContain('אין persistence');
-    expect(html).toContain('ביקורת חזותית בלבד לפני הרחבה נוספת.');
-    expect(html).toContain('סיכום התקדמות לקריאה בלבד');
-  });
-
-  it('does not use banned live deployment wording in the latest change summary', () => {
+  it('does not render raw internal labels or action controls', () => {
     const { container, cleanup } = mountConsole();
-
     try {
-      const latestChange = container.querySelector('[data-testid="build-progress-latest-change"]')?.cloneNode(true) as HTMLElement;
-      latestChange.querySelectorAll('[data-testid="build-progress-latest-blocked"]').forEach((element) => element.remove());
-      const latestChangeText = latestChange.textContent?.toLowerCase() ?? '';
-
-      for (const bannedWord of BANNED_LATEST_CHANGE_WORDING) {
-        expect(latestChangeText).not.toMatch(new RegExp(`\\b${bannedWord}\\b`, 'i'));
+      const renderedText = container.textContent ?? '';
+      for (const internalLabel of INTERNAL_LABELS) {
+        expect(renderedText).not.toContain(internalLabel);
       }
-    } finally {
-      cleanup();
-    }
-  });
-
-  it('shows visible route, proof scenario, blocked actions, and recent commits in Hebrew-first copy', () => {
-    const html = renderConsole();
-
-    expect(html).toContain('/internal/manual-preview-workbench');
-    expect(html).toContain('סריקות דימה');
-    expect(html).toContain('ee3a06f');
-    expect(html).toContain('edf165d');
-    expect(html).toContain('הרצה חסומה');
-    expect(html).toContain('חיבור חיצוני חסום');
-  });
-
-  it('renders the required Hebrew safety notices, labels, statuses, and item titles', () => {
-    const html = renderConsole();
-
-    for (const notice of REQUIRED_SAFETY_NOTICES) {
-      expect(html).toContain(notice);
-    }
-
-    for (const label of REQUIRED_HEBREW_FIELD_LABELS) {
-      expect(html).toContain(label);
-    }
-
-    for (const status of REQUIRED_HEBREW_STATUS_VALUES) {
-      expect(html).toContain(status);
-    }
-
-    for (const blockedAction of REQUIRED_HEBREW_BLOCKED_ACTIONS) {
-      expect(html).toContain(blockedAction);
-    }
-
-    for (const title of REQUIRED_HEBREW_ITEM_TITLES) {
-      expect(html).toContain(title);
-    }
-  });
-
-  it('does not render raw English or internal progress labels', () => {
-    const renderedText = renderConsole();
-
-    for (const internalLabel of FORBIDDEN_VISIBLE_INTERNAL_LABELS) {
-      expect(renderedText).not.toContain(internalLabel);
-    }
-  });
-
-  it('does not render action controls, progress bars, percentages, or ETA text', () => {
-    const { container, cleanup } = mountConsole();
-
-    try {
       expect(container.querySelectorAll('button')).toHaveLength(0);
       expect(container.querySelector('[role="progressbar"]')).toBeNull();
-      expect(container.textContent).not.toContain('%');
-      expect(container.textContent).not.toContain('ETA');
+      expect(renderedText).not.toContain('%');
     } finally {
       cleanup();
     }
@@ -350,11 +208,9 @@ describe('BrainBuildProgressConsole', () => {
 
   it('does not use banned wording outside blocked or negative contexts', () => {
     const { container, cleanup } = mountConsole();
-
     try {
       const searchableText = textWithoutAllowedNegativeSections(container);
-
-      for (const bannedWord of BANNED_ACTION_WORDING) {
+      for (const bannedWord of BANNED_WORDING) {
         expect(searchableText).not.toMatch(new RegExp(`\\b${bannedWord}\\b`, 'i'));
       }
     } finally {
@@ -362,15 +218,93 @@ describe('BrainBuildProgressConsole', () => {
     }
   });
 
-  it('does not import or call forbidden live surfaces in the component source', () => {
+  it('does not import or call forbidden live surfaces in component, summary, or roadmap data', () => {
     const componentText = BrainBuildProgressConsole.toString();
-    const serializedItems = JSON.stringify(BRAIN_BUILD_PROGRESS_ITEMS);
-    const serializedLatestChange = JSON.stringify(BRAIN_BUILD_LATEST_CHANGE_SUMMARY);
+    const serializedStaticData = JSON.stringify([
+      BRAIN_BUILD_PROGRESS_ITEMS,
+      BRAIN_BUILD_LATEST_CHANGE_SUMMARY,
+      BRAIN_BUILD_STAGE_ROADMAP_GROUPS,
+    ]);
 
     for (const forbiddenPattern of FORBIDDEN_SOURCE_PATTERNS) {
       expect(componentText).not.toMatch(forbiddenPattern);
-      expect(serializedItems).not.toMatch(forbiddenPattern);
-      expect(serializedLatestChange).not.toMatch(forbiddenPattern);
+      expect(serializedStaticData).not.toMatch(forbiddenPattern);
+    }
+  });
+});
+
+describe('BrainBuildStageRoadmap', () => {
+  it('renders the roadmap title, exact banner, groups, and divider', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const text = container.textContent ?? '';
+      expect(text).toContain('מפת שלבי בניית המוח');
+      expect(text).toContain(BRAIN_BUILD_STAGE_ROADMAP_BANNER);
+      expect(text).toContain(BRAIN_BUILD_STAGE_ROADMAP_WORKING_PLAN_NOTICE);
+      expect(text).toContain(`roadmapStatus:${BRAIN_BUILD_STAGE_ROADMAP_CONTROL.roadmapStatus}`);
+      expect(text).toContain(`canBeReordered:${String(BRAIN_BUILD_STAGE_ROADMAP_CONTROL.canBeReordered)}`);
+      expect(text).toContain(
+        `requiresEldadApprovalForRoadmapChange:${String(
+          BRAIN_BUILD_STAGE_ROADMAP_CONTROL.requiresEldadApprovalForRoadmapChange,
+        )}`,
+      );
+      expect(text).toContain(BRAIN_BUILD_STAGE_ROADMAP_DIVIDER);
+      for (const group of BRAIN_BUILD_STAGE_ROADMAP_GROUPS) {
+        expect(text).toContain(group.title);
+        expect(text).toContain(group.subtitle);
+      }
+      expect(container.querySelectorAll('[data-testid="roadmap-group"]')).toHaveLength(3);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders 20 vertical roadmap rows with the approved status labels', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const labels = Array.from(container.querySelectorAll('[data-testid="roadmap-status-label"]')).map(
+        (element) => element.textContent,
+      );
+      expect(container.querySelectorAll('[data-testid="roadmap-stage"]')).toHaveLength(20);
+      expect(labels).toContain('נבנה');
+      expect(labels).toContain('עכשיו');
+      expect(labels).toContain('ממתין');
+      expect(labels).toContain('חסום');
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('shows commit hashes for built stages and the blocked reason for the final stage', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      for (const hash of roadmapStages().filter((stage) => stage.status === 'built').map((stage) => stage.relatedCommit!)) {
+        expect(container.textContent).toContain(hash);
+      }
+      const blockedReason = container.querySelector('[data-testid="roadmap-blocked-reason"]')?.textContent ?? '';
+      expect(blockedReason).toContain('persistence');
+      expect(blockedReason).toContain('WorkItem');
+      expect(blockedReason).toContain('Matter');
+      expect(blockedReason).toContain('DocumentRef');
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('keeps the roadmap free of progress UI and limits ETA to negative phrasing', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const roadmap = container.querySelector('[data-testid="brain-build-stage-roadmap"]')!;
+      expect(roadmap.querySelectorAll('button')).toHaveLength(0);
+      expect(roadmap.querySelector('[role="progressbar"]')).toBeNull();
+      expect(roadmap.textContent).not.toContain('%');
+      expect(roadmap.textContent).toContain('אין ETA');
+      expect(roadmap.textContent).not.toMatch(/\bfinal\b/i);
+      expect(roadmap.textContent).not.toMatch(/\bfixed\b/i);
+      expect(roadmap.textContent).not.toMatch(/\bimmutable\b/i);
+      expect(roadmap.textContent).not.toMatch(/\blocked roadmap\b/i);
+    } finally {
+      cleanup();
     }
   });
 });

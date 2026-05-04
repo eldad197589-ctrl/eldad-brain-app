@@ -8,6 +8,12 @@ import {
   BRAIN_BUILD_PROGRESS_ITEMS,
   BRAIN_BUILD_PROGRESS_ROUTE,
   BRAIN_BUILD_PROGRESS_WARNING,
+  BRAIN_BUILD_STAGE_ROADMAP_BANNER,
+  BRAIN_BUILD_STAGE_ROADMAP_CONTROL,
+  BRAIN_BUILD_STAGE_ROADMAP_DIVIDER,
+  BRAIN_BUILD_STAGE_ROADMAP_GROUPS,
+  BRAIN_BUILD_STAGE_ROADMAP_STATUSES,
+  BRAIN_BUILD_STAGE_ROADMAP_WORKING_PLAN_NOTICE,
 } from './brain-build-progress-console-seed';
 import {
   BRAIN_BUILD_BLOCKED_ACTIONS,
@@ -98,6 +104,10 @@ const nonBlockedTextValues = (progressItem: BrainBuildProgressItem): readonly st
 
 const serializedNonBlockedProgressText = (): string =>
   BRAIN_BUILD_PROGRESS_ITEMS.flatMap(nonBlockedTextValues).join(' ').toLowerCase();
+
+const roadmapStages = () => BRAIN_BUILD_STAGE_ROADMAP_GROUPS.flatMap((group) => group.stages);
+
+const serializedRoadmapText = (): string => JSON.stringify(BRAIN_BUILD_STAGE_ROADMAP_GROUPS);
 // #endregion
 
 // #region Tests
@@ -162,6 +172,138 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
 
     for (const bannedWord of BANNED_LIVE_WORDING) {
       expect(searchableText).not.toContain(bannedWord.toLowerCase());
+    }
+  });
+});
+
+describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
+  it('exports exactly 20 roadmap stages', () => {
+    expect(roadmapStages()).toHaveLength(20);
+  });
+
+  it('exports exactly three roadmap groups with Hebrew titles', () => {
+    expect(BRAIN_BUILD_STAGE_ROADMAP_GROUPS).toHaveLength(3);
+    const titles = BRAIN_BUILD_STAGE_ROADMAP_GROUPS.map((group) => group.title);
+    expect(titles).toContain('יסודות סטטיים');
+    expect(titles).toContain('תצוגות מקדימות');
+    expect(titles).toContain('דרך לתפעול');
+  });
+
+  it('assigns stage statuses matching the approved table', () => {
+    const expected: Record<number, (typeof BRAIN_BUILD_STAGE_ROADMAP_STATUSES)[number]> = {};
+    for (let i = 1; i <= 16; i += 1) {
+      expected[i] = 'built';
+    }
+    expected[17] = 'current';
+    expected[18] = 'next';
+    expected[19] = 'next';
+    expected[20] = 'blocked';
+
+    for (const stage of roadmapStages()) {
+      expect(stage.status).toBe(expected[stage.order]);
+    }
+  });
+
+  it('marks every roadmap stage as static roadmap only', () => {
+    for (const stage of roadmapStages()) {
+      expect(stage.safetyStatus).toBe('static_roadmap_only');
+    }
+  });
+
+  it('includes commit hashes for all built stages', () => {
+    const builtStages = roadmapStages().filter((stage) => stage.status === 'built');
+    expect(builtStages.length).toBe(16);
+    for (const stage of builtStages) {
+      expect(stage.relatedCommit).not.toBeNull();
+      expect((stage.relatedCommit ?? '').length).toBeGreaterThan(0);
+    }
+  });
+
+  it('does not include commit hashes for non-built stages', () => {
+    const nonBuilt = roadmapStages().filter((stage) => stage.status !== 'built');
+    for (const stage of nonBuilt) {
+      expect(stage.relatedCommit).toBeNull();
+    }
+  });
+
+  it('includes blocked reason on the blocked stage', () => {
+    const blockedStage = roadmapStages().find((stage) => stage.status === 'blocked');
+    expect(blockedStage).toBeDefined();
+    const blockedText = blockedStage!.whatIsNotDone.join(' ');
+    expect(blockedText).toContain('persistence');
+    expect(blockedText).toContain('WorkItem');
+    expect(blockedText).toContain('Matter');
+    expect(blockedText).toContain('DocumentRef');
+  });
+
+  it('exports the exact roadmap banner', () => {
+    expect(BRAIN_BUILD_STAGE_ROADMAP_BANNER).toBe(
+      'מפת שלבי יסוד — תצוגת מבנה בלבד. כל מה שמסומן "נבנה" הוכח חזותית על קלט סטטי ידוע בלבד. המוח לא תפעולי. אין שמירה. אין פעולה חיה.',
+    );
+  });
+
+  it('exports the working roadmap clarification and static control flags', () => {
+    expect(BRAIN_BUILD_STAGE_ROADMAP_WORKING_PLAN_NOTICE).toBe(
+      'מפת שלבים זו היא מפת עבודה ניתנת לעדכון. שינוי במפה אינו פעולה תפעולית ואינו משנה נתונים במערכת.',
+    );
+    expect(BRAIN_BUILD_STAGE_ROADMAP_CONTROL.roadmapStatus).toBe('working_plan_only');
+    expect(BRAIN_BUILD_STAGE_ROADMAP_CONTROL.canBeReordered).toBe(true);
+    expect(BRAIN_BUILD_STAGE_ROADMAP_CONTROL.requiresEldadApprovalForRoadmapChange).toBe(true);
+  });
+
+  it('exports the exact roadmap divider', () => {
+    expect(BRAIN_BUILD_STAGE_ROADMAP_DIVIDER).toContain('תשתית שלא קיימת');
+    expect(BRAIN_BUILD_STAGE_ROADMAP_DIVIDER).toContain('preview');
+  });
+
+  it('does not contain percentage signs in roadmap data', () => {
+    expect(serializedRoadmapText()).not.toContain('%');
+  });
+
+  it('does not contain ETA in roadmap data except in negative phrasing', () => {
+    for (const stage of roadmapStages()) {
+      const allText = [
+        stage.title,
+        stage.proofScenario,
+        ...stage.whatIsDone,
+        ...stage.whatIsNotDone,
+        stage.nextGate,
+      ].join(' ');
+      if (allText.includes('ETA')) {
+        expect(allText).toContain('אין ETA');
+      }
+    }
+  });
+
+  it('does not use positive readiness or approval wording in roadmap stage meanings', () => {
+    const banned = ['opera' + 'tional', 'rea' + 'dy', 'app' + 'roved', 'com' + 'plete', 'deploy', 'production'];
+    const searchableText = roadmapStages()
+      .flatMap((stage) => [stage.title, stage.proofScenario, ...stage.whatIsDone])
+      .join(' ')
+      .toLowerCase();
+
+    for (const word of banned) {
+      expect(searchableText).not.toContain(word.toLowerCase());
+    }
+  });
+
+  it('keeps the stage list in vertical groups without action wording fields', () => {
+    const serializedRoadmap = [
+      serializedRoadmapText(),
+      BRAIN_BUILD_STAGE_ROADMAP_WORKING_PLAN_NOTICE,
+      JSON.stringify(BRAIN_BUILD_STAGE_ROADMAP_CONTROL),
+    ].join(' ');
+
+    expect(serializedRoadmap).not.toMatch(/\bfinal\b/i);
+    expect(serializedRoadmap).not.toMatch(/\bfixed\b/i);
+    expect(serializedRoadmap).not.toMatch(/\bimmutable\b/i);
+    expect(serializedRoadmap).not.toMatch(/\blocked roadmap\b/i);
+
+    for (const stage of roadmapStages()) {
+      expect(stage).not.toHaveProperty('taskId');
+      expect(stage).not.toHaveProperty('workItemId');
+      expect(stage).not.toHaveProperty('matterId');
+      expect(stage).not.toHaveProperty('documentRefId');
     }
   });
 });

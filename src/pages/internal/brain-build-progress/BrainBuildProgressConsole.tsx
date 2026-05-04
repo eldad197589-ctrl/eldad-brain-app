@@ -7,6 +7,12 @@ import {
   BRAIN_BUILD_PROGRESS_ITEMS,
   BRAIN_BUILD_PROGRESS_ROUTE,
   BRAIN_BUILD_PROGRESS_WARNING,
+  BRAIN_BUILD_STAGE_ROADMAP_BANNER,
+  BRAIN_BUILD_STAGE_ROADMAP_CONTROL,
+  BRAIN_BUILD_STAGE_ROADMAP_DIVIDER,
+  BRAIN_BUILD_STAGE_ROADMAP_GROUPS,
+  BRAIN_BUILD_STAGE_ROADMAP_STATUSES,
+  BRAIN_BUILD_STAGE_ROADMAP_WORKING_PLAN_NOTICE,
 } from '../../../work-spine/build-progress/brain-build-progress-console-seed';
 import type {
   BrainBuildBlockedAction,
@@ -97,6 +103,8 @@ const STILL_BLOCKED_LABELS: Record<string, string> = {
   'no retained state write': 'אין כתיבה למצב שמור',
 };
 
+const ROADMAP_STATUS_LABELS: Record<RoadmapStageStatus, string> = { built: 'נבנה', current: 'עכשיו', next: 'ממתין', blocked: 'חסום' };
+
 const DOMAIN_LABELS: Record<BrainBuildProgressDomain, string> = {
   vat: 'מע״מ',
   scanned_evidence: 'ראיות סריקה',
@@ -150,6 +158,10 @@ const renderList = (items: readonly string[], testId: string, label?: string) =>
 // #endregion
 
 // #region Types
+type RoadmapStageStatus = (typeof BRAIN_BUILD_STAGE_ROADMAP_STATUSES)[number];
+type BrainBuildRoadmapGroup = (typeof BRAIN_BUILD_STAGE_ROADMAP_GROUPS)[number];
+type BrainBuildRoadmapStage = BrainBuildRoadmapGroup['stages'][number];
+
 /** Props for a single progress item card. */
 interface ProgressItemCardProps {
   /** Static progress item to render. */
@@ -287,9 +299,86 @@ function ProgressLayerSection({ layer, progressItems }: ProgressLayerSectionProp
   );
 }
 
+interface RoadmapStageRowProps {
+  stage: BrainBuildRoadmapStage;
+}
+
+interface RoadmapGroupSectionProps {
+  group: BrainBuildRoadmapGroup;
+}
+
+// #region Roadmap Components
+function RoadmapStageRow({ stage }: RoadmapStageRowProps) {
+  const label = ROADMAP_STATUS_LABELS[stage.status];
+
+  return (
+    <div data-testid="roadmap-stage" style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '12px 0', borderBottom: '1px solid rgba(148, 163, 184, 0.12)' }}>
+      <span style={{ color: '#93c5fd', fontWeight: 800, minWidth: 28 }}>{stage.order}.</span>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontWeight: 600 }}>
+          {stage.title}
+          {stage.status === 'current' ? <span style={{ color: '#60a5fa', marginInlineStart: 8, fontWeight: 800 }}>עכשיו</span> : null}
+        </div>
+        <div style={{ color: '#94a3b8', fontSize: 13, marginTop: 2 }}>
+          <span>סטטוס: </span>
+          <span data-testid="roadmap-status-label">{label}</span>
+          {stage.relatedCommit ? <span> · commit: {stage.relatedCommit}</span> : null}
+          <span> · איפה רואים: {stage.visibleRoute ?? 'אין מסך עצמאי'}</span>
+        </div>
+        <p style={{ color: '#cbd5e1', fontSize: 13, margin: '6px 0 0' }}>הוכחת תצוגה: {stage.proofScenario}</p>
+        {renderList(stage.whatIsDone, 'roadmap-done', 'משמעות סטטית / preview')}
+        {stage.whatIsNotDone.length > 0 ? (
+          <div data-testid={stage.status === 'blocked' ? 'roadmap-blocked-reason' : 'roadmap-not-done'}>
+            {renderList(stage.whatIsNotDone, 'roadmap-not-done-list', stage.status === 'blocked' ? 'סיבת חסימה' : 'מה עדיין לא קיים')}
+          </div>
+        ) : null}
+        {renderList(stage.blockedActions, 'roadmap-blocked-actions', 'פעולות חסומות')}
+        <p style={{ color: '#bae6fd', fontSize: 13, margin: '8px 0 0' }}>שער הבא: {stage.nextGate}</p>
+      </div>
+    </div>
+  );
+}
+
+function RoadmapGroupSection({ group }: RoadmapGroupSectionProps) {
+  const bgColors: Record<string, string> = {
+    'static-foundations': 'rgba(22, 101, 52, 0.08)',
+    previews: 'rgba(30, 58, 138, 0.08)',
+    'path-to-operation': 'rgba(51, 65, 85, 0.12)',
+  };
+
+  return (
+    <section data-testid="roadmap-group" style={{ background: bgColors[group.groupId] ?? 'transparent', borderRadius: 10, padding: 16, marginTop: 14 }}>
+      <h3 style={{ margin: '0 0 4px', fontSize: 18 }}>{group.title}</h3>
+      <p style={{ margin: '0 0 10px', color: '#94a3b8', fontSize: 14 }}>{group.subtitle}</p>
+      {group.stages.map((stage) => <RoadmapStageRow key={stage.roadmapStageId} stage={stage} />)}
+    </section>
+  );
+}
+
+function StageRoadmapSection() {
+  return (
+    <section data-testid="brain-build-stage-roadmap" style={{ marginTop: 28 }}>
+      <h2 style={{ fontSize: 22, margin: '0 0 8px' }}>מפת שלבי בניית המוח</h2>
+      <p data-testid="roadmap-banner" style={{ color: '#fbbf24', fontWeight: 700, margin: '0 0 14px', fontSize: 13 }}>{BRAIN_BUILD_STAGE_ROADMAP_BANNER}</p>
+      <p data-testid="roadmap-working-plan-notice" style={{ color: '#bae6fd', fontWeight: 700, margin: '0 0 14px', fontSize: 13 }}>{BRAIN_BUILD_STAGE_ROADMAP_WORKING_PLAN_NOTICE}</p>
+      <p data-testid="roadmap-working-plan-flags" style={{ color: '#cbd5e1', margin: '0 0 14px', fontSize: 13 }}>roadmapStatus:{BRAIN_BUILD_STAGE_ROADMAP_CONTROL.roadmapStatus} · canBeReordered:{String(BRAIN_BUILD_STAGE_ROADMAP_CONTROL.canBeReordered)} · requiresEldadApprovalForRoadmapChange:{String(BRAIN_BUILD_STAGE_ROADMAP_CONTROL.requiresEldadApprovalForRoadmapChange)}</p>
+      {BRAIN_BUILD_STAGE_ROADMAP_GROUPS.map((group) => (
+        <div key={group.groupId}>
+          {group.groupId === 'path-to-operation' ? (
+            <div data-testid="roadmap-divider" style={{ background: 'rgba(251, 191, 36, 0.12)', border: '1px solid rgba(251, 191, 36, 0.3)', borderRadius: 8, padding: '10px 14px', marginTop: 14, color: '#fde68a', fontWeight: 700, fontSize: 13 }}>
+              {BRAIN_BUILD_STAGE_ROADMAP_DIVIDER}
+            </div>
+          ) : null}
+          <RoadmapGroupSection group={group} />
+        </div>
+      ))}
+    </section>
+  );
+}
+// #endregion
+
 /**
  * BrainBuildProgressConsole — Static read-only project-control screen for Brain build progress.
- *
  * @example
  * <BrainBuildProgressConsole />
  */
@@ -298,6 +387,7 @@ export default function BrainBuildProgressConsole() {
     <main data-testid="brain-build-progress-console" dir="rtl" style={{ color: '#e5edf7', padding: 24 }}>
       <ProgressHeader />
       <LatestChangeSummary />
+      <StageRoadmapSection />
       <ProgressMetrics />
       {groupProgressItems().map(([layer, progressItems]) => (
         <ProgressLayerSection key={layer} layer={layer} progressItems={progressItems} />
