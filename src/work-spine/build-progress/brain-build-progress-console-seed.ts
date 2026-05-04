@@ -29,6 +29,12 @@ export const BRAIN_BUILD_STAGE_ROADMAP_WORKING_PLAN_NOTICE =
 export const BRAIN_BUILD_STAGE_ROADMAP_DIVIDER =
   'מעבר לקו הזה = תשתית שלא קיימת עדיין. כל מה שמעל = תצוגת preview בלבד.';
 export const BRAIN_BUILD_STAGE_ROADMAP_STATUSES = ['built', 'current', 'next', 'blocked'] as const;
+export const BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS: Record<(typeof BRAIN_BUILD_STAGE_ROADMAP_STATUSES)[number], string> = {
+  built: '✅',
+  current: '◀',
+  next: '○',
+  blocked: '🔒',
+} as const;
 export const BRAIN_BUILD_STAGE_ROADMAP_CONTROL = {
   roadmapStatus: 'working_plan_only',
   canBeReordered: true,
@@ -101,6 +107,7 @@ const roadmapStage = (
   whatIsNotDone: readonly string[],
   blockedActions: readonly string[],
   nextGate: string,
+  compactLine: string,
 ) => ({
   roadmapStageId: `brain-build-roadmap-stage-${order}`,
   title,
@@ -114,6 +121,7 @@ const roadmapStage = (
   whatIsNotDone,
   blockedActions,
   nextGate,
+  compactLine,
   safetyStatus: 'static_roadmap_only',
 } as const);
 
@@ -124,6 +132,7 @@ const builtRoadmapStage = (
   relatedCommit: string,
   visibleRoute: string | null,
   proofText: string,
+  compactLine: string,
 ) =>
   roadmapStage(
     group,
@@ -137,6 +146,7 @@ const builtRoadmapStage = (
     ['לא מוכנות תפעולית', 'אין פעולה חיה', 'אין שמירה'],
     ['אין פעולה חיה', 'אין שמירה', 'אין חיבור ספקים'],
     'בדיקה חזותית בלבד לפני הרחבה נוספת.',
+    compactLine,
   );
 // #endregion
 
@@ -177,15 +187,15 @@ export const BRAIN_BUILD_STAGE_ROADMAP_GROUPS = [
     title: 'יסודות סטטיים',
     subtitle: 'מה המוח כבר רואה על קלט ידוע',
     stages: [
-      builtRoadmapStage('יסודות סטטיים', 1, 'Static VAT Evidence Seed', '0c9444c', MANUAL_WORKBENCH_ROUTE, 'שורות מע״מ סטטיות מוצגות דרך Preview.'),
-      builtRoadmapStage('יסודות סטטיים', 2, 'Scanned Evidence Batch', '2fb509d', MANUAL_WORKBENCH_ROUTE, 'אצוות סריקות סטטית מוצגת דרך Preview.'),
-      builtRoadmapStage('יסודות סטטיים', 3, 'Brain Operating Truth', 'cda69ee', null, 'מסמך אמת תפעולית קיים כהפניה סטטית.'),
-      builtRoadmapStage('יסודות סטטיים', 4, 'Static Visual Proof Checklist', '07cd8fa', null, 'רשימת בדיקת הוכחה חזותית קיימת כהפניה.'),
-      builtRoadmapStage('יסודות סטטיים', 5, 'Knowledge Inventory Phase 1', 'a2011a6', MANUAL_WORKBENCH_ROUTE, 'רשומות מלאי ידע שלב 1 מוצגות כהקשר סטטי.'),
-      builtRoadmapStage('יסודות סטטיים', 6, 'Knowledge Inventory Phase 2', 'cd122de', MANUAL_WORKBENCH_ROUTE, 'מועמדי ידע שלב 2 מוצגים כהקשר סטטי.'),
-      builtRoadmapStage('יסודות סטטיים', 7, 'Visual Brain Surface Inventory', 'edf165d', BRAIN_BUILD_PROGRESS_ROUTE, 'מלאי משטחים חזותיים מוצג דרך מסך ההתקדמות.'),
-      builtRoadmapStage('יסודות סטטיים', 8, 'Brain Build Progress Console', '36f3d4b', BRAIN_BUILD_PROGRESS_ROUTE, 'מסך התקדמות בניית המוח מוצג במסלול הפנימי.'),
-      builtRoadmapStage('יסודות סטטיים', 9, 'Latest Change Summary', 'a4f81d4', BRAIN_BUILD_PROGRESS_ROUTE, 'מה השתנה עכשיו מופיע בראש מסך ההתקדמות.'),
+      builtRoadmapStage('יסודות סטטיים', 1, 'מאגר ראיות מע״מ סטטי', '0c9444c', MANUAL_WORKBENCH_ROUTE, 'שורות מע״מ סטטיות מוצגות דרך Preview.', 'נתוני מע״מ סטטיים קיימים כהפניה.'),
+      builtRoadmapStage('יסודות סטטיים', 2, 'אצוות ראיות סריקה סטטית', '2fb509d', MANUAL_WORKBENCH_ROUTE, 'אצוות סריקות סטטית מוצגת דרך Preview.', 'אצוות סריקה סטטיות קיימות כהפניה.'),
+      builtRoadmapStage('יסודות סטטיים', 3, 'אמת תפעולית של המוח', 'cda69ee', null, 'מסמך אמת תפעולית קיים כהפניה סטטית.', 'מסמך אמת קיים כהפניה פנימית.'),
+      builtRoadmapStage('יסודות סטטיים', 4, 'רשימת בדיקת הוכחת תצוגה סטטית', '07cd8fa', null, 'רשימת בדיקת הוכחה חזותית קיימת כהפניה.', 'רשימת בדיקה חזותית קיימת.'),
+      builtRoadmapStage('יסודות סטטיים', 5, 'מלאי ידע שלב 1', 'a2011a6', MANUAL_WORKBENCH_ROUTE, 'רשומות מלאי ידע שלב 1 מוצגות כהקשר סטטי.', 'רשומות ידע שלב 1 מוצגות כהקשר.'),
+      builtRoadmapStage('יסודות סטטיים', 6, 'מלאי ידע שלב 2', 'cd122de', MANUAL_WORKBENCH_ROUTE, 'מועמדי ידע שלב 2 מוצגים כהקשר סטטי.', 'מועמדי ידע שלב 2 מוצגים כהקשר.'),
+      builtRoadmapStage('יסודות סטטיים', 7, 'מלאי משטחי מוח חזותיים', 'edf165d', BRAIN_BUILD_PROGRESS_ROUTE, 'מלאי משטחים חזותיים מוצג דרך מסך ההתקדמות.', 'מפת משטחים קיימת במסך ההתקדמות.'),
+      builtRoadmapStage('יסודות סטטיים', 8, 'מסך התקדמות בניית המוח', '36f3d4b', BRAIN_BUILD_PROGRESS_ROUTE, 'מסך התקדמות בניית המוח מוצג במסלול הפנימי.', 'מסך התקדמות מוצג במסלול פנימי.'),
+      builtRoadmapStage('יסודות סטטיים', 9, 'תקציר שינוי אחרון', 'a4f81d4', BRAIN_BUILD_PROGRESS_ROUTE, 'מה השתנה עכשיו מופיע בראש מסך ההתקדמות.', 'תקציר שינוי מופיע בראש המסך.'),
     ],
   },
   {
@@ -193,13 +203,13 @@ export const BRAIN_BUILD_STAGE_ROADMAP_GROUPS = [
     title: 'תצוגות מקדימות',
     subtitle: 'מה מוצג ב־Workbench — הוכחה חזותית בלבד',
     stages: [
-      builtRoadmapStage('תצוגות מקדימות', 10, 'Manual Workbench VAT Preview', 'a843121', MANUAL_WORKBENCH_ROUTE, 'המסך הידני מציג Preview למע״מ.'),
-      builtRoadmapStage('תצוגות מקדימות', 11, 'VAT Mapping Table Preview', '28ecb17', MANUAL_WORKBENCH_ROUTE, 'טבלת מיפוי מע״מ מוצגת לקריאה בלבד.'),
-      builtRoadmapStage('תצוגות מקדימות', 12, 'Scanned Batch Preview', '5ed94d4', MANUAL_WORKBENCH_ROUTE, 'אצוות סריקות מוצגת לפי רמזי טקסט ידניים.'),
-      builtRoadmapStage('תצוגות מקדימות', 13, 'Approval Gate Preview', '6f1368b', MANUAL_WORKBENCH_ROUTE, 'שער אישור מוצג כטקסט פסיבי בלבד.'),
-      builtRoadmapStage('תצוגות מקדימות', 14, 'Knowledge Inventory Preview', '31facca', MANUAL_WORKBENCH_ROUTE, 'מלאי ידע קשור מוצג במסך הידני.'),
-      builtRoadmapStage('תצוגות מקדימות', 15, 'Intake Signal Summary', 'ee3a06f', MANUAL_WORKBENCH_ROUTE, 'סיכום רמזי קלט מוצג בראש המסך הידני.'),
-      builtRoadmapStage('תצוגות מקדימות', 16, 'Hypothetical Scanned Task Shape Preview', '160f271', MANUAL_WORKBENCH_ROUTE, 'צורת משימה היפותטית מוצגת ללא יצירת אובייקט.'),
+      builtRoadmapStage('תצוגות מקדימות', 10, 'המסך הידני — Preview מע״מ', 'a843121', MANUAL_WORKBENCH_ROUTE, 'המסך הידני מציג Preview למע״מ.', 'המסך הידני מציג preview מע״מ.'),
+      builtRoadmapStage('תצוגות מקדימות', 11, 'תצוגת טבלת מיפוי מע״מ', '28ecb17', MANUAL_WORKBENCH_ROUTE, 'טבלת מיפוי מע״מ מוצגת לקריאה בלבד.', 'טבלת מיפוי מוצגת לקריאה בלבד.'),
+      builtRoadmapStage('תצוגות מקדימות', 12, 'תצוגת אצוות סריקות', '5ed94d4', MANUAL_WORKBENCH_ROUTE, 'אצוות סריקות מוצגת לפי רמזי טקסט ידניים.', 'אצוות סריקות מוצגת לפי רמזי טקסט.'),
+      builtRoadmapStage('תצוגות מקדימות', 13, 'תצוגת שער אישור', '6f1368b', MANUAL_WORKBENCH_ROUTE, 'שער אישור מוצג כטקסט פסיבי בלבד.', 'שער אישור פסיבי מוצג.'),
+      builtRoadmapStage('תצוגות מקדימות', 14, 'תצוגת מלאי ידע', '31facca', MANUAL_WORKBENCH_ROUTE, 'מלאי ידע קשור מוצג במסך הידני.', 'מלאי ידע קשור מוצג במסך הידני.'),
+      builtRoadmapStage('תצוגות מקדימות', 15, 'סיכום רמזי קלט', 'ee3a06f', MANUAL_WORKBENCH_ROUTE, 'סיכום רמזי קלט מוצג בראש המסך הידני.', 'סיכום רמזי קלט מוצג בראש המסך.'),
+      builtRoadmapStage('תצוגות מקדימות', 16, 'תצוגת צורת משימה היפותטית', '160f271', MANUAL_WORKBENCH_ROUTE, 'צורת משימה היפותטית מוצגת ללא יצירת אובייקט.', 'צורת משימה היפותטית מוצגת ללא אובייקט.'),
     ],
   },
   {
@@ -207,10 +217,10 @@ export const BRAIN_BUILD_STAGE_ROADMAP_GROUPS = [
     title: 'דרך לתפעול',
     subtitle: 'מה נדרש כדי שהמוח יתחיל לעבוד באמת',
     stages: [
-      roadmapStage('דרך לתפעול', 17, 'Visual Brain Surface Section', 'current', null, BRAIN_BUILD_PROGRESS_ROUTE, 'מוצג כשלב תכנון נוכחי במפה בלבד.', ['שלב תכנון בלבד'], ['לא תפעולי', 'אין פעולה חיה'], ['אין פעולה חיה', 'אין שמירה'], 'ביקורת Gravity לפני יישום.'),
-      roadmapStage('דרך לתפעול', 18, 'External Knowledge Sources Map', 'next', null, null, 'נדרש מיפוי מקורות חיצוניים לפני חיבור כלשהו.', ['ממתין לשער Agent A'], ['אין חיבור ספקים'], ['אין חיבור ספקים', 'אין קריאת מקור'], AGENT_A_NO_ETA),
-      roadmapStage('דרך לתפעול', 19, 'Real Scanned Evidence Expansion', 'next', null, null, 'נדרשת הרחבת ראיות סריקה אמיתיות רק לאחר אישור סטטי.', ['ממתין לשער Agent A'], ['אין קריאת תיקייה', 'אין OCR'], ['אין קריאת קבצים', 'אין OCR'], AGENT_A_NO_ETA),
-      roadmapStage('דרך לתפעול', 20, 'שער תפעולי מוגבל ראשון', 'blocked', null, null, 'חסום עד שער אישור מפורש.', [], ['אין עדיין שער אישור מפורש, אין שכבת persistence מאושרת, ואין הרשאה ליצור WorkItem/Matter/DocumentRef.'], ['אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין persistence'], 'דורש החלטת אלדד נפרדת לפני כל עבודה תפעולית.'),
+      roadmapStage('דרך לתפעול', 17, 'מצב המוח הוויזואלי', 'current', null, BRAIN_BUILD_PROGRESS_ROUTE, 'מוצג כשלב תכנון נוכחי במפה בלבד.', ['שלב תכנון בלבד'], ['לא תפעולי', 'אין פעולה חיה'], ['אין פעולה חיה', 'אין שמירה'], 'ביקורת Gravity לפני יישום.', 'שלב תכנון נוכחי. ביקורת Gravity לפני יישום.'),
+      roadmapStage('דרך לתפעול', 18, 'מפת מקורות ידע חיצוניים', 'next', null, null, 'נדרש מיפוי מקורות חיצוניים לפני חיבור כלשהו.', ['ממתין לשער Agent A'], ['אין חיבור ספקים'], ['אין חיבור ספקים', 'אין קריאת מקור'], AGENT_A_NO_ETA, 'ממתין לשער Agent A.'),
+      roadmapStage('דרך לתפעול', 19, 'הרחבת ראיות סריקה אמיתיות', 'next', null, null, 'נדרשת הרחבת ראיות סריקה אמיתיות רק לאחר אישור סטטי.', ['ממתין לשער Agent A'], ['אין קריאת תיקייה', 'אין OCR'], ['אין קריאת קבצים', 'אין OCR'], AGENT_A_NO_ETA, 'ממתין לשער Agent A.'),
+      roadmapStage('דרך לתפעול', 20, 'שער תפעולי מוגבל ראשון', 'blocked', null, null, 'חסום עד שער אישור מפורש.', [], ['אין עדיין שער אישור מפורש, אין שכבת persistence מאושרת, ואין הרשאה ליצור WorkItem/Matter/DocumentRef.'], ['אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין persistence'], 'דורש החלטת אלדד נפרדת לפני כל עבודה תפעולית.', 'חסום — דורש החלטת אלדד נפרדת.'),
     ],
   },
 ] as const;

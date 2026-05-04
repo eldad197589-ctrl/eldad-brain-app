@@ -12,6 +12,7 @@ import {
   BRAIN_BUILD_STAGE_ROADMAP_CONTROL,
   BRAIN_BUILD_STAGE_ROADMAP_DIVIDER,
   BRAIN_BUILD_STAGE_ROADMAP_GROUPS,
+  BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS,
   BRAIN_BUILD_STAGE_ROADMAP_STATUSES,
   BRAIN_BUILD_STAGE_ROADMAP_WORKING_PLAN_NOTICE,
 } from './brain-build-progress-console-seed';
@@ -57,6 +58,29 @@ const REQUIRED_PROGRESS_IDS = [
   'progress-hypothetical-task-shape-preview-v1',
   'progress-intake-signal-summary-v1',
   'progress-visual-brain-surface-inventory-v1',
+] as const;
+
+const REQUIRED_ROADMAP_STAGE_TITLES = [
+  'מאגר ראיות מע״מ סטטי',
+  'אצוות ראיות סריקה סטטית',
+  'אמת תפעולית של המוח',
+  'רשימת בדיקת הוכחת תצוגה סטטית',
+  'מלאי ידע שלב 1',
+  'מלאי ידע שלב 2',
+  'מלאי משטחי מוח חזותיים',
+  'מסך התקדמות בניית המוח',
+  'תקציר שינוי אחרון',
+  'המסך הידני — Preview מע״מ',
+  'תצוגת טבלת מיפוי מע״מ',
+  'תצוגת אצוות סריקות',
+  'תצוגת שער אישור',
+  'תצוגת מלאי ידע',
+  'סיכום רמזי קלט',
+  'תצוגת צורת משימה היפותטית',
+  'מצב המוח הוויזואלי',
+  'מפת מקורות ידע חיצוניים',
+  'הרחבת ראיות סריקה אמיתיות',
+  'שער תפעולי מוגבל ראשון',
 ] as const;
 
 const BANNED_LIVE_WORDING = [
@@ -179,6 +203,11 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
 describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
   it('exports exactly 20 roadmap stages', () => {
     expect(roadmapStages()).toHaveLength(20);
+  });
+
+  it('uses the approved Hebrew stage titles in order', () => {
+    expect(roadmapStages().map((stage) => stage.title)).toEqual(REQUIRED_ROADMAP_STAGE_TITLES);
+    expect(serializedRoadmapText()).not.toContain('Visual Brain Surface Section');
   });
 
   it('exports exactly three roadmap groups with Hebrew titles', () => {
@@ -306,5 +335,20 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
       expect(stage).not.toHaveProperty('documentRefId');
     }
   });
+
+  it('includes a compactLine for every roadmap stage', () => {
+    for (const stage of roadmapStages()) {
+      expect(typeof stage.compactLine).toBe('string');
+      expect(stage.compactLine.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('exports status icons for all four roadmap statuses', () => {
+    expect(BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS.built).toBe('✅');
+    expect(BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS.current).toBe('◀');
+    expect(BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS.next).toBe('○');
+    expect(BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS.blocked).toBe('🔒');
+  });
+
 });
 // #endregion

@@ -17,8 +17,10 @@ import {
   BRAIN_BUILD_STAGE_ROADMAP_CONTROL,
   BRAIN_BUILD_STAGE_ROADMAP_DIVIDER,
   BRAIN_BUILD_STAGE_ROADMAP_GROUPS,
+  BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS,
   BRAIN_BUILD_STAGE_ROADMAP_WORKING_PLAN_NOTICE,
 } from '../../../work-spine/build-progress/brain-build-progress-console-seed';
+import brainBuildProgressConsoleSource from './BrainBuildProgressConsole.tsx?raw';
 import BrainBuildProgressConsole from './BrainBuildProgressConsole';
 // #endregion
 
@@ -104,6 +106,36 @@ const FORBIDDEN_SOURCE_PATTERNS = [
   /import\s+.*WorkItem/,
   /import\s+.*Matter/,
   /import\s+.*DocumentRef/,
+] as const;
+
+const REQUIRED_HEBREW_STAGE_TITLES = [
+  'מאגר ראיות מע״מ סטטי',
+  'אצוות ראיות סריקה סטטית',
+  'אמת תפעולית של המוח',
+  'רשימת בדיקת הוכחת תצוגה סטטית',
+  'מלאי ידע שלב 1',
+  'מלאי ידע שלב 2',
+  'מלאי משטחי מוח חזותיים',
+  'מסך התקדמות בניית המוח',
+  'תקציר שינוי אחרון',
+  'המסך הידני — Preview מע״מ',
+  'תצוגת טבלת מיפוי מע״מ',
+  'תצוגת אצוות סריקות',
+  'תצוגת שער אישור',
+  'תצוגת מלאי ידע',
+  'סיכום רמזי קלט',
+  'תצוגת צורת משימה היפותטית',
+  'מצב המוח הוויזואלי',
+  'מפת מקורות ידע חיצוניים',
+  'הרחבת ראיות סריקה אמיתיות',
+  'שער תפעולי מוגבל ראשון',
+] as const;
+
+const COMPACT_FORBIDDEN_DETAIL_LABELS = [
+  'משמעות סטטית / preview',
+  'מה עדיין לא קיים',
+  'פעולות חסומות',
+  'שער הבא',
 ] as const;
 // #endregion
 
@@ -231,6 +263,11 @@ describe('BrainBuildProgressConsole', () => {
       expect(serializedStaticData).not.toMatch(forbiddenPattern);
     }
   });
+
+  it('uses exported roadmap status icons without a local symbol table', () => {
+    expect(brainBuildProgressConsoleSource).toContain('BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS');
+    expect(brainBuildProgressConsoleSource).not.toContain('ROADMAP_STATUS_SYMBOLS');
+  });
 });
 
 describe('BrainBuildStageRoadmap', () => {
@@ -249,6 +286,7 @@ describe('BrainBuildStageRoadmap', () => {
         )}`,
       );
       expect(text).toContain(BRAIN_BUILD_STAGE_ROADMAP_DIVIDER);
+      expect(text).toContain('16 נבנו · 1 עכשיו · 2 ממתינים · 1 חסום');
       for (const group of BRAIN_BUILD_STAGE_ROADMAP_GROUPS) {
         expect(text).toContain(group.title);
         expect(text).toContain(group.subtitle);
@@ -259,17 +297,107 @@ describe('BrainBuildStageRoadmap', () => {
     }
   });
 
-  it('renders 20 vertical roadmap rows with the approved status labels', () => {
+  it('renders 20 compact roadmap stages with the approved status labels', () => {
     const { container, cleanup } = mountConsole();
     try {
+      const compactStages = container.querySelectorAll('[data-testid="roadmap-stage"]');
+      expect(compactStages).toHaveLength(20);
+      for (const stage of compactStages) {
+        expect(stage.children.length).toBeLessThanOrEqual(2);
+      }
       const labels = Array.from(container.querySelectorAll('[data-testid="roadmap-status-label"]')).map(
         (element) => element.textContent,
       );
-      expect(container.querySelectorAll('[data-testid="roadmap-stage"]')).toHaveLength(20);
       expect(labels).toContain('נבנה');
       expect(labels).toContain('עכשיו');
       expect(labels).toContain('ממתין');
       expect(labels).toContain('חסום');
+      expect(container.textContent).toContain(BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS.built);
+      expect(container.textContent).toContain(BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS.current);
+      expect(container.textContent).toContain(BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS.next);
+      expect(container.textContent).toContain(BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS.blocked);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders the exact roadmap summary counter', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const counterText = container.querySelector('[data-testid="roadmap-summary-counter"]')?.textContent ?? '';
+      expect(counterText).toBe('16 נבנו · 1 עכשיו · 2 ממתינים · 1 חסום');
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders compactLine text for stage 1 and stage 17', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const stages = roadmapStages();
+      const roadmapText = container.querySelector('[data-testid="brain-build-stage-roadmap"]')?.textContent ?? '';
+      expect(roadmapText).toContain(stages[0].compactLine);
+      expect(roadmapText).toContain(stages[16].compactLine);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders stage 17 title and status separated, not concatenated', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const compactStages = Array.from(container.querySelectorAll('[data-testid="roadmap-stage"]'));
+      const stage17 = compactStages.find((el) => el.textContent?.includes('17.'));
+      expect(stage17).toBeDefined();
+      const text = stage17!.textContent ?? '';
+      expect(text).toContain('מצב המוח הוויזואלי');
+      expect(text).toContain('עכשיו');
+      // Verify they are NOT concatenated — there must be a separator between title and status
+      expect(text).not.toContain('הוויזואליעכשיו');
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders all 20 Hebrew stage titles in the compact roadmap', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const roadmapText = container.querySelector('[data-testid="brain-build-stage-roadmap"]')?.textContent ?? '';
+      for (const title of REQUIRED_HEBREW_STAGE_TITLES) {
+        expect(roadmapText).toContain(title);
+      }
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('does NOT render repeated detail labels in the compact roadmap section', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const roadmapText = container.querySelector('[data-testid="brain-build-stage-roadmap"]')?.textContent ?? '';
+      for (const forbidden of COMPACT_FORBIDDEN_DETAIL_LABELS) {
+        expect(roadmapText).not.toContain(forbidden);
+      }
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('long progress history below the roadmap still renders detailed fields', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const roadmap = container.querySelector('[data-testid="brain-build-stage-roadmap"]');
+      const firstHistoryItemElement = container.querySelector('[data-testid="build-progress-item"]');
+      expect(roadmap).not.toBeNull();
+      expect(firstHistoryItemElement).not.toBeNull();
+      expect(Boolean(roadmap!.compareDocumentPosition(firstHistoryItemElement!) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+      const firstHistoryItem = firstHistoryItemElement!.textContent ?? '';
+      expect(firstHistoryItem).toContain('הוכחת תצוגה');
+      expect(firstHistoryItem).toContain('מה נבנה');
+      expect(firstHistoryItem).toContain('מה אלדד רואה');
+      expect(firstHistoryItem).toContain('השלב הבטוח הבא');
+      expect(firstHistoryItem).toContain('מה עדיין חסום');
+      expect(firstHistoryItem).toContain('פעולות חסומות');
     } finally {
       cleanup();
     }
@@ -291,14 +419,14 @@ describe('BrainBuildStageRoadmap', () => {
     }
   });
 
-  it('keeps the roadmap free of progress UI and limits ETA to negative phrasing', () => {
+  it('keeps the roadmap free of progress UI and ETA text', () => {
     const { container, cleanup } = mountConsole();
     try {
       const roadmap = container.querySelector('[data-testid="brain-build-stage-roadmap"]')!;
       expect(roadmap.querySelectorAll('button')).toHaveLength(0);
       expect(roadmap.querySelector('[role="progressbar"]')).toBeNull();
       expect(roadmap.textContent).not.toContain('%');
-      expect(roadmap.textContent).toContain('אין ETA');
+      expect(roadmap.textContent).not.toContain('ETA');
       expect(roadmap.textContent).not.toMatch(/\bfinal\b/i);
       expect(roadmap.textContent).not.toMatch(/\bfixed\b/i);
       expect(roadmap.textContent).not.toMatch(/\bimmutable\b/i);
