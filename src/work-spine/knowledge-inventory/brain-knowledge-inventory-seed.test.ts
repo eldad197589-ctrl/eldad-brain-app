@@ -52,6 +52,49 @@ const REQUIRED_KNOWLEDGE_IDS = [
   'knowledge-brain-operating-truth-governance-v1',
 ] as const;
 
+const PHASE1_RECORD_COUNT = 9;
+
+const PHASE2_EXPECTED_CLASSIFICATIONS = {
+  'knowledge-phase2-proof-of-life-standard-v1': {
+    evidenceStatus: 'committed_static',
+    sourceLocation: 'commit:07cd8fa',
+    confidence: 'high',
+    nextSafeUse: 'preview_reference_only',
+  },
+  'knowledge-phase2-full-brain-blueprint-v1': {
+    evidenceStatus: 'committed_static',
+    sourceLocation: 'src/work-spine/blueprint',
+    confidence: 'high',
+    nextSafeUse: 'preview_reference_only',
+  },
+  'knowledge-phase2-robium-salary-clients-v1': {
+    evidenceStatus: 'committed_static',
+    sourceLocation: 'known-project-context/robium-salary-clients',
+    confidence: 'medium',
+    nextSafeUse: 'learning_queue_candidate',
+  },
+  'knowledge-phase2-vat-static-evidence-v1': {
+    evidenceStatus: 'committed_static',
+    sourceLocation: 'src/work-spine/vat-evidence',
+    confidence: 'high',
+    nextSafeUse: 'approval_gate_context',
+  },
+  'knowledge-phase2-scanned-evidence-batch-v1': {
+    evidenceStatus: 'partial_static',
+    sourceLocation: 'src/work-spine/scanned-evidence',
+    confidence: 'medium',
+    nextSafeUse: 'learning_queue_candidate',
+  },
+  'knowledge-phase2-knowledge-inventory-preview-v1': {
+    evidenceStatus: 'partial_static',
+    sourceLocation: 'planned:manual-workbench-knowledge-inventory-preview',
+    confidence: 'medium',
+    nextSafeUse: 'learning_queue_candidate',
+  },
+} as const;
+
+const PHASE2_KNOWLEDGE_IDS = Object.keys(PHASE2_EXPECTED_CLASSIFICATIONS);
+
 const REQUIRED_BLOCKED_ACTIONS = [
   'execute',
   'submit',
@@ -105,6 +148,40 @@ const BLOCKED_EXECUTION_WORDS = [
   'sy' + 'nc',
 ] as const;
 
+const BLOCKED_EXCLUDED_CANDIDATE_TERMS = [
+  'Gma' + 'il',
+  'Supa' + 'base',
+  'Mat' + 'ter workspace',
+  'Mav' + 'en reconciliation drafts',
+  'Dima legacy outputs',
+  'Tsila untracked materials',
+  'generated DOCX',
+  'generated HTML',
+] as const;
+
+const UNSAFE_WORDS = [
+  'live',
+  'connected',
+  'verified',
+  'approved',
+  'ready',
+  'executed',
+  'submitted',
+  'created',
+  'filed',
+  'synced',
+] as const;
+
+const SAFE_NEGATIVE_PHRASES = [
+  'no live',
+  'without live',
+  'separated from live',
+  'not live',
+  'no folder scan',
+  'no document-content reading',
+  'no client-data access',
+] as const;
+
 const ALLOWED_STATUS_VALUES = ['committed_static', 'partial_static', 'known_context_only'] as const;
 
 const ALLOWED_ACTION_FIELD_KEYS = ['blockedActions', 'canExecute', 'canPersist'] as const;
@@ -124,33 +201,31 @@ const BLOCKED_FIELD_NAME_PARTS = [
 // #endregion
 
 // #region Helpers
-/**
- * Return non-blocked static text values from a record.
- * @param record - Inventory record to inspect.
- * @returns Text values excluding blocked action markers.
- */
 const recordTextValuesWithoutBlockedActions = (record: BrainKnowledgeInventoryRecord): readonly string[] =>
   Object.entries(record)
     .filter(([fieldName]) => fieldName !== 'blockedActions')
     .flatMap(([, value]) => (Array.isArray(value) ? value : [value]))
     .filter((value): value is string => typeof value === 'string');
 
-/**
- * Serialize the exported static inventory surface without blocked action markers.
- * @returns Serialized static values.
- */
 const serializedNonBlockedInventory = (): string =>
   BRAIN_KNOWLEDGE_INVENTORY_PHASE1_RECORDS
     .flatMap((record) => recordTextValuesWithoutBlockedActions(record))
     .join(' ');
 
-/**
- * Return whether a record satisfies committed evidence requirements.
- * @param record - Inventory record to inspect.
- * @returns Whether the record is committed static evidence.
- */
 const satisfiesEvidenceRequirements = (record: BrainKnowledgeInventoryRecord): boolean =>
   record.evidenceStatus === 'committed_static';
+
+const phase2Records = (): readonly BrainKnowledgeInventoryRecord[] =>
+  BRAIN_KNOWLEDGE_INVENTORY_PHASE1_RECORDS.filter((record) => record.knowledgeId.startsWith('knowledge-phase2-'));
+
+const findRecord = (knowledgeId: string): BrainKnowledgeInventoryRecord | undefined =>
+  BRAIN_KNOWLEDGE_INVENTORY_PHASE1_RECORDS.find((record) => record.knowledgeId === knowledgeId);
+
+const hasUnsafePositiveWording = (text: string, unsafeWord: string): boolean => {
+  if (!text.toLowerCase().includes(unsafeWord)) return false;
+
+  return !SAFE_NEGATIVE_PHRASES.some((safePhrase) => text.toLowerCase().includes(safePhrase));
+};
 // #endregion
 
 // #region Tests
@@ -158,7 +233,7 @@ describe('BRAIN_KNOWLEDGE_INVENTORY_PHASE1_RECORDS', () => {
   it('exports all Phase 1 inventory records', () => {
     const knowledgeIds = BRAIN_KNOWLEDGE_INVENTORY_PHASE1_RECORDS.map((record) => record.knowledgeId);
 
-    expect(BRAIN_KNOWLEDGE_INVENTORY_PHASE1_RECORDS).toHaveLength(REQUIRED_KNOWLEDGE_IDS.length);
+    expect(BRAIN_KNOWLEDGE_INVENTORY_PHASE1_RECORDS.length).toBeGreaterThanOrEqual(REQUIRED_KNOWLEDGE_IDS.length);
     for (const knowledgeId of REQUIRED_KNOWLEDGE_IDS) {
       expect(knowledgeIds).toContain(knowledgeId);
     }
@@ -234,6 +309,45 @@ describe('BRAIN_KNOWLEDGE_INVENTORY_PHASE1_RECORDS', () => {
     }
   });
 
+  it('adds exactly the six Phase 2 safe candidates', () => {
+    const phase2KnowledgeIds = phase2Records().map((record) => record.knowledgeId);
+
+    expect(BRAIN_KNOWLEDGE_INVENTORY_PHASE1_RECORDS).toHaveLength(PHASE1_RECORD_COUNT + PHASE2_KNOWLEDGE_IDS.length);
+    expect(phase2Records()).toHaveLength(PHASE2_KNOWLEDGE_IDS.length);
+    for (const knowledgeId of PHASE2_KNOWLEDGE_IDS) {
+      expect(phase2KnowledgeIds).toContain(knowledgeId);
+    }
+  });
+
+  it('matches the aligned Phase 2 classification table exactly', () => {
+    for (const [knowledgeId, expectedClassification] of Object.entries(PHASE2_EXPECTED_CLASSIFICATIONS)) {
+      const record = findRecord(knowledgeId);
+
+      expect(record).toBeDefined();
+      expect(record?.evidenceStatus).toBe(expectedClassification.evidenceStatus);
+      expect(record?.sourceLocation).toBe(expectedClassification.sourceLocation);
+      expect(record?.confidence).toBe(expectedClassification.confidence);
+      expect(record?.nextSafeUse).toBe(expectedClassification.nextSafeUse);
+    }
+  });
+
+  it('keeps excluded Phase 2 candidates out of exported values', () => {
+    for (const excludedTerm of BLOCKED_EXCLUDED_CANDIDATE_TERMS) {
+      expect(serializedNonBlockedInventory()).not.toContain(excludedTerm);
+    }
+  });
+
+  it('keeps full blocked actions on every Phase 2 candidate', () => {
+    for (const record of phase2Records()) {
+      expect(record.blockedActions).toEqual([...REQUIRED_BLOCKED_ACTIONS]);
+      expect(record.previewOnly).toBe(true);
+      expect(record.staticOnly).toBe(true);
+      expect(record.bindingKnowledge).toBe(false);
+      expect(record.canExecute).toBe(false);
+      expect(record.canPersist).toBe(false);
+    }
+  });
+
   it('does not expose function, callback, or action fields on inventory records', () => {
     for (const record of BRAIN_KNOWLEDGE_INVENTORY_PHASE1_RECORDS) {
       for (const value of Object.values(record)) {
@@ -257,6 +371,12 @@ describe('BRAIN_KNOWLEDGE_INVENTORY_PHASE1_RECORDS', () => {
   it('does not expose execution wording outside blocked action markers', () => {
     for (const blockedWord of BLOCKED_EXECUTION_WORDS) {
       expect(serializedNonBlockedInventory()).not.toContain(blockedWord);
+    }
+  });
+
+  it('does not expose unsafe positive wording in descriptive values', () => {
+    for (const unsafeWord of UNSAFE_WORDS) {
+      expect(hasUnsafePositiveWording(serializedNonBlockedInventory(), unsafeWord)).toBe(false);
     }
   });
 
