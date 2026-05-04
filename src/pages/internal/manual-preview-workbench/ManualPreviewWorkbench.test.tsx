@@ -27,6 +27,8 @@ reactActEnvironment.IS_REACT_ACT_ENVIRONMENT = true;
 
 // #region Constants
 const ALLOWED_SOURCE_TYPES = ['manual_text', 'scan', 'email', 'drive', 'protocol'] as const;
+const SOURCE_TYPE_DISPLAY_LABELS = ['טקסט ידני', 'סריקה', 'מייל', 'Drive', 'פרוטוקול'] as const;
+const HEBREW_FIELD_LABELS = ['כותרת המסמך / המשימה', 'סוג מקור', 'תקציר / תיאור קצר', 'לקוח / תיק', 'תחום מקצועי'] as const;
 
 const REQUIRED_PREVIEW_SECTIONS = [
   'Intake Preview',
@@ -163,8 +165,17 @@ describe('ManualPreviewWorkbench', () => {
   it('renders every allowed form field', () => {
     const html = renderWorkbench();
 
-    ['title', 'sourceType', 'metadataSummary', 'clientOrCaseLabel', 'domainLabel'].forEach((field) => {
-      expect(html).toContain(field);
+    HEBREW_FIELD_LABELS.forEach((label) => {
+      expect(html).toContain(label);
+    });
+    [
+      'הזן כאן קלט ידני כדי לראות כיצד המוח היה מסווג',
+      'לדוגמה: חשבונית בזק לחודש 04/2026',
+      'לדוגמה: חשבונית ספק שנסרקה לצורך בדיקת מע״מ והנהלת חשבונות',
+      'לדוגמה: דוד אלדד מע״מ / דימה / צילה',
+      'לדוגמה: VAT / שכר / דיני עבודה',
+    ].forEach((text) => {
+      expect(html).toContain(text);
     });
   });
 
@@ -173,8 +184,12 @@ describe('ManualPreviewWorkbench', () => {
     const options = Array.from(container.querySelectorAll<HTMLOptionElement>('option')).map(
       (option) => option.value,
     );
+    const optionLabels = Array.from(container.querySelectorAll<HTMLOptionElement>('option')).map(
+      (option) => option.textContent,
+    );
 
     expect(options).toEqual([...ALLOWED_SOURCE_TYPES]);
+    expect(optionLabels).toEqual([...SOURCE_TYPE_DISPLAY_LABELS]);
     cleanup();
   });
 
@@ -252,7 +267,7 @@ describe('ManualPreviewWorkbench', () => {
   it('renders only Reset and Clear buttons', () => {
     const { container, cleanup } = mountWorkbench();
 
-    expect(getButtonLabels(container)).toEqual(['Reset', 'Clear']);
+    expect(getButtonLabels(container)).toEqual(['איפוס', 'נקה']);
     cleanup();
   });
 
@@ -293,7 +308,7 @@ describe('ManualPreviewWorkbench', () => {
     expect(container.textContent).toContain('Intake Preview');
 
     const resetButton = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(
-      (button) => button.textContent === 'Reset',
+      (button) => button.textContent === 'איפוס',
     );
     expect(resetButton).toBeDefined();
 
@@ -306,7 +321,7 @@ describe('ManualPreviewWorkbench', () => {
     expect(container.textContent).toContain('Intake Preview');
 
     const clearButton = Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(
-      (button) => button.textContent === 'Clear',
+      (button) => button.textContent === 'נקה',
     );
     expect(clearButton).toBeDefined();
 

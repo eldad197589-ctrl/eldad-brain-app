@@ -56,6 +56,8 @@ interface FieldTextInputProps {
   id: string;
   /** Input label. */
   label: string;
+  /** Placeholder example for the input. */
+  placeholder: string;
   /** Input value. */
   value: string;
   /** Input change callback. */
@@ -66,6 +68,10 @@ interface FieldTextInputProps {
 interface FieldTextAreaProps {
   /** Textarea id. */
   id: string;
+  /** Textarea label. */
+  label: string;
+  /** Placeholder example for the textarea. */
+  placeholder: string;
   /** Textarea value. */
   value: string;
   /** Textarea change callback. */
@@ -74,13 +80,11 @@ interface FieldTextAreaProps {
 // #endregion
 
 // #region Constants
-const SOURCE_TYPES: readonly ManualPreviewSourceType[] = [
-  'manual_text',
-  'scan',
-  'email',
-  'drive',
-  'protocol',
-];
+const SOURCE_TYPES: readonly ManualPreviewSourceType[] = ['manual_text', 'scan', 'email', 'drive', 'protocol'];
+
+const SOURCE_TYPE_LABELS: Record<ManualPreviewSourceType, string> = { manual_text: 'טקסט ידני', scan: 'סריקה', email: 'מייל', drive: 'Drive', protocol: 'פרוטוקול' };
+const FIELD_LABELS = { title: 'כותרת המסמך / המשימה', sourceType: 'סוג מקור', metadataSummary: 'תקציר / תיאור קצר', clientOrCaseLabel: 'לקוח / תיק', domainLabel: 'תחום מקצועי' } as const;
+const PLACEHOLDERS = { title: 'לדוגמה: חשבונית בזק לחודש 04/2026', metadataSummary: 'לדוגמה: חשבונית ספק שנסרקה לצורך בדיקת מע״מ והנהלת חשבונות', clientOrCaseLabel: 'לדוגמה: דוד אלדד מע״מ / דימה / צילה', domainLabel: 'לדוגמה: VAT / שכר / דיני עבודה' } as const;
 
 const INITIAL_FORM_STATE: ManualPreviewFormState = {
   title: '',
@@ -96,6 +100,7 @@ const shellStyle = {
   color: '#e5edf7',
   background: '#0a0e1a',
   direction: 'rtl',
+  textAlign: 'right',
 } as const;
 
 const panelStyle = {
@@ -305,22 +310,23 @@ function PreviewCard({ section }: PreviewCardProps) {
   );
 }
 
-function FieldTextInput({ id, label, value, onChange }: FieldTextInputProps) {
+function FieldTextInput({ id, label, placeholder, value, onChange }: FieldTextInputProps) {
   return (
     <label htmlFor={id} style={{ display: 'grid', gap: 7 }}>
       <span>{label}</span>
-      <input id={id} aria-label={label} value={value} onChange={onChange} style={inputStyle} />
+      <input id={id} aria-label={label} placeholder={placeholder} value={value} onChange={onChange} style={inputStyle} />
     </label>
   );
 }
 
-function FieldTextArea({ id, value, onChange }: FieldTextAreaProps) {
+function FieldTextArea({ id, label, placeholder, value, onChange }: FieldTextAreaProps) {
   return (
     <label htmlFor={id} style={{ display: 'grid', gap: 7 }}>
-      <span>metadataSummary</span>
+      <span>{label}</span>
       <textarea
         id={id}
-        aria-label="metadataSummary"
+        aria-label={label}
+        placeholder={placeholder}
         value={value}
         onChange={onChange}
         rows={5}
@@ -350,7 +356,7 @@ export default function ManualPreviewWorkbench() {
     setForm((current) => ({ ...current, sourceType: event.target.value as ManualPreviewSourceType }));
 
   return (
-    <main style={shellStyle}>
+    <main style={shellStyle} dir="rtl" lang="he">
       <section style={panelStyle}>
         <div style={{ ...cardStyle, borderColor: 'rgba(251, 191, 36, 0.55)' }}>
           <strong>⚠️ סביבת עבודה פנימית — תצוגה מקדימה בלבד — שום דבר לא נשמר</strong>
@@ -358,23 +364,24 @@ export default function ManualPreviewWorkbench() {
 
         <form style={{ ...cardStyle, display: 'grid', gap: 16 }}>
           <h1 style={{ margin: 0, fontSize: 28 }}>Manual Preview Workbench</h1>
+          <p style={{ margin: 0, color: '#cbd5e1', lineHeight: 1.6 }}>הזן כאן קלט ידני כדי לראות כיצד המוח היה מסווג, בודק ומציע המשך טיפול — ללא שמירה וללא פעולה אמיתית.</p>
           <div style={formGridStyle}>
-            <FieldTextInput id="manual-preview-title" label="title" value={form.title} onChange={updateText('title')} />
+            <FieldTextInput id="manual-preview-title" label={FIELD_LABELS.title} placeholder={PLACEHOLDERS.title} value={form.title} onChange={updateText('title')} />
             <label htmlFor="manual-preview-source-type" style={{ display: 'grid', gap: 7 }}>
-              <span>sourceType</span>
-              <select id="manual-preview-source-type" aria-label="sourceType" value={form.sourceType} onChange={updateSourceType} style={inputStyle}>
+              <span>{FIELD_LABELS.sourceType}</span>
+              <select id="manual-preview-source-type" aria-label={FIELD_LABELS.sourceType} value={form.sourceType} onChange={updateSourceType} style={inputStyle}>
                 {SOURCE_TYPES.map((sourceType) => (
-                  <option key={sourceType} value={sourceType}>{sourceType}</option>
+                  <option key={sourceType} value={sourceType}>{SOURCE_TYPE_LABELS[sourceType]}</option>
                 ))}
               </select>
             </label>
-            <FieldTextInput id="manual-preview-client" label="clientOrCaseLabel" value={form.clientOrCaseLabel} onChange={updateText('clientOrCaseLabel')} />
-            <FieldTextInput id="manual-preview-domain" label="domainLabel" value={form.domainLabel} onChange={updateText('domainLabel')} />
+            <FieldTextInput id="manual-preview-client" label={FIELD_LABELS.clientOrCaseLabel} placeholder={PLACEHOLDERS.clientOrCaseLabel} value={form.clientOrCaseLabel} onChange={updateText('clientOrCaseLabel')} />
+            <FieldTextInput id="manual-preview-domain" label={FIELD_LABELS.domainLabel} placeholder={PLACEHOLDERS.domainLabel} value={form.domainLabel} onChange={updateText('domainLabel')} />
           </div>
-          <FieldTextArea id="manual-preview-summary" value={form.metadataSummary} onChange={updateText('metadataSummary')} />
+          <FieldTextArea id="manual-preview-summary" label={FIELD_LABELS.metadataSummary} placeholder={PLACEHOLDERS.metadataSummary} value={form.metadataSummary} onChange={updateText('metadataSummary')} />
           <div style={{ display: 'flex', gap: 10 }}>
-            <button type="button" onClick={() => setForm(INITIAL_FORM_STATE)}>Reset</button>
-            <button type="button" onClick={() => setForm({ ...INITIAL_FORM_STATE })}>Clear</button>
+            <button type="button" onClick={() => setForm(INITIAL_FORM_STATE)}>איפוס</button>
+            <button type="button" onClick={() => setForm({ ...INITIAL_FORM_STATE })}>נקה</button>
           </div>
         </form>
 
