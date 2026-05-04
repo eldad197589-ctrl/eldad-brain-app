@@ -14,6 +14,7 @@ import type { Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import ManualPreviewWorkbench from './ManualPreviewWorkbench';
+import ScannedEvidenceApprovalGatePreview from './ScannedEvidenceApprovalGatePreview';
 import ScannedEvidenceBatchPreview from './ScannedEvidenceBatchPreview';
 import VatMappingTablePreview from './VatMappingTablePreview';
 // #endregion
@@ -75,6 +76,8 @@ const SCANNED_BATCH_INPUT = {
 
 const SCANNED_BATCH_WARNING_TEXT =
   `תצוגה זו מבוססת על אצוות סריקות סטטית בלבד. אין קריאת תיקייה חיה, אין ${'O'}${'CR'}, ואין יצירת משימות.`;
+const SCANNED_APPROVAL_WARNING_TEXT =
+  'תצוגת אישור בלבד — לא נוצרת משימה, לא נשלח דבר, ולא מתבצעת פעולה.';
 
 const FORBIDDEN_BUTTON_LABELS = [
   'Sa' + 've',
@@ -123,6 +126,34 @@ const FORBIDDEN_IMPORT_BOUNDARY_TERMS = [
   'use-c' + 'ases',
   'read-m' + 'odel',
   'proj' + 'ection',
+] as const;
+
+const FORBIDDEN_APPROVAL_SOURCE_TERMS = [
+  'f' + 's',
+  'pa' + 'th',
+  'xl' + 'sx',
+  'O' + 'CR',
+  'pro' + 'vider',
+  'Gma' + 'il',
+  'Dri' + 've',
+  'Mav' + 'en',
+  'fet' + 'ch',
+  'Supa' + 'base',
+  'sto' + 're',
+  'Work' + 'Item',
+  'Mat' + 'ter',
+  'Document' + 'Ref',
+] as const;
+
+const FORBIDDEN_ACTION_BUTTON_WORDS = [
+  'cre' + 'ate',
+  'se' + 'nd',
+  'sub' + 'mit',
+  'sa' + 've',
+  'צור',
+  'שלח',
+  'הגש',
+  'שמור',
 ] as const;
 // #endregion
 
@@ -208,6 +239,9 @@ const getButtonLabels = (container: HTMLElement): string[] =>
   Array.from(container.querySelectorAll<HTMLButtonElement>('button')).map(
     (button) => button.textContent?.trim() ?? '',
   );
+
+const getApprovalPreviews = (container: HTMLElement): HTMLElement[] =>
+  Array.from(container.querySelectorAll<HTMLElement>('[data-testid="scanned-evidence-approval-gate-preview"]'));
 // #endregion
 
 // #region Tests
@@ -498,6 +532,45 @@ describe('ManualPreviewWorkbench', () => {
     cleanup();
   });
 
+  it('displays approval preview for scanned evidence candidates', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    expect(getApprovalPreviews(container).length).toBeGreaterThan(0);
+    expect(container.textContent).toContain(SCANNED_APPROVAL_WARNING_TEXT);
+    expect(container.textContent).toContain('preview_only_not_executed');
+    expect(container.textContent).toContain('scanned-evidence-001');
+    cleanup();
+  });
+
+  it('shows missing fields inside scanned approval preview', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    const approvalPreview = getApprovalPreviews(container)[0];
+    expect(approvalPreview).toBeDefined();
+    expect(approvalPreview.textContent).toContain('missingFields');
+    expect(approvalPreview.textContent).toContain('client_or_matter');
+    expect(approvalPreview.textContent).toContain('document_date');
+    cleanup();
+  });
+
+  it('keeps scanned approval preview passive without real action controls', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    getApprovalPreviews(container).forEach((approvalPreview) => {
+      expect(approvalPreview.querySelector('button')).toBeNull();
+    });
+    FORBIDDEN_ACTION_BUTTON_WORDS.forEach((word) => {
+      expect(getButtonLabels(container).join(' ')).not.toContain(word);
+    });
+    cleanup();
+  });
+
   it('renders only Reset and Clear buttons', () => {
     const { container, cleanup } = mountWorkbench();
 
@@ -530,17 +603,23 @@ describe('ManualPreviewWorkbench', () => {
     const componentText = ManualPreviewWorkbench.toString();
     const mappingComponentText = VatMappingTablePreview.toString();
     const scannedBatchComponentText = ScannedEvidenceBatchPreview.toString();
+    const scannedApprovalComponentText = ScannedEvidenceApprovalGatePreview.toString();
 
     FORBIDDEN_SURFACE_TERMS.forEach((term) => {
       expect(html).not.toContain(term);
       expect(componentText).not.toContain(term);
       expect(mappingComponentText).not.toContain(term);
       expect(scannedBatchComponentText).not.toContain(term);
+      expect(scannedApprovalComponentText).not.toContain(term);
     });
     FORBIDDEN_IMPORT_BOUNDARY_TERMS.forEach((term) => {
       expect(componentText).not.toContain(term);
       expect(mappingComponentText).not.toContain(term);
       expect(scannedBatchComponentText).not.toContain(term);
+      expect(scannedApprovalComponentText).not.toContain(term);
+    });
+    FORBIDDEN_APPROVAL_SOURCE_TERMS.forEach((term) => {
+      expect(scannedApprovalComponentText).not.toContain(term);
     });
   });
 

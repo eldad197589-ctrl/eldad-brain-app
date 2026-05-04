@@ -7,6 +7,7 @@
 
 // #region Imports
 import { STATIC_SCANNED_EVIDENCE_BATCHES } from '../../../work-spine/scanned-evidence/scanned-evidence-static-batch';
+import ScannedEvidenceApprovalGatePreview from './ScannedEvidenceApprovalGatePreview';
 // #endregion
 
 // #region Types
@@ -40,16 +41,7 @@ interface CandidateRowProps {
 const MISSING = 'חסר';
 const CLIENT_GUESS_FIELD = `clientOr${'Mat'}terGuess` as keyof StaticScannedCandidate;
 
-const SCANS_SIGNAL_TERMS = [
-  'scans',
-  'scan',
-  'סריקות',
-  'סריקה',
-  'תיקיית סריקות',
-  'batch',
-  'אצווה',
-  'מסמכים שנסרקו',
-] as const;
+const SCANS_SIGNAL_TERMS = ['scans', 'scan', 'סריקות', 'סריקה', 'תיקיית סריקות', 'batch', 'אצווה', 'מסמכים שנסרקו'] as const;
 
 const DOCUMENT_KIND_RULES: readonly MatchRule<StaticDocumentKind>[] = [
   { value: 'supplier_invoice', terms: ['חשבונית'] },
@@ -105,6 +97,12 @@ const headerCellStyle = {
   fontWeight: 700,
   color: '#e2e8f0',
   fontSize: 12,
+};
+
+const approvalCellStyle = {
+  ...cellStyle,
+  background: 'rgba(15, 23, 42, 0.56)',
+  padding: 10,
 };
 // #endregion
 
@@ -218,22 +216,29 @@ const formatClientGuess = (candidate: StaticScannedCandidate): string =>
 // #region Components
 function CandidateRow({ candidate }: CandidateRowProps) {
   return (
-    <tr>
-      <td style={cellStyle}>{candidate.documentKind}</td>
-      <td style={cellStyle}>{candidate.sourceFileName}</td>
-      <td style={cellStyle}>{candidate.professionalDomain}</td>
-      <td style={cellStyle}>{formatClientGuess(candidate)}</td>
-      <td style={cellStyle}>{formatKnownParties(candidate)}</td>
-      <td style={cellStyle}>{formatValue(candidate.documentDate)}</td>
-      <td style={cellStyle}>{formatValue(candidate.periodDescription)}</td>
-      <td style={cellStyle}>{formatValue(candidate.amountIfKnown)}</td>
-      <td style={cellStyle}>{formatValue(candidate.vatIfRelevant)}</td>
-      <td style={cellStyle}>{formatValue(candidate.deadlineIfRelevant)}</td>
-      <td style={cellStyle}>{candidate.missingFields.join(', ')}</td>
-      <td style={cellStyle}>{candidate.suggestedActionPreview}</td>
-      <td style={cellStyle}>{candidate.confidence}</td>
-      <td style={cellStyle}>{candidate.sourceTrace}</td>
-    </tr>
+    <>
+      <tr>
+        <td style={cellStyle}>{candidate.documentKind}</td>
+        <td style={cellStyle}>{candidate.sourceFileName}</td>
+        <td style={cellStyle}>{candidate.professionalDomain}</td>
+        <td style={cellStyle}>{formatClientGuess(candidate)}</td>
+        <td style={cellStyle}>{formatKnownParties(candidate)}</td>
+        <td style={cellStyle}>{formatValue(candidate.documentDate)}</td>
+        <td style={cellStyle}>{formatValue(candidate.periodDescription)}</td>
+        <td style={cellStyle}>{formatValue(candidate.amountIfKnown)}</td>
+        <td style={cellStyle}>{formatValue(candidate.vatIfRelevant)}</td>
+        <td style={cellStyle}>{formatValue(candidate.deadlineIfRelevant)}</td>
+        <td style={cellStyle}>{candidate.missingFields.join(', ')}</td>
+        <td style={cellStyle}>{candidate.suggestedActionPreview}</td>
+        <td style={cellStyle}>{candidate.confidence}</td>
+        <td style={cellStyle}>{candidate.sourceTrace}</td>
+      </tr>
+      <tr>
+        <td colSpan={14} style={approvalCellStyle}>
+          <ScannedEvidenceApprovalGatePreview candidate={candidate} />
+        </td>
+      </tr>
+    </>
   );
 }
 // #endregion
