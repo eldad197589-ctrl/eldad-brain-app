@@ -13,6 +13,8 @@ export const BRAIN_BUILD_PROGRESS_ROUTE = '/internal/brain-build-progress';
 export const MANUAL_WORKBENCH_ROUTE = '/internal/manual-preview-workbench';
 export const BRAIN_BUILD_PROGRESS_WARNING =
   'התקדמות בנייה בלבד — לא מוכנות תפעולית, לא אימות מקצועי, לא חיבור חי, ולא הרשאה לפעול.';
+export const BRAIN_BUILD_LATEST_CHANGE_WARNING =
+  'סיכום שינוי סטטי בלבד — לא פריסה חיה, לא מוכנות תפעולית, לא אימות מקור, לא חיבור ספקים, ולא הרשאה לפעול.';
 
 const COMMON_BLOCKED = [
   'no live source access',
@@ -29,6 +31,33 @@ const proofScenario = (input: string, expectedVisibleResult: string) => ({
 // #endregion
 
 // #region Static Data
+/** Latest committed build-state summary shown above the full progress history. */
+export const BRAIN_BUILD_LATEST_CHANGE_SUMMARY = {
+  title: 'תיקון עברית מלא למסך התקדמות בניית המוח',
+  relatedCommit: '0132154',
+  whereToSee: BRAIN_BUILD_PROGRESS_ROUTE,
+  whatChanged: 'המסך עבר לתצוגה עברית מלאה: כותרות, מדדים, סטטוסים, שדות, שמות פריטים ופעולות חסומות.',
+  proofOfLife: `המסך מציג UI עברי מלא ושומר על האזהרה: ${BRAIN_BUILD_PROGRESS_WARNING}`,
+  stillBlocked: [
+    'אין פעולה חיה',
+    'אין שמירה',
+    'אין חיבור ספק',
+    'אין יצירת משימה',
+    'אין יצירת תיק',
+    'אין DocumentRef',
+    'אין persistence',
+  ],
+  nextSafeStep: 'ביקורת חזותית בלבד לפני הרחבה נוספת.',
+  safetyStatus: 'סיכום התקדמות לקריאה בלבד',
+  safetyNotes: [
+    'מידע בנייה פנימי אמיתי לקריאה בלבד',
+    'לא מוכנות תפעולית',
+    'לא אימות מקור',
+    'אין חיבור ספקים',
+    'אין הרשאת פעולה או שמירה',
+  ],
+} as const;
+
 /** Static build progress checkpoints for the temporary Brain Build Progress Console. */
 export const BRAIN_BUILD_PROGRESS_ITEMS: readonly BrainBuildProgressItem[] = [
   {

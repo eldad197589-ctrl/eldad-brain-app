@@ -2,6 +2,8 @@
 
 // #region Imports
 import {
+  BRAIN_BUILD_LATEST_CHANGE_SUMMARY,
+  BRAIN_BUILD_LATEST_CHANGE_WARNING,
   BRAIN_BUILD_PROGRESS_ITEMS,
   BRAIN_BUILD_PROGRESS_ROUTE,
   BRAIN_BUILD_PROGRESS_WARNING,
@@ -29,9 +31,11 @@ const SAFETY_NOTICES = [
 ] as const;
 
 const DETAIL_LABELS = {
+  title: 'כותרת',
   relatedCommit: 'Commit קשור',
   visibleRoute: 'איפה רואים',
   proofScenario: 'הוכחת תצוגה',
+  whatChanged: 'מה השתנה',
   whatWasBuilt: 'מה נבנה',
   whatEldadCanSee: 'מה אלדד רואה',
   nextSafeStep: 'השלב הבטוח הבא',
@@ -136,11 +140,11 @@ const translatedBlockedActions = (items: readonly BrainBuildBlockedAction[]): re
 const renderList = (items: readonly string[], testId: string, label?: string) => (
   <section aria-label={label}>
     {label ? <h4 style={{ margin: '12px 0 4px' }}>{label}</h4> : null}
-  <ul data-testid={testId} style={{ margin: '8px 0 0', paddingInlineStart: 20 }}>
-    {items.map((item) => (
-      <li key={item}>{item}</li>
-    ))}
-  </ul>
+    <ul data-testid={testId} style={{ margin: '8px 0 0', paddingInlineStart: 20 }}>
+      {items.map((item) => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
   </section>
 );
 // #endregion
@@ -187,6 +191,35 @@ function ProgressMetrics() {
       <MetricCard label="נקודות בנייה שננעלו" value={BRAIN_BUILD_PROGRESS_ITEMS.length} />
       <MetricCard label="הוכחות תצוגה פעילות" value={visibleProofScreenCount()} />
       <MetricCard label="פעולות חיות פעילות" value={0} />
+    </section>
+  );
+}
+
+function LatestChangeSummary() {
+  const latestChangeDetails = [
+    [DETAIL_LABELS.title, BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title],
+    [DETAIL_LABELS.relatedCommit, BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit],
+    [DETAIL_LABELS.visibleRoute, BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee],
+    [DETAIL_LABELS.whatChanged, BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged],
+    [DETAIL_LABELS.proofScenario, BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife],
+    [DETAIL_LABELS.nextSafeStep, BRAIN_BUILD_LATEST_CHANGE_SUMMARY.nextSafeStep],
+    [DETAIL_LABELS.safetyStatus, BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus],
+  ] as const;
+
+  return (
+    <section data-testid="build-progress-latest-change" style={{ background: 'rgba(8, 47, 73, 0.52)', border: '1px solid rgba(125, 211, 252, 0.28)', borderRadius: 12, marginTop: 18, padding: 18 }}>
+      <h2 style={{ color: '#bae6fd', fontSize: 22, margin: '0 0 8px' }}>מה השתנה עכשיו</h2>
+      <p style={{ color: '#fbbf24', fontWeight: 700, margin: '0 0 10px' }}>{BRAIN_BUILD_LATEST_CHANGE_WARNING}</p>
+      {renderList(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyNotes, 'build-progress-latest-safety-notes')}
+      <dl style={{ display: 'grid', gap: 8, margin: '12px 0 0' }}>
+        {latestChangeDetails.map(([label, value]) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+      {renderList(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked, 'build-progress-latest-blocked', 'מה עדיין חסום')}
     </section>
   );
 }
@@ -264,6 +297,7 @@ export default function BrainBuildProgressConsole() {
   return (
     <main data-testid="brain-build-progress-console" dir="rtl" style={{ color: '#e5edf7', padding: 24 }}>
       <ProgressHeader />
+      <LatestChangeSummary />
       <ProgressMetrics />
       {groupProgressItems().map(([layer, progressItems]) => (
         <ProgressLayerSection key={layer} layer={layer} progressItems={progressItems} />

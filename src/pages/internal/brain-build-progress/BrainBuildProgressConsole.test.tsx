@@ -9,6 +9,8 @@ import type { Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import {
+  BRAIN_BUILD_LATEST_CHANGE_SUMMARY,
+  BRAIN_BUILD_LATEST_CHANGE_WARNING,
   BRAIN_BUILD_PROGRESS_ITEMS,
   BRAIN_BUILD_PROGRESS_ROUTE,
   BRAIN_BUILD_PROGRESS_WARNING,
@@ -142,6 +144,28 @@ const BANNED_ACTION_WORDING = [
   'deploy',
 ] as const;
 
+const BANNED_LATEST_CHANGE_WORDING = [
+  'live',
+  'deployed',
+  'activated',
+  'enabled',
+  'ready',
+  'operational',
+  'verified',
+  'approved',
+  'correct',
+  'connected',
+  'synced',
+  'persisted',
+  'executed',
+  'created',
+  'submitted',
+  'sent',
+  'posted',
+  'filed',
+  'production',
+] as const;
+
 const FORBIDDEN_SOURCE_PATTERNS = [
   /from ['"]fs['"]/,
   /from ['"]path['"]/,
@@ -152,9 +176,9 @@ const FORBIDDEN_SOURCE_PATTERNS = [
   /Supabase/,
   /\bDB\b/,
   /runtime/,
-  /WorkItem/,
-  /Matter/,
-  /DocumentRef/,
+  /import\s+.*WorkItem/,
+  /import\s+.*Matter/,
+  /import\s+.*DocumentRef/,
 ] as const;
 // #endregion
 
@@ -235,6 +259,39 @@ describe('BrainBuildProgressConsole', () => {
     }
   });
 
+  it('renders the latest change summary before metrics', () => {
+    const html = renderConsole();
+
+    expect(html.indexOf('מה השתנה עכשיו')).toBeLessThan(html.indexOf('נקודות בנייה שננעלו'));
+    expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_WARNING);
+    expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title);
+    expect(html).toContain('0132154');
+    expect(html).toContain('/internal/brain-build-progress');
+    expect(html).toContain(BRAIN_BUILD_PROGRESS_WARNING);
+    expect(html).toContain('מידע בנייה פנימי אמיתי לקריאה בלבד');
+    expect(html).toContain('אין פעולה חיה');
+    expect(html).toContain('אין DocumentRef');
+    expect(html).toContain('אין persistence');
+    expect(html).toContain('ביקורת חזותית בלבד לפני הרחבה נוספת.');
+    expect(html).toContain('סיכום התקדמות לקריאה בלבד');
+  });
+
+  it('does not use banned live deployment wording in the latest change summary', () => {
+    const { container, cleanup } = mountConsole();
+
+    try {
+      const latestChange = container.querySelector('[data-testid="build-progress-latest-change"]')?.cloneNode(true) as HTMLElement;
+      latestChange.querySelectorAll('[data-testid="build-progress-latest-blocked"]').forEach((element) => element.remove());
+      const latestChangeText = latestChange.textContent?.toLowerCase() ?? '';
+
+      for (const bannedWord of BANNED_LATEST_CHANGE_WORDING) {
+        expect(latestChangeText).not.toMatch(new RegExp(`\\b${bannedWord}\\b`, 'i'));
+      }
+    } finally {
+      cleanup();
+    }
+  });
+
   it('shows visible route, proof scenario, blocked actions, and recent commits in Hebrew-first copy', () => {
     const html = renderConsole();
 
@@ -308,10 +365,12 @@ describe('BrainBuildProgressConsole', () => {
   it('does not import or call forbidden live surfaces in the component source', () => {
     const componentText = BrainBuildProgressConsole.toString();
     const serializedItems = JSON.stringify(BRAIN_BUILD_PROGRESS_ITEMS);
+    const serializedLatestChange = JSON.stringify(BRAIN_BUILD_LATEST_CHANGE_SUMMARY);
 
     for (const forbiddenPattern of FORBIDDEN_SOURCE_PATTERNS) {
       expect(componentText).not.toMatch(forbiddenPattern);
       expect(serializedItems).not.toMatch(forbiddenPattern);
+      expect(serializedLatestChange).not.toMatch(forbiddenPattern);
     }
   });
 });

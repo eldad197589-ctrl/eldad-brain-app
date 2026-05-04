@@ -3,6 +3,8 @@
 // #region Imports
 import { describe, expect, it } from 'vitest';
 import {
+  BRAIN_BUILD_LATEST_CHANGE_SUMMARY,
+  BRAIN_BUILD_LATEST_CHANGE_WARNING,
   BRAIN_BUILD_PROGRESS_ITEMS,
   BRAIN_BUILD_PROGRESS_ROUTE,
   BRAIN_BUILD_PROGRESS_WARNING,
@@ -110,6 +112,22 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     expect(BRAIN_BUILD_PROGRESS_WARNING).toBe(
       'התקדמות בנייה בלבד — לא מוכנות תפעולית, לא אימות מקצועי, לא חיבור חי, ולא הרשאה לפעול.',
     );
+    expect(BRAIN_BUILD_LATEST_CHANGE_WARNING).toBe(
+      'סיכום שינוי סטטי בלבד — לא פריסה חיה, לא מוכנות תפעולית, לא אימות מקור, לא חיבור ספקים, ולא הרשאה לפעול.',
+    );
+  });
+
+  it('exports the latest committed change summary for the top console section', () => {
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('תיקון עברית מלא למסך התקדמות בניית המוח');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('0132154');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee).toBe(BRAIN_BUILD_PROGRESS_ROUTE);
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain(BRAIN_BUILD_PROGRESS_WARNING);
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין פעולה חיה');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין יצירת משימה');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין יצירת תיק');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין DocumentRef');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין persistence');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe('סיכום התקדמות לקריאה בלבד');
   });
 
   it('includes every required field and static safety marker', () => {
