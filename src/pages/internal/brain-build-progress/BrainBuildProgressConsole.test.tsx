@@ -20,6 +20,18 @@ import {
   BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS,
   BRAIN_BUILD_STAGE_ROADMAP_WORKING_PLAN_NOTICE,
 } from '../../../work-spine/build-progress/brain-build-progress-console-seed';
+import {
+  BRAIN_SYSTEM_SOURCE_MAP_ROW_WARNING,
+  BRAIN_SYSTEM_SOURCE_MAP_ROWS,
+  BRAIN_SYSTEM_SOURCE_MAP_TITLE,
+  BRAIN_SYSTEM_SOURCE_MAP_WARNING,
+} from '../../../work-spine/build-progress/brain-system-source-map-seed';
+import {
+  BRAIN_VISUAL_PROCESS_PENDING_CANDIDATES,
+  BRAIN_VISUAL_PROCESS_REGISTRY_ROWS,
+  BRAIN_VISUAL_PROCESS_REGISTRY_TITLE,
+  BRAIN_VISUAL_PROCESS_REGISTRY_WARNING,
+} from '../../../work-spine/build-progress/brain-visual-process-registry-seed';
 import brainBuildProgressConsoleSource from './BrainBuildProgressConsole.tsx?raw';
 import BrainBuildProgressConsole from './BrainBuildProgressConsole';
 // #endregion
@@ -52,6 +64,8 @@ const HEBREW_COPY = [
   'פעולות חסומות',
   'תצוגת טבלת מיפוי מע״מ',
   'מלאי משטחי מוח חזותיים',
+  'מפת מצב המוח ומקורותיו',
+  'רשימת תהליכי המוח הוויזואלי',
 ] as const;
 
 const INTERNAL_LABELS = [
@@ -94,15 +108,21 @@ const BANNED_WORDING = [
 ] as const;
 
 const FORBIDDEN_SOURCE_PATTERNS = [
+  /brainStore/,
+  /work-spine\/.*repository/i,
+  /work-spine\/.*use-cases/i,
   /from ['"]fs['"]/,
   /from ['"]path['"]/,
+  /from ['"]xlsx['"]/,
+  /from ['"].*provider/i,
   /fetch\s*\(/,
   /localStorage/,
   /sessionStorage/,
   /OAuth/,
+  /OCR/,
   /Supabase/,
   /\bDB\b/,
-  /runtime/,
+  /from ['"].*runtime/i,
   /import\s+.*WorkItem/,
   /import\s+.*Matter/,
   /import\s+.*DocumentRef/,
@@ -125,7 +145,7 @@ const REQUIRED_HEBREW_STAGE_TITLES = [
   'תצוגת מלאי ידע',
   'סיכום רמזי קלט',
   'תצוגת צורת משימה היפותטית',
-  'מצב המוח הוויזואלי',
+  'מפת מצב המוח ומקורותיו',
   'מפת מקורות ידע חיצוניים',
   'הרחבת ראיות סריקה אמיתיות',
   'שער תפעולי מוגבל ראשון',
@@ -251,10 +271,8 @@ describe('BrainBuildProgressConsole', () => {
   });
 
   it('does not import or call forbidden live surfaces in the component source', () => {
-    const componentText = BrainBuildProgressConsole.toString();
-
     for (const forbiddenPattern of FORBIDDEN_SOURCE_PATTERNS) {
-      expect(componentText).not.toMatch(forbiddenPattern);
+      expect(brainBuildProgressConsoleSource).not.toMatch(forbiddenPattern);
     }
   });
 
@@ -268,6 +286,109 @@ describe('BrainBuildProgressConsole', () => {
       expect(renderedText).toContain('אין יצירת WorkItem אמיתי ללא אישור');
       expect(renderedText).toContain('אין DocumentRef');
       expect(renderedText).toContain('אין חיבור ספקים');
+      expect(container.querySelectorAll('button')).toHaveLength(0);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders the source ecosystem map after the roadmap and before the long history', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const sourceMap = container.querySelector('[data-testid="brain-system-source-map"]');
+      const roadmap = container.querySelector('[data-testid="brain-build-stage-roadmap"]');
+      const firstHistoryItem = container.querySelector('[data-testid="build-progress-item"]');
+
+      expect(sourceMap).not.toBeNull();
+      expect(roadmap).not.toBeNull();
+      expect(firstHistoryItem).not.toBeNull();
+      expect(Boolean(roadmap!.compareDocumentPosition(sourceMap!) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+      expect(Boolean(sourceMap!.compareDocumentPosition(firstHistoryItem!) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders the exact source map warnings and 20 index-only rows', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const sourceMap = container.querySelector('[data-testid="brain-system-source-map"]');
+      expect(sourceMap).not.toBeNull();
+      const sourceMapText = sourceMap!.textContent ?? '';
+      expect(sourceMapText).toContain(BRAIN_SYSTEM_SOURCE_MAP_TITLE);
+      expect(sourceMapText).toContain(BRAIN_SYSTEM_SOURCE_MAP_WARNING);
+      expect(sourceMapText).toContain(BRAIN_SYSTEM_SOURCE_MAP_ROW_WARNING);
+      expect(sourceMap!.querySelectorAll('[data-testid="brain-system-source-row"]')).toHaveLength(20);
+      expect(BRAIN_SYSTEM_SOURCE_MAP_ROWS).toHaveLength(20);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders conservative source statuses without action controls', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const sourceMapText = container.querySelector('[data-testid="brain-system-source-map"]')?.textContent ?? '';
+      expect(sourceMapText).toContain('Gmail/Drive exports');
+      expect(sourceMapText).toContain('חיבור חי חסום');
+      expect(sourceMapText).toContain('סריקות');
+      expect(sourceMapText).toContain('לא נקראה תיקייה');
+      expect(sourceMapText).toContain('לא הופעל OCR');
+      expect(sourceMapText).toContain('דימה');
+      expect(sourceMapText).toContain('צילה');
+      expect(sourceMapText).toContain('לא מאשרת שתוכן תיק נקרא');
+      expect(sourceMapText).toContain('לא מאשרת תלושים');
+      expect(container.querySelectorAll('button')).toHaveLength(0);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders the visual Brain process registry as a static/index-only snapshot', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const registry = container.querySelector('[data-testid="brain-visual-process-registry"]');
+      expect(registry).not.toBeNull();
+      const registryText = registry!.textContent ?? '';
+      expect(registryText).toContain(BRAIN_VISUAL_PROCESS_REGISTRY_TITLE);
+      expect(registryText).toContain(BRAIN_VISUAL_PROCESS_REGISTRY_WARNING);
+      expect(registryText).toContain('17 נבנו · 2 בבנייה · 3 ממתינים');
+      expect(registry!.querySelectorAll('[data-testid="brain-visual-process-group"]')).toHaveLength(7);
+      expect(registry!.querySelectorAll('[data-testid="brain-visual-process-row"]')).toHaveLength(22);
+      expect(BRAIN_VISUAL_PROCESS_REGISTRY_ROWS).toHaveLength(22);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders required visual process labels and pending candidates', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const registryText = container.querySelector('[data-testid="brain-visual-process-registry"]')?.textContent ?? '';
+      const requiredProcesses = [
+        'פיצויי מלחמה',
+        'ביטול קנסות',
+        'מחזור חיי עובד',
+        'בוט מכתבים',
+        'אפוטרופוס',
+        'רווח הון ממקרקעין בחו"ל',
+        'דוחות מוסדיים',
+        'קליטת לקוחות ותמחור',
+      ];
+      const requiredPendingCandidates = ['מע"מ חודשי', 'דוח שנתי', 'ביטוח לאומי', 'דמי הבראה', 'חישובי פיצויים', 'הסכם קיבוצי'];
+
+      for (const processLabel of requiredProcesses) {
+        expect(registryText).toContain(processLabel);
+      }
+      for (const candidate of requiredPendingCandidates) {
+        expect(BRAIN_VISUAL_PROCESS_PENDING_CANDIDATES).toContain(candidate);
+        expect(registryText).toContain(candidate);
+      }
+      expect(registryText).toContain('visualPresenceOnly:true');
+      expect(registryText).toContain('indexOnly:true');
+      expect(registryText).toContain('operationalReady:false');
+      expect(registryText).toContain('canExecute:false');
+      expect(registryText).toContain('canCreateRecord:false');
       expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {
       cleanup();
@@ -360,10 +481,11 @@ describe('BrainBuildStageRoadmap', () => {
       const stage17 = compactStages.find((el) => el.textContent?.includes('17.'));
       expect(stage17).toBeDefined();
       const text = stage17!.textContent ?? '';
-      expect(text).toContain('מצב המוח הוויזואלי');
+      expect(text).toContain('מפת מצב המוח ומקורותיו');
       expect(text).toContain('עכשיו');
       // Verify they are NOT concatenated — there must be a separator between title and status
-      expect(text).not.toContain('הוויזואליעכשיו');
+      expect(text).not.toContain('מקורותיועכשיו');
+      expect(text).not.toContain('מצב המוח הוויזואלי');
     } finally {
       cleanup();
     }

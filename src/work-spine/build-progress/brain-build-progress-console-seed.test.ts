@@ -78,7 +78,7 @@ const REQUIRED_ROADMAP_STAGE_TITLES = [
   'תצוגת מלאי ידע',
   'סיכום רמזי קלט',
   'תצוגת צורת משימה היפותטית',
-  'מצב המוח הוויזואלי',
+  'מפת מצב המוח ומקורותיו',
   'מפת מקורות ידע חיצוניים',
   'הרחבת ראיות סריקה אמיתיות',
   'שער תפעולי מוגבל ראשון',
@@ -232,6 +232,7 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
   it('uses the approved Hebrew stage titles in order', () => {
     expect(roadmapStages().map((stage) => stage.title)).toEqual(REQUIRED_ROADMAP_STAGE_TITLES);
     expect(serializedRoadmapText()).not.toContain('Visual Brain Surface Section');
+    expect(serializedRoadmapText()).not.toContain('מצב המוח הוויזואלי');
   });
 
   it('exports exactly three roadmap groups with Hebrew titles', () => {
@@ -255,6 +256,14 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
     for (const stage of roadmapStages()) {
       expect(stage.status).toBe(expected[stage.order]);
     }
+  });
+
+  it('renames stage 17 to the Brain System Source Map without changing roadmap count', () => {
+    const stage17 = roadmapStages().find((stage) => stage.order === 17);
+    expect(stage17).toBeDefined();
+    expect(stage17!.title).toBe('מפת מצב המוח ומקורותיו');
+    expect(stage17!.status).toBe('current');
+    expect(stage17!.compactLine).toBe('מפת מקורות + רשימת תהליכי המוח הוויזואלי — אינדקס בלבד, לא פעולה.');
   });
 
   it('marks every roadmap stage as static roadmap only', () => {

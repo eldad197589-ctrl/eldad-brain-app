@@ -15,6 +15,20 @@ import {
   BRAIN_BUILD_STAGE_ROADMAP_STATUSES,
   BRAIN_BUILD_STAGE_ROADMAP_WORKING_PLAN_NOTICE,
 } from '../../../work-spine/build-progress/brain-build-progress-console-seed';
+import {
+  BRAIN_SYSTEM_SOURCE_MAP_ROW_WARNING,
+  BRAIN_SYSTEM_SOURCE_MAP_ROWS,
+  BRAIN_SYSTEM_SOURCE_MAP_TITLE,
+  BRAIN_SYSTEM_SOURCE_MAP_WARNING,
+} from '../../../work-spine/build-progress/brain-system-source-map-seed';
+import {
+  BRAIN_VISUAL_PROCESS_CATEGORIES,
+  BRAIN_VISUAL_PROCESS_PENDING_CANDIDATES,
+  BRAIN_VISUAL_PROCESS_REGISTRY_ROWS,
+  BRAIN_VISUAL_PROCESS_REGISTRY_TITLE,
+  BRAIN_VISUAL_PROCESS_REGISTRY_WARNING,
+  BRAIN_VISUAL_PROCESS_STATUS_LABELS,
+} from '../../../work-spine/build-progress/brain-visual-process-registry-seed';
 import type {
   BrainBuildBlockedAction,
   BrainBuildProofStatus,
@@ -25,6 +39,16 @@ import type {
   BrainBuildProgressStatus,
   BrainBuildSurfaceClassification,
 } from '../../../work-spine/build-progress/brain-build-progress-console-types';
+import type {
+  BrainSystemSourceKind,
+  BrainSystemSourceMapRow,
+  BrainSystemSourceRiskLevel,
+  BrainSystemSourceStatus,
+} from '../../../work-spine/build-progress/brain-system-source-map-types';
+import type {
+  BrainVisualProcessBuildStatus,
+  BrainVisualProcessRegistryRow,
+} from '../../../work-spine/build-progress/brain-visual-process-registry-types';
 // #endregion
 
 // #region Constants
@@ -125,6 +149,35 @@ const LAYER_LABELS: Record<BrainBuildProgressLayer, string> = {
   proof_inventory: 'מלאי הוכחות',
   surface_inventory: 'מלאי משטחים',
 };
+
+const SOURCE_STATUS_LABELS: Record<BrainSystemSourceStatus, string> = {
+  known_source: 'מקור ידוע',
+  partial_static: 'סטטי חלקי',
+  imported_context: 'הקשר מיובא',
+  needs_mining: 'דורש כרייה עתידית',
+  blocked_live_connection: 'חיבור חי חסום',
+  unknown_needs_audit: 'לא ידוע, נדרש Audit',
+};
+
+const SOURCE_KIND_LABELS: Record<BrainSystemSourceKind, string> = {
+  internal_brain_system: 'מערכת מוח פנימית',
+  governance: 'ממשל וזהירות',
+  static_inventory: 'מלאי סטטי',
+  manual_source_area: 'אזור מקור ידני',
+  case_context: 'הקשר תיק',
+  professional_domain: 'דומיין מקצועי',
+  product_context: 'הקשר מוצר',
+  provider_snapshot: 'ייצוא/ספק חסום',
+  runtime_area: 'אזור Runtime חסום',
+  output_engine: 'מנוע פלט חסום',
+};
+
+const SOURCE_RISK_LABELS: Record<BrainSystemSourceRiskLevel, string> = {
+  low: 'סיכון נמוך',
+  medium: 'סיכון בינוני',
+  high: 'סיכון גבוה',
+  blocked: 'חסום',
+};
 // #endregion
 
 // #region Helpers
@@ -170,6 +223,59 @@ const roadmapSummaryCounter = (): string => {
   return `${built} נבנו · ${current} עכשיו · ${next} ממתינים · ${blocked} חסום`;
 };
 
+// #region Source Map Helpers
+const sourceStatusCounter = (): string => {
+  const counts = BRAIN_SYSTEM_SOURCE_MAP_ROWS.reduce<Record<BrainSystemSourceStatus, number>>(
+    (currentCounts, sourceRow) => ({
+      ...currentCounts,
+      [sourceRow.status]: currentCounts[sourceRow.status] + 1,
+    }),
+    {
+      known_source: 0,
+      partial_static: 0,
+      imported_context: 0,
+      needs_mining: 0,
+      blocked_live_connection: 0,
+      unknown_needs_audit: 0,
+    },
+  );
+
+  return Object.entries(counts)
+    .filter(([, count]) => count > 0)
+    .map(([status, count]) => `${SOURCE_STATUS_LABELS[status as BrainSystemSourceStatus]}: ${count}`)
+    .join(' · ');
+};
+
+const groupedSourceRows = (): readonly [BrainSystemSourceKind, readonly BrainSystemSourceMapRow[]][] => {
+  const sourceKinds = Array.from(new Set(BRAIN_SYSTEM_SOURCE_MAP_ROWS.map((sourceRow) => sourceRow.sourceKind)));
+
+  return sourceKinds.map((sourceKind) => [
+    sourceKind,
+    BRAIN_SYSTEM_SOURCE_MAP_ROWS.filter((sourceRow) => sourceRow.sourceKind === sourceKind),
+  ]);
+};
+// #endregion
+
+// #region Visual Process Helpers
+const visualProcessStatusCounter = (): string => {
+  const counts = BRAIN_VISUAL_PROCESS_REGISTRY_ROWS.reduce<Record<BrainVisualProcessBuildStatus, number>>(
+    (currentCounts, processRow) => ({
+      ...currentCounts,
+      [processRow.buildStatus]: currentCounts[processRow.buildStatus] + 1,
+    }),
+    { built: 0, building: 0, pending: 0 },
+  );
+
+  return `${counts.built} נבנו · ${counts.building} בבנייה · ${counts.pending} ממתינים`;
+};
+
+const groupedVisualProcesses = (): readonly [string, readonly BrainVisualProcessRegistryRow[]][] =>
+  BRAIN_VISUAL_PROCESS_CATEGORIES.map((categoryItem) => [
+    categoryItem.categoryLabel,
+    BRAIN_VISUAL_PROCESS_REGISTRY_ROWS.filter((processRow) => processRow.categoryId === categoryItem.categoryId),
+  ]);
+// #endregion
+
 // #region Types
 type RoadmapStageStatus = (typeof BRAIN_BUILD_STAGE_ROADMAP_STATUSES)[number];
 type BrainBuildRoadmapGroup = (typeof BRAIN_BUILD_STAGE_ROADMAP_GROUPS)[number];
@@ -195,6 +301,34 @@ interface MetricCardProps {
   label: string;
   /** Metric value. */
   value: number;
+}
+
+/** Props for one compact source-map row. */
+interface SourceMapRowProps {
+  /** Index-only source row to render. */
+  sourceRow: BrainSystemSourceMapRow;
+}
+
+/** Props for one source-map group. */
+interface SourceMapGroupProps {
+  /** Static source group kind. */
+  sourceKind: BrainSystemSourceKind;
+  /** Source rows in the group. */
+  sourceRows: readonly BrainSystemSourceMapRow[];
+}
+
+/** Props for one compact visual process row. */
+interface VisualProcessRowProps {
+  /** Static visual process row. */
+  processRow: BrainVisualProcessRegistryRow;
+}
+
+/** Props for one visual process category group. */
+interface VisualProcessGroupProps {
+  /** Category label. */
+  categoryLabel: string;
+  /** Visual process rows in the category. */
+  processRows: readonly BrainVisualProcessRegistryRow[];
 }
 // #endregion
 
@@ -376,6 +510,94 @@ function StageRoadmapSection() {
 }
 // #endregion
 
+// #region Source Map Components
+function SourceMapRow({ sourceRow }: SourceMapRowProps) {
+  return (
+    <article data-testid="brain-system-source-row" style={{ borderBottom: '1px solid rgba(148, 163, 184, 0.08)', padding: '8px 0' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'baseline' }}>
+        <strong>{sourceRow.label}</strong>
+        <span style={{ color: '#93c5fd' }}>{SOURCE_STATUS_LABELS[sourceRow.status]}</span>
+        <span style={{ color: '#94a3b8' }}>תחום: {sourceRow.domain}</span>
+        <span style={{ color: '#94a3b8' }}>סיכון: {SOURCE_RISK_LABELS[sourceRow.riskLevel]}</span>
+      </div>
+      <p style={{ color: '#cbd5e1', fontSize: 13, margin: '4px 0 0' }}>{sourceRow.whatIsKnown}</p>
+      <p style={{ color: '#fecaca', fontSize: 13, margin: '4px 0 0' }}>{sourceRow.whatIsNotKnown}</p>
+      <p style={{ color: '#fde68a', fontSize: 12, margin: '4px 0 0' }}>{sourceRow.visibleWarning}</p>
+    </article>
+  );
+}
+
+function SourceMapGroup({ sourceKind, sourceRows }: SourceMapGroupProps) {
+  return (
+    <section data-testid="brain-system-source-group" style={{ marginTop: 14 }}>
+      <h3 style={{ color: '#bae6fd', fontSize: 16, margin: '0 0 4px' }}>{SOURCE_KIND_LABELS[sourceKind]}</h3>
+      {sourceRows.map((sourceRow) => <SourceMapRow key={sourceRow.sourceId} sourceRow={sourceRow} />)}
+    </section>
+  );
+}
+
+function BrainSystemSourceMapSection() {
+  return (
+    <section data-testid="brain-system-source-map" style={{ background: 'rgba(15, 23, 42, 0.58)', border: '1px solid rgba(125, 211, 252, 0.18)', borderRadius: 12, marginTop: 24, padding: 18 }}>
+      <h2 style={{ fontSize: 22, margin: '0 0 8px' }}>{BRAIN_SYSTEM_SOURCE_MAP_TITLE}</h2>
+      <p style={{ color: '#fbbf24', fontWeight: 700, margin: '0 0 10px' }}>{BRAIN_SYSTEM_SOURCE_MAP_WARNING}</p>
+      <p data-testid="brain-system-source-counter" style={{ color: '#e2e8f0', fontWeight: 700, margin: '0 0 12px' }}>{sourceStatusCounter()}</p>
+      <p style={{ color: '#fde68a', fontSize: 13, margin: '0 0 12px' }}>{BRAIN_SYSTEM_SOURCE_MAP_ROW_WARNING}</p>
+      {groupedSourceRows().map(([sourceKind, sourceRows]) => (
+        <SourceMapGroup key={sourceKind} sourceKind={sourceKind} sourceRows={sourceRows} />
+      ))}
+    </section>
+  );
+}
+// #endregion
+
+// #region Visual Process Registry Components
+function VisualProcessRow({ processRow }: VisualProcessRowProps) {
+  return (
+    <div data-testid="brain-visual-process-row" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, borderBottom: '1px solid rgba(148, 163, 184, 0.08)', padding: '6px 0' }}>
+      <strong>{processRow.processLabel}</strong>
+      <span style={{ color: '#93c5fd' }}>{BRAIN_VISUAL_PROCESS_STATUS_LABELS[processRow.buildStatus]}</span>
+      <span style={{ color: '#94a3b8' }}>visualPresenceOnly:true</span>
+      <span style={{ color: '#94a3b8' }}>indexOnly:true</span>
+      <span style={{ color: '#fecaca' }}>operationalReady:false</span>
+      <span style={{ color: '#fecaca' }}>canExecute:false</span>
+      <span style={{ color: '#fecaca' }}>canCreateRecord:false</span>
+    </div>
+  );
+}
+
+function VisualProcessGroup({ categoryLabel, processRows }: VisualProcessGroupProps) {
+  return (
+    <section data-testid="brain-visual-process-group" style={{ marginTop: 14 }}>
+      <h3 style={{ color: '#bae6fd', fontSize: 16, margin: '0 0 4px' }}>{categoryLabel}</h3>
+      {processRows.map((processRow) => <VisualProcessRow key={processRow.processId} processRow={processRow} />)}
+    </section>
+  );
+}
+
+function BrainVisualProcessRegistrySection() {
+  return (
+    <section data-testid="brain-visual-process-registry" style={{ background: 'rgba(15, 23, 42, 0.58)', border: '1px solid rgba(167, 139, 250, 0.18)', borderRadius: 12, marginTop: 18, padding: 18 }}>
+      <h2 style={{ fontSize: 22, margin: '0 0 8px' }}>{BRAIN_VISUAL_PROCESS_REGISTRY_TITLE}</h2>
+      <p style={{ color: '#fbbf24', fontWeight: 700, margin: '0 0 10px' }}>{BRAIN_VISUAL_PROCESS_REGISTRY_WARNING}</p>
+      <p data-testid="brain-visual-process-counter" style={{ color: '#e2e8f0', fontWeight: 700, margin: '0 0 12px' }}>{visualProcessStatusCounter()}</p>
+      {groupedVisualProcesses().map(([categoryLabel, processRows]) => (
+        <VisualProcessGroup key={categoryLabel} categoryLabel={categoryLabel} processRows={processRows} />
+      ))}
+      <section data-testid="brain-visual-pending-candidates" style={{ marginTop: 16 }}>
+        <h3 style={{ color: '#bae6fd', fontSize: 16, margin: '0 0 6px' }}>מועמדים עתידיים ממתינים</h3>
+        <p style={{ color: '#cbd5e1', margin: '0 0 8px' }}>רשימת מועמדים סטטית בלבד, ללא פעולה וללא כריית מקור.</p>
+        <ul style={{ columns: 2, margin: 0, paddingInlineStart: 20 }}>
+          {BRAIN_VISUAL_PROCESS_PENDING_CANDIDATES.map((candidate) => (
+            <li key={candidate}>{candidate}</li>
+          ))}
+        </ul>
+      </section>
+    </section>
+  );
+}
+// #endregion
+
 /**
  * BrainBuildProgressConsole — Static read-only project-control screen for Brain build progress.
  * @example
@@ -387,6 +609,8 @@ export default function BrainBuildProgressConsole() {
       <ProgressHeader />
       <LatestChangeSummary />
       <StageRoadmapSection />
+      <BrainSystemSourceMapSection />
+      <BrainVisualProcessRegistrySection />
       <ProgressMetrics />
       {groupProgressItems().map(([layer, progressItems]) => (
         <ProgressLayerSection key={layer} layer={layer} progressItems={progressItems} />
