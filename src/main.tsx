@@ -81,6 +81,7 @@ const BrainDiagnosticsPage = lazy(() => import('./pages/internal/BrainDiagnostic
 const LearningInboxPage = lazy(() => import('./pages/internal/LearningInboxPage'))
 const ApprovalGatePreview = lazy(() => import('./pages/internal/approval-gate-preview/ApprovalGatePreview'))
 const ManualPreviewWorkbench = lazy(() => import('./pages/internal/manual-preview-workbench/ManualPreviewWorkbench'))
+const BrainBuildProgressConsole = lazy(() => import('./pages/internal/brain-build-progress'))
 
 // Placeholder for pages we'll build later
 const ComingSoon = lazy(() => import('./pages/ComingSoon'))
@@ -156,6 +157,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/internal/learning-inbox" element={<LearningInboxPage />} />
             <Route path="/internal/approval-gate-preview" element={<ApprovalGatePreview />} />
             <Route path="/internal/manual-preview-workbench" element={<ManualPreviewWorkbench />} />
+            <Route path="/internal/brain-build-progress" element={<BrainBuildProgressConsole />} />
             {/* Flowcharts */}
             <Route path="/flow/:flowId" element={<FlowchartPageWrapper />} />
             {/* Personal */}
@@ -176,4 +178,3 @@ createRoot(document.getElementById('root')!).render(
     </BrowserRouter>
   </StrictMode>,
 )
-
