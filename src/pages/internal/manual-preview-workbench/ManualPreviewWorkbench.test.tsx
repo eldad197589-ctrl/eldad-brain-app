@@ -14,6 +14,7 @@ import type { Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import ManualPreviewWorkbench from './ManualPreviewWorkbench';
+import VatMappingTablePreview from './VatMappingTablePreview';
 // #endregion
 
 // #region Test Environment
@@ -95,6 +96,10 @@ const FORBIDDEN_SURFACE_TERMS = [
   'Work' + 'Item',
   'Mat' + 'ter',
   'Document' + 'Ref',
+  'xl' + 'sx',
+  'pro' + 'vider',
+  'sto' + 're',
+  'Accounting ' + 'Core',
   'CEO ' + 'Bureau',
   'Dash' + 'board',
 ] as const;
@@ -323,7 +328,6 @@ describe('ManualPreviewWorkbench', () => {
       'בדיקת חבילת מסמכים / כפילות / מערכת הנהלת החשבונות',
       'זוהתה חבילת מסמכים ולא פריט בודד',
       'סיכון כפילות',
-      'טרם נקלט',
       'סטטוס קליטה במערכת הנהלת החשבונות',
       'אצל אלדד כרגע מערכת הנהלת החשבונות החיצונית היא מייבן',
       'תקופות דיווח שונות',
@@ -332,9 +336,86 @@ describe('ManualPreviewWorkbench', () => {
       'לסמן חשבונות שכבר נקלטו',
       'לשייך כל חשבון לתקופת הדיווח המתאימה',
       'מה לקלוט במערכת הנהלת החשבונות',
+      // The static seed values for Bezeq should appear
+      '06/01/2026',
+      '365.74',
+      'נרשם במערכת הנהלת החשבונות',
+      'ראיית מקור',
+      'וודאות: high',
+      'מוצגות רק ראיות סטטיות שכבר הומרו ל־seed. אין כאן עדיין דגימה מלאה של כל הסריקות.',
     ].forEach((expectedText) => {
       expect(container.textContent).toContain(expectedText);
     });
+    cleanup();
+  });
+
+  it('displays Bezeq records from the static VAT evidence seed', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillBezeqBatchInput(container);
+
+    [
+      'דצמבר 2025',
+      'ינואר 2026',
+      '365.74',
+      '55.79',
+      '390.45',
+      '59.56',
+      'נרשם במערכת הנהלת החשבונות',
+      'סכום כפי שמופיע במקור',
+    ].forEach((expectedText) => {
+      expect(container.textContent).toContain(expectedText);
+    });
+    cleanup();
+  });
+
+  it('shows static source artifact and confidence when VAT evidence matches', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillBezeqBatchInput(container);
+
+    expect(container.textContent).toContain(
+      'Knowledge_Base/tax/vat/maven_reconciliation_examples/2026_01_02_vat_close/דוח תנועות יומן 1-2.26.xlsx',
+    );
+    expect(container.textContent).toContain('high');
+    cleanup();
+  });
+
+  it('keeps placeholder behavior for unrelated suppliers without false static evidence matches', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', '9 חשבונות ספק אלמוני');
+    changeField(container, '#manual-preview-source-type', 'scan');
+    changeField(
+      container,
+      '#manual-preview-summary',
+      '9 חשבונות ספק אלמוני לצורך בדיקת מע״מ. יש סיכון כפילות ונדרש מיפוי פרטני.',
+    );
+    changeField(container, '#manual-preview-client', 'דוד אלדד');
+    changeField(container, '#manual-preview-domain', 'vat');
+
+    expect(container.textContent).toContain('טבלת מיפוי חשבוניות / הנהלת חשבונות');
+    expect(container.textContent).toContain('חסר');
+    expect(container.textContent).not.toContain('365.74');
+    expect(container.textContent).not.toContain('390.45');
+    expect(container.textContent).not.toContain('דוח תנועות יומן 1-2.26.xlsx');
+    cleanup();
+  });
+
+  it('preserves placeholder behavior for unknown suppliers even with batch signals', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'חשבוניות של ספק_לא_מוכר — 4 קבלות');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'בדיקה');
+    changeField(container, '#manual-preview-client', 'דוד אלדד');
+    changeField(container, '#manual-preview-domain', 'vat');
+
+    expect(container.textContent).toContain('טרם אומת');
+    expect(container.textContent).toContain('חסר');
+    // Should NOT have the static evidence badges
+    expect(container.textContent).not.toContain('ראיית מקור');
+    
     cleanup();
   });
 
@@ -368,13 +449,16 @@ describe('ManualPreviewWorkbench', () => {
   it('does not expose forbidden runtime surfaces in component output', () => {
     const html = renderWorkbench();
     const componentText = ManualPreviewWorkbench.toString();
+    const mappingComponentText = VatMappingTablePreview.toString();
 
     FORBIDDEN_SURFACE_TERMS.forEach((term) => {
       expect(html).not.toContain(term);
       expect(componentText).not.toContain(term);
+      expect(mappingComponentText).not.toContain(term);
     });
     FORBIDDEN_IMPORT_BOUNDARY_TERMS.forEach((term) => {
       expect(componentText).not.toContain(term);
+      expect(mappingComponentText).not.toContain(term);
     });
   });
 

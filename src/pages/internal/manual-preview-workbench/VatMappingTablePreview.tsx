@@ -5,7 +5,11 @@
    EXPORTS: VatMappingTablePreview component
    ============================================ */
 
+import { STATIC_VAT_EVIDENCE_RECORDS } from '../../../work-spine/vat-evidence/vat-static-evidence-seed';
+
 // #region Types
+type StaticVatEvidenceRecord = (typeof STATIC_VAT_EVIDENCE_RECORDS)[number];
+
 /** A single row in the preview mapping table. */
 interface MappingRow {
   /** Row index. */
@@ -16,8 +20,8 @@ interface MappingRow {
   periodFromInput: string;
   /** Invoice date or חסר. */
   invoiceDate: string;
-  /** Amount before VAT or חסר. */
-  amountBeforeVat: string;
+  /** Amount field as in source or חסר. */
+  amountFieldAsInSource: string;
   /** VAT amount or חסר. */
   vatAmount: string;
   /** Total amount or חסר. */
@@ -30,6 +34,12 @@ interface MappingRow {
   expenseClassification: string;
   /** Review note. */
   reviewNote: string;
+  /** True if this row comes from the static evidence seed. */
+  fromStaticEvidence?: boolean;
+  /** Source artifact if static evidence, otherwise חסר. */
+  sourceArtifact: string;
+  /** Confidence if static evidence, otherwise חסר. */
+  confidence: string;
 }
 
 /** Props for VatMappingTablePreview. */
@@ -49,12 +59,14 @@ const TABLE_COLUMNS = [
   'ספק',
   'תקופה לפי הקלט',
   'תאריך חשבונית',
-  'סכום לפני מע״מ',
+  'סכום כפי שמופיע במקור',
   'סכום מע״מ',
   'סכום כולל',
   'סטטוס במערכת הנהלת החשבונות',
   'שיוך לדוח מע״מ',
   'סיווג הוצאה',
+  'מקור ראיה סטטי',
+  'רמת ביטחון',
   'הערת בדיקה',
 ] as const;
 
@@ -102,6 +114,17 @@ const warningStyle = {
   fontSize: 13,
   marginBottom: 10,
 };
+
+const badgeStyle = {
+  display: 'inline-block',
+  background: 'rgba(56, 189, 248, 0.15)',
+  border: '1px solid rgba(56, 189, 248, 0.4)',
+  borderRadius: 4,
+  padding: '2px 6px',
+  fontSize: 10,
+  color: '#38bdf8',
+  marginRight: 6,
+};
 // #endregion
 
 // #region Helpers
@@ -118,6 +141,8 @@ const inferSupplier = (text: string): string => {
   if (text.includes('ארנונה')) return 'עיריית אשקלון';
   if (text.includes('google') || text.includes('גוגל')) return 'Google';
   if (text.includes('צמיגי')) return 'צמיגי המילניום';
+  if (text.includes('עוקץ')) return 'עוקץ';
+  if (text.includes('מייבן')) return 'מייבן פתרונות';
   return MISSING;
 };
 
@@ -162,11 +187,124 @@ const inferPeriod = (text: string): string => {
 };
 
 /**
- * Build placeholder mapping rows from detected signals.
+ * Normalize user text for deterministic local matching.
+ * @param text - Raw searchable text.
+ * @returns Lowercased, whitespace-normalized text.
+ */
+const normalizeSearchText = (text: string): string =>
+  text.toLowerCase().replace(/\s+/g, ' ').trim();
+
+/**
+ * Build accepted report-month variants for conservative static matching.
+ * @param reportMonth - Report month from the static seed.
+ * @returns Text variants for the same report month.
+ */
+const reportMonthVariants = (reportMonth: string): readonly string[] => [
+  reportMonth,
+  reportMonth.replace(/^0/, ''),
+  reportMonth.replace('/2026', '/26'),
+  reportMonth.replace('/', '.'),
+];
+
+/**
+ * Check whether a static supplier name appears in the input.
+ * @param text - Normalized searchable text.
+ * @param supplier - Supplier name from the static seed.
+ * @returns Whether the supplier appears.
+ */
+const supplierAppearsInText = (text: string, supplier: string): boolean => {
+  const normalizedSupplier = normalizeSearchText(supplier);
+  const supplierWithoutCompanyPrefix = normalizedSupplier.replace(/^חברת\s+/, '');
+  const firstSupplierToken = normalizedSupplier.split(' ')[0] ?? '';
+  const firstTokenMatch =
+    firstSupplierToken.length > 3 &&
+    firstSupplierToken !== 'חברת' &&
+    text.includes(firstSupplierToken);
+
+  return text.includes(normalizedSupplier) || text.includes(supplierWithoutCompanyPrefix) || firstTokenMatch;
+};
+
+/**
+ * Check whether a report month appears in the input.
+ * @param text - Normalized searchable text.
+ * @param record - Static VAT evidence record.
+ * @returns Whether the report month appears.
+ */
+const reportMonthAppearsInText = (text: string, record: StaticVatEvidenceRecord): boolean =>
+  reportMonthVariants(record.reportMonth).some((variant) => text.includes(normalizeSearchText(variant)));
+
+/**
+ * Check whether an accounting reference appears in the input.
+ * @param text - Normalized searchable text.
+ * @param record - Static VAT evidence record.
+ * @returns Whether the accounting reference appears.
+ */
+const accountingReferenceAppearsInText = (text: string, record: StaticVatEvidenceRecord): boolean =>
+  record.accountingReference !== MISSING && text.includes(normalizeSearchText(record.accountingReference));
+
+/**
+ * Match static VAT evidence records based on text input.
+ * @param text - Searchable text from form inputs.
+ * @returns Array of matched static evidence records, or empty array if none.
+ */
+const findStaticEvidenceMatches = (text: string): readonly StaticVatEvidenceRecord[] => {
+  const normalizedText = normalizeSearchText(text);
+  const referenceMatches = STATIC_VAT_EVIDENCE_RECORDS.filter((record) =>
+    accountingReferenceAppearsInText(normalizedText, record),
+  );
+
+  if (referenceMatches.length > 0) return referenceMatches;
+
+  const supplierMatches = STATIC_VAT_EVIDENCE_RECORDS.filter((record) =>
+    supplierAppearsInText(normalizedText, record.supplier),
+  );
+  const reportMonthMatches = supplierMatches.filter((record) =>
+    reportMonthAppearsInText(normalizedText, record),
+  );
+
+  if (reportMonthMatches.length > 0) return reportMonthMatches;
+  return supplierMatches;
+};
+
+/**
+ * Format static accounting status for Hebrew display.
+ * @param status - Static accounting-system status.
+ * @returns User-facing Hebrew status.
+ */
+const formatAccountingStatus = (status: StaticVatEvidenceRecord['accountingSystemStatus']): string => {
+  if (status === 'recorded_in_accounting_system') return 'נרשם במערכת הנהלת החשבונות';
+  if (status === 'not_found') return 'לא נמצא במערכת הנהלת החשבונות';
+  return MISSING;
+};
+
+/**
+ * Build mapping rows from detected signals or static evidence seed.
  * @param text - Lowercased searchable text from form.
  * @returns Array of mapping rows.
  */
 const buildMappingRows = (text: string): readonly MappingRow[] => {
+  const staticMatches = findStaticEvidenceMatches(text);
+
+  if (staticMatches.length > 0) {
+    return staticMatches.map((record, i) => ({
+      index: i + 1,
+      supplier: record.supplier,
+      periodFromInput: record.periodDescription,
+      invoiceDate: record.invoiceDate,
+      amountFieldAsInSource: record.amountFieldAsInSource,
+      vatAmount: record.vatAmount,
+      totalAmount: record.totalIfKnown,
+      accountingSystemStatus: formatAccountingStatus(record.accountingSystemStatus),
+      vatReportAssignment: record.vatReportAssignment,
+      expenseClassification: record.expenseClassification,
+      reviewNote: record.reviewNote,
+      fromStaticEvidence: true,
+      sourceArtifact: record.sourceArtifact,
+      confidence: record.confidence,
+    }));
+  }
+
+  // Fallback to placeholders if no static matches
   const rowCount = detectRowCount(text);
   const supplier = inferSupplier(text);
   const period = inferPeriod(text);
@@ -177,12 +315,14 @@ const buildMappingRows = (text: string): readonly MappingRow[] => {
     supplier,
     periodFromInput: period,
     invoiceDate: MISSING,
-    amountBeforeVat: MISSING,
+    amountFieldAsInSource: MISSING,
     vatAmount: MISSING,
     totalAmount: MISSING,
     accountingSystemStatus: NOT_VERIFIED,
     vatReportAssignment: NEEDS_ASSIGNMENT,
     expenseClassification: classification,
+    sourceArtifact: MISSING,
+    confidence: MISSING,
     reviewNote: i === 0 ? 'לבדוק כפילות מול מערכת הנהלת החשבונות' : NEEDS_REVIEW,
   }));
 };
@@ -191,7 +331,8 @@ const buildMappingRows = (text: string): readonly MappingRow[] => {
 // #region Component
 /**
  * VatMappingTablePreview — Preview-only mapping table for batch/duplicate VAT signals.
- * Renders placeholder rows when batch or duplicate-risk signals are detected.
+ * Displays rows from the static VAT evidence seed if a match is found.
+ * Otherwise, renders placeholder rows.
  * No persistence, no accounting actions, no file operations.
  *
  * @param props - VatMappingTablePreviewProps
@@ -222,23 +363,39 @@ export default function VatMappingTablePreview({ hasBatchSignal, hasDuplicateRis
             {rows.map((row) => (
               <tr key={row.index}>
                 <td style={cellStyle}>{row.index}</td>
-                <td style={cellStyle}>{row.supplier}</td>
+                <td style={cellStyle}>
+                  {row.supplier}
+                  {row.fromStaticEvidence && (
+                    <div style={{ marginTop: 4 }}>
+                      <span style={badgeStyle} title={row.sourceArtifact}>ראיית מקור</span>
+                      <span style={badgeStyle}>וודאות: {row.confidence}</span>
+                    </div>
+                  )}
+                </td>
                 <td style={cellStyle}>{row.periodFromInput}</td>
                 <td style={cellStyle}>{row.invoiceDate}</td>
-                <td style={cellStyle}>{row.amountBeforeVat}</td>
+                <td style={cellStyle}>{row.amountFieldAsInSource}</td>
                 <td style={cellStyle}>{row.vatAmount}</td>
                 <td style={cellStyle}>{row.totalAmount}</td>
                 <td style={cellStyle}>{row.accountingSystemStatus}</td>
                 <td style={cellStyle}>{row.vatReportAssignment}</td>
                 <td style={cellStyle}>{row.expenseClassification}</td>
-                <td style={cellStyle}>{row.reviewNote}</td>
+                <td style={cellStyle}>{row.sourceArtifact}</td>
+                <td style={cellStyle}>{row.confidence}</td>
+                <td style={cellStyle} title={row.reviewNote}>
+                  <div style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {row.reviewNote}
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <p style={{ margin: '12px 0 0', color: '#94a3b8', fontSize: 12, lineHeight: 1.5 }}>
-        שדות חסרים דורשים בדיקה ידנית או OCR. הטבלה לא מייצגת רישום חשבונאי.
+        שדות חסרים דורשים בדיקה ידנית. הטבלה לא מייצגת רישום חשבונאי.
+        <br />
+        מוצגות רק ראיות סטטיות שכבר הומרו ל־seed. אין כאן עדיין דגימה מלאה של כל הסריקות.
         <br />
         אצל אלדד כרגע מערכת הנהלת החשבונות החיצונית היא מייבן.
       </p>
