@@ -220,7 +220,7 @@ const roadmapSummaryCounter = (): string => {
   const current = stages.filter((s) => s.status === 'current').length;
   const next = stages.filter((s) => s.status === 'next').length;
   const blocked = stages.filter((s) => s.status === 'blocked').length;
-  return `${built} נבנו · ${current} עכשיו · ${next} ממתינים · ${blocked} חסום`;
+  return `${built} נבנו · ${current} עכשיו · ${next} ${next === 1 ? 'ממתין' : 'ממתינים'} · ${blocked} חסום`;
 };
 
 // #region Source Map Helpers

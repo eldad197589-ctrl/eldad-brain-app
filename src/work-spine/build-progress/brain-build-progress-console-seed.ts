@@ -155,14 +155,14 @@ const builtRoadmapStage = (
 // #region Static Data
 /** Latest committed build-state summary shown above the full progress history. */
 export const BRAIN_BUILD_LATEST_CHANGE_SUMMARY = {
-  title: 'תיקון יציבות אתחול Work Spine',
-  relatedCommit: 'e6c15e9',
-  whereToSee: `המערכת עולה דרך ${BRAIN_BUILD_PROGRESS_ROUTE} לאחר תיקון bootstrap`,
-  whatChanged: 'תהליך האתחול של Work Spine הפך לעמיד ל־localStorage לא עקבי. אינדקס WorkItems נבנה מחדש מרשומות קיימות, וזריעת הדמו אינה קורסת על פריטים קיימים.',
-  proofOfLife: `המסך ${BRAIN_BUILD_PROGRESS_ROUTE} נטען לאחר אתחול חוזר, ללא קריסת duplicate WorkItem.`,
-  stillBlocked: ['אין יצירת WorkItem אמיתי ללא אישור', 'אין Matter', 'אין DocumentRef', 'אין provider', 'אין persistence חדש', 'אין פעולה חיה'],
-  nextSafeStep: 'להמשיך לשלב מפת מצב המוח ומקורותיו לאחר בדיקת Runtime יציבה.',
-  safetyStatus: 'תיקון יציבות אתחול לקריאה בלבד בלוח ההתקדמות',
+  title: 'מפת מצב המוח ומקורותיו',
+  relatedCommit: '4b05db3',
+  whereToSee: BRAIN_BUILD_PROGRESS_ROUTE,
+  whatChanged: 'נוספה מפת מקורות ומערכות של המוח יחד עם רשימת תהליכי המוח הוויזואלי.',
+  proofOfLife: 'המסך מציג 20 מקורות, 7 קטגוריות, 22 תהליכים, וסטטוס תהליכים: 17 נבנו · 2 בבנייה · 3 ממתינים.',
+  stillBlocked: ['אין קריאת תיקיות', 'אין OCR', 'אין חיבור Gmail/Drive/Maven', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין פעולה חיה'],
+  nextSafeStep: 'להמשיך לשלב מפת מקורות ידע חיצוניים כתכנון אינדקס בלבד.',
+  safetyStatus: 'מיפוי מקורות ותהליכים לקריאה בלבד',
   safetyNotes: ['מידע בנייה פנימי אמיתי לקריאה בלבד', 'לא מוכנות תפעולית', 'לא אימות מקור', 'אין חיבור ספקים', 'אין הרשאת פעולה או שמירה'],
 } as const;
 
@@ -196,6 +196,24 @@ export const BRAIN_BUILD_PROGRESS_ITEMS: readonly BrainBuildProgressItem[] = [
     'המסך עולה ללא מסך כחול לאחר רענון, והמערכת ממשיכה לרנדר את מסך ההתקדמות.',
     'להמשיך לשלב מפת מצב המוח ומקורותיו לאחר בדיקת Runtime יציבה.',
     ['אין יצירת WorkItem אמיתי ללא אישור', 'אין שימוש ב־Matter', 'אין DocumentRef', 'אין חיבור ספקים', 'אין פעולה חיה'],
+    'Codex ראשי + Gravity א׳',
+  ),
+  progressItem(
+    'progress-brain-system-source-map-v1',
+    'מפת מצב המוח ומקורותיו',
+    'visual_surface',
+    'surface_inventory',
+    '4b05db3',
+    BRAIN_BUILD_PROGRESS_ROUTE,
+    'פתיחת /internal/brain-build-progress לאחר Stage 17',
+    'מוצגים 20 מקורות, 7 קטגוריות, 22 תהליכים, וסטטוס תהליכים 17/2/3.',
+    'built_and_visible',
+    'visible_static_preview',
+    'preview_only',
+    'נוספה מפת מקורות ומערכות של המוח יחד עם רשימת תהליכי המוח הוויזואלי.',
+    'אלדד רואה מפת מקורות אינדקס בלבד ורשימת תהליכים חזותית סטטית.',
+    'להמשיך לשלב מפת מקורות ידע חיצוניים כתכנון אינדקס בלבד.',
+    ['אין קריאת תיקיות', 'אין OCR', 'אין חיבור Gmail/Drive/Maven', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין פעולה חיה'],
     'Codex ראשי + Gravity א׳',
   ),
 ];
@@ -237,8 +255,8 @@ export const BRAIN_BUILD_STAGE_ROADMAP_GROUPS = [
     title: 'דרך לתפעול',
     subtitle: 'מה נדרש כדי שהמוח יתחיל לעבוד באמת',
     stages: [
-      roadmapStage('דרך לתפעול', 17, 'מפת מצב המוח ומקורותיו', 'current', null, BRAIN_BUILD_PROGRESS_ROUTE, 'מוצג כשלב תכנון נוכחי במפה בלבד.', ['שלב תכנון בלבד'], ['לא תפעולי', 'אין פעולה חיה'], ['אין פעולה חיה', 'אין שמירה'], 'ביקורת Gravity לפני יישום.', 'מפת מקורות + רשימת תהליכי המוח הוויזואלי — אינדקס בלבד, לא פעולה.'),
-      roadmapStage('דרך לתפעול', 18, 'מפת מקורות ידע חיצוניים', 'next', null, null, 'נדרש מיפוי מקורות חיצוניים לפני חיבור כלשהו.', ['ממתין לשער Agent A'], ['אין חיבור ספקים'], ['אין חיבור ספקים', 'אין קריאת מקור'], AGENT_A_NO_ETA, 'ממתין לשער Agent A.'),
+      builtRoadmapStage('דרך לתפעול', 17, 'מפת מצב המוח ומקורותיו', '4b05db3', BRAIN_BUILD_PROGRESS_ROUTE, 'מוצגת מפת מקורות ותהליכים אינדקס בלבד.', 'מפת מקורות + רשימת תהליכי המוח הוויזואלי — אינדקס בלבד, לא פעולה.'),
+      roadmapStage('דרך לתפעול', 18, 'מפת מקורות ידע חיצוניים', 'current', null, null, 'נדרש מיפוי מקורות חיצוניים לפני חיבור כלשהו.', ['שלב תכנון נוכחי בלבד'], ['אין חיבור ספקים'], ['אין חיבור ספקים', 'אין קריאת מקור'], AGENT_A_NO_ETA, 'עכשיו — תכנון אינדקס מקורות חיצוניים בלבד.'),
       roadmapStage('דרך לתפעול', 19, 'הרחבת ראיות סריקה אמיתיות', 'next', null, null, 'נדרשת הרחבת ראיות סריקה אמיתיות רק לאחר אישור סטטי.', ['ממתין לשער Agent A'], ['אין קריאת תיקייה', 'אין OCR'], ['אין קריאת קבצים', 'אין OCR'], AGENT_A_NO_ETA, 'ממתין לשער Agent A.'),
       roadmapStage('דרך לתפעול', 20, 'שער תפעולי מוגבל ראשון', 'blocked', null, null, 'חסום עד שער אישור מפורש.', [], ['אין עדיין שער אישור מפורש, אין שכבת persistence מאושרת, ואין הרשאה ליצור WorkItem/Matter/DocumentRef.'], ['אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין persistence'], 'דורש החלטת אלדד נפרדת לפני כל עבודה תפעולית.', 'חסום — דורש החלטת אלדד נפרדת.'),
     ],

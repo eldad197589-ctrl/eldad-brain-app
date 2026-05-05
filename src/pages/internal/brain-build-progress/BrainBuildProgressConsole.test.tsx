@@ -224,7 +224,7 @@ describe('BrainBuildProgressConsole', () => {
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_WARNING);
     expect(html.indexOf('מה השתנה עכשיו')).toBeLessThan(html.indexOf('נקודות בנייה שננעלו'));
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title);
-    expect(html).toContain('e6c15e9');
+    expect(html).toContain('4b05db3');
     for (const text of HEBREW_COPY) {
       expect(html).toContain(text);
     }
@@ -233,10 +233,10 @@ describe('BrainBuildProgressConsole', () => {
   it('renders the static progress item count and top metric values', () => {
     const { container, cleanup } = mountConsole();
     try {
-      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(13);
+      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(14);
       const metricsText = container.querySelector('[data-testid="build-progress-top-metrics"]')?.textContent ?? '';
       expect(metricsText).toContain(String(BRAIN_BUILD_PROGRESS_ITEMS.length));
-      expect(metricsText).toContain('7');
+      expect(metricsText).toContain('8');
       expect(metricsText).toContain('0');
     } finally {
       cleanup();
@@ -286,6 +286,25 @@ describe('BrainBuildProgressConsole', () => {
       expect(renderedText).toContain('אין יצירת WorkItem אמיתי ללא אישור');
       expect(renderedText).toContain('אין DocumentRef');
       expect(renderedText).toContain('אין חיבור ספקים');
+      expect(container.querySelectorAll('button')).toHaveLength(0);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders the Stage 17 source and process map checkpoint without action controls', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const renderedText = container.textContent ?? '';
+      expect(renderedText).toContain('מפת מצב המוח ומקורותיו');
+      expect(renderedText).toContain('4b05db3');
+      expect(renderedText).toContain('מוצגים 20 מקורות, 7 קטגוריות, 22 תהליכים, וסטטוס תהליכים 17/2/3.');
+      expect(renderedText).toContain('אין קריאת תיקיות');
+      expect(renderedText).toContain('אין OCR');
+      expect(renderedText).toContain('אין חיבור Gmail/Drive/Maven');
+      expect(renderedText).toContain('אין WorkItem');
+      expect(renderedText).toContain('אין Matter');
+      expect(renderedText).toContain('אין DocumentRef');
       expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {
       cleanup();
@@ -417,7 +436,7 @@ describe('BrainBuildStageRoadmap', () => {
         )}`,
       );
       expect(text).toContain(BRAIN_BUILD_STAGE_ROADMAP_DIVIDER);
-      expect(text).toContain('16 נבנו · 1 עכשיו · 2 ממתינים · 1 חסום');
+      expect(text).toContain('17 נבנו · 1 עכשיו · 1 ממתין · 1 חסום');
       for (const group of BRAIN_BUILD_STAGE_ROADMAP_GROUPS) {
         expect(text).toContain(group.title);
         expect(text).toContain(group.subtitle);
@@ -456,7 +475,7 @@ describe('BrainBuildStageRoadmap', () => {
     const { container, cleanup } = mountConsole();
     try {
       const counterText = container.querySelector('[data-testid="roadmap-summary-counter"]')?.textContent ?? '';
-      expect(counterText).toBe('16 נבנו · 1 עכשיו · 2 ממתינים · 1 חסום');
+      expect(counterText).toBe('17 נבנו · 1 עכשיו · 1 ממתין · 1 חסום');
     } finally {
       cleanup();
     }
@@ -482,10 +501,27 @@ describe('BrainBuildStageRoadmap', () => {
       expect(stage17).toBeDefined();
       const text = stage17!.textContent ?? '';
       expect(text).toContain('מפת מצב המוח ומקורותיו');
-      expect(text).toContain('עכשיו');
+      expect(text).toContain('נבנה');
       // Verify they are NOT concatenated — there must be a separator between title and status
-      expect(text).not.toContain('מקורותיועכשיו');
+      expect(text).not.toContain('מקורותיונבנה');
       expect(text).not.toContain('מצב המוח הוויזואלי');
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders stage 18 as the current roadmap pointer and keeps stage 20 blocked', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const compactStages = Array.from(container.querySelectorAll('[data-testid="roadmap-stage"]'));
+      const stage18 = compactStages.find((el) => el.textContent?.includes('18.'));
+      const stage20 = compactStages.find((el) => el.textContent?.includes('20.'));
+      expect(stage18).toBeDefined();
+      expect(stage20).toBeDefined();
+      expect(stage18!.textContent ?? '').toContain('מפת מקורות ידע חיצוניים');
+      expect(stage18!.textContent ?? '').toContain('עכשיו');
+      expect(stage20!.textContent ?? '').toContain('שער תפעולי מוגבל ראשון');
+      expect(stage20!.textContent ?? '').toContain('חסום');
     } finally {
       cleanup();
     }

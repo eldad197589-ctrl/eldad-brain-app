@@ -59,6 +59,7 @@ const REQUIRED_PROGRESS_IDS = [
   'progress-intake-signal-summary-v1',
   'progress-visual-brain-surface-inventory-v1',
   'progress-work-spine-bootstrap-idempotency-fix-v1',
+  'progress-brain-system-source-map-v1',
 ] as const;
 
 const REQUIRED_ROADMAP_STAGE_TITLES = [
@@ -137,8 +138,8 @@ const serializedRoadmapText = (): string => JSON.stringify(BRAIN_BUILD_STAGE_ROA
 
 // #region Tests
 describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
-  it('exports exactly the 13 approved build progress items', () => {
-    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(13);
+  it('exports exactly the 14 approved build progress items', () => {
+    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(14);
     expect(progressIds()).toEqual(REQUIRED_PROGRESS_IDS);
   });
 
@@ -153,19 +154,22 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
   });
 
   it('exports the latest committed change summary for the top console section', () => {
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('תיקון יציבות אתחול Work Spine');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('e6c15e9');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee).toContain(BRAIN_BUILD_PROGRESS_ROUTE);
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('localStorage');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('duplicate WorkItem');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain(BRAIN_BUILD_PROGRESS_ROUTE);
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('מפת מצב המוח ומקורותיו');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('4b05db3');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee).toBe(BRAIN_BUILD_PROGRESS_ROUTE);
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('מפת מקורות');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('20 מקורות');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('7 קטגוריות');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('22 תהליכים');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('17 נבנו · 2 בבנייה · 3 ממתינים');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין פעולה חיה');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין יצירת WorkItem אמיתי ללא אישור');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין קריאת תיקיות');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין OCR');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין חיבור Gmail/Drive/Maven');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין WorkItem');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין Matter');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין DocumentRef');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין provider');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין persistence חדש');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe('תיקון יציבות אתחול לקריאה בלבד בלוח ההתקדמות');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe('מיפוי מקורות ותהליכים לקריאה בלבד');
   });
 
   it('includes every required field and static safety marker', () => {
@@ -186,6 +190,7 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     expect(relatedCommits).toContain('ee3a06f');
     expect(relatedCommits).toContain('edf165d');
     expect(relatedCommits).toContain('e6c15e9');
+    expect(relatedCommits).toContain('4b05db3');
   });
 
   it('includes the Work Spine bootstrap idempotency fix checkpoint', () => {
@@ -204,6 +209,31 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     expect(checkpoint!.whatIsStillBlocked).toContain('אין שימוש ב־Matter');
     expect(checkpoint!.whatIsStillBlocked).toContain('אין DocumentRef');
     expect(checkpoint!.whatIsStillBlocked).toContain('אין חיבור ספקים');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין פעולה חיה');
+  });
+
+  it('includes the Stage 17 Brain System Source Map checkpoint', () => {
+    const checkpoint = BRAIN_BUILD_PROGRESS_ITEMS.find(
+      (progressItem) => progressItem.progressItemId === 'progress-brain-system-source-map-v1',
+    );
+
+    expect(checkpoint).toBeDefined();
+    expect(checkpoint!.title).toBe('מפת מצב המוח ומקורותיו');
+    expect(checkpoint!.relatedCommit).toBe('4b05db3');
+    expect(checkpoint!.visibleRoute).toBe(BRAIN_BUILD_PROGRESS_ROUTE);
+    expect(checkpoint!.currentStatus).toBe('built_and_visible');
+    expect(checkpoint!.proofStatus).toBe('visible_static_preview');
+    expect(checkpoint!.surfaceClassification).toBe('preview_only');
+    expect(checkpoint!.proofScenario.expectedVisibleResult).toContain('20 מקורות');
+    expect(checkpoint!.proofScenario.expectedVisibleResult).toContain('7 קטגוריות');
+    expect(checkpoint!.proofScenario.expectedVisibleResult).toContain('22 תהליכים');
+    expect(checkpoint!.proofScenario.expectedVisibleResult).toContain('17/2/3');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין קריאת תיקיות');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין OCR');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין חיבור Gmail/Drive/Maven');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין WorkItem');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין Matter');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין DocumentRef');
     expect(checkpoint!.whatIsStillBlocked).toContain('אין פעולה חיה');
   });
 
@@ -245,11 +275,10 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
 
   it('assigns stage statuses matching the approved table', () => {
     const expected: Record<number, (typeof BRAIN_BUILD_STAGE_ROADMAP_STATUSES)[number]> = {};
-    for (let i = 1; i <= 16; i += 1) {
+    for (let i = 1; i <= 17; i += 1) {
       expected[i] = 'built';
     }
-    expected[17] = 'current';
-    expected[18] = 'next';
+    expected[18] = 'current';
     expected[19] = 'next';
     expected[20] = 'blocked';
 
@@ -258,12 +287,17 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
     }
   });
 
-  it('renames stage 17 to the Brain System Source Map without changing roadmap count', () => {
+  it('marks stage 17 built and moves the current pointer to stage 18', () => {
     const stage17 = roadmapStages().find((stage) => stage.order === 17);
+    const stage18 = roadmapStages().find((stage) => stage.order === 18);
     expect(stage17).toBeDefined();
+    expect(stage18).toBeDefined();
     expect(stage17!.title).toBe('מפת מצב המוח ומקורותיו');
-    expect(stage17!.status).toBe('current');
+    expect(stage17!.status).toBe('built');
+    expect(stage17!.relatedCommit).toBe('4b05db3');
     expect(stage17!.compactLine).toBe('מפת מקורות + רשימת תהליכי המוח הוויזואלי — אינדקס בלבד, לא פעולה.');
+    expect(stage18!.title).toBe('מפת מקורות ידע חיצוניים');
+    expect(stage18!.status).toBe('current');
   });
 
   it('marks every roadmap stage as static roadmap only', () => {
@@ -274,7 +308,7 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
 
   it('includes commit hashes for all built stages', () => {
     const builtStages = roadmapStages().filter((stage) => stage.status === 'built');
-    expect(builtStages.length).toBe(16);
+    expect(builtStages.length).toBe(17);
     for (const stage of builtStages) {
       expect(stage.relatedCommit).not.toBeNull();
       expect((stage.relatedCommit ?? '').length).toBeGreaterThan(0);
