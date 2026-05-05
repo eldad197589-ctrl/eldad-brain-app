@@ -66,7 +66,7 @@ const REQUIRED_ROADMAP_STAGE_TITLES = [
   'מאגר ראיות מע״מ סטטי',
   'אצוות ראיות סריקה סטטית',
   'אמת תפעולית של המוח',
-  'רשימת בדיקת הוכחת תצוגה סטטית',
+  'רשימת בדיקת תצוגה סטטית',
   'מלאי ידע שלב 1',
   'מלאי ידע שלב 2',
   'מלאי משטחי מוח חזותיים',
@@ -161,7 +161,15 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('20 מקורות');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('7 קטגוריות');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('22 תהליכים');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('17 נבנו · 2 בבנייה · 3 ממתינים');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('מה מוצג במסך');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('מפת שלבי בניית המוח: 17 נבנו · 1 עכשיו · 1 ממתין · 1 חסום.');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain(
+      'רשימת תהליכי המוח הוויזואלי: 7 קטגוריות · 22 תהליכים · 17 נבנו · 2 בבנייה · 3 ממתינים.',
+    );
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain(
+      'נתוני התהליכים מתארים את המוח הוויזואלי בלבד, ולא מוכנות תפעולית של המערכת.',
+    );
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).not.toContain('סטטוס תהליכים');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין פעולה חיה');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין קריאת תיקיות');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין OCR');
@@ -227,7 +235,18 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     expect(checkpoint!.proofScenario.expectedVisibleResult).toContain('20 מקורות');
     expect(checkpoint!.proofScenario.expectedVisibleResult).toContain('7 קטגוריות');
     expect(checkpoint!.proofScenario.expectedVisibleResult).toContain('22 תהליכים');
-    expect(checkpoint!.proofScenario.expectedVisibleResult).toContain('17/2/3');
+    expect(checkpoint!.proofScenario.expectedVisibleResult).toContain('מה מוצג במסך');
+    expect(checkpoint!.proofScenario.expectedVisibleResult).toContain(
+      'מפת שלבי בניית המוח: 17 נבנו · 1 עכשיו · 1 ממתין · 1 חסום.',
+    );
+    expect(checkpoint!.proofScenario.expectedVisibleResult).toContain(
+      'רשימת תהליכי המוח הוויזואלי: 7 קטגוריות · 22 תהליכים · 17 נבנו · 2 בבנייה · 3 ממתינים.',
+    );
+    expect(checkpoint!.proofScenario.expectedVisibleResult).toContain(
+      'נתוני התהליכים מתארים את המוח הוויזואלי בלבד, ולא מוכנות תפעולית של המערכת.',
+    );
+    expect(checkpoint!.proofScenario.expectedVisibleResult).not.toContain('17/2/3');
+    expect(checkpoint!.proofScenario.expectedVisibleResult).not.toContain('סטטוס תהליכים');
     expect(checkpoint!.whatIsStillBlocked).toContain('אין קריאת תיקיות');
     expect(checkpoint!.whatIsStillBlocked).toContain('אין OCR');
     expect(checkpoint!.whatIsStillBlocked).toContain('אין חיבור Gmail/Drive/Maven');

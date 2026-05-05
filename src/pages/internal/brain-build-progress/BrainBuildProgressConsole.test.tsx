@@ -49,17 +49,17 @@ reactActEnvironment.IS_REACT_ACT_ENVIRONMENT = true;
 const HEBREW_COPY = [
   'מסך התקדמות בניית המוח',
   'נקודות בנייה שננעלו',
-  'הוכחות תצוגה פעילות',
+  'מסכים מוצגים פעילים',
   'פעולות חיות פעילות',
   'Commit קשור',
   'איפה רואים',
-  'הוכחת תצוגה',
+  'מה מוצג במסך',
   'מה נבנה',
   'מה אלדד רואה',
   'השלב הבטוח הבא',
   'סטטוס בטיחות',
   'סטטוס נוכחי',
-  'סטטוס הוכחה',
+  'סטטוס תצוגה',
   'סיווג משטח',
   'פעולות חסומות',
   'תצוגת טבלת מיפוי מע״מ',
@@ -132,7 +132,7 @@ const REQUIRED_HEBREW_STAGE_TITLES = [
   'מאגר ראיות מע״מ סטטי',
   'אצוות ראיות סריקה סטטית',
   'אמת תפעולית של המוח',
-  'רשימת בדיקת הוכחת תצוגה סטטית',
+  'רשימת בדיקת תצוגה סטטית',
   'מלאי ידע שלב 1',
   'מלאי ידע שלב 2',
   'מלאי משטחי מוח חזותיים',
@@ -298,7 +298,14 @@ describe('BrainBuildProgressConsole', () => {
       const renderedText = container.textContent ?? '';
       expect(renderedText).toContain('מפת מצב המוח ומקורותיו');
       expect(renderedText).toContain('4b05db3');
-      expect(renderedText).toContain('מוצגים 20 מקורות, 7 קטגוריות, 22 תהליכים, וסטטוס תהליכים 17/2/3.');
+      expect(renderedText).toContain('מה מוצג במסך: מוצגת מפת מקורות ומערכות, יחד עם רשימת תהליכי המוח הוויזואלי.');
+      expect(renderedText).toContain('מפת שלבי בניית המוח: 17 נבנו · 1 עכשיו · 1 ממתין · 1 חסום.');
+      expect(renderedText).toContain(
+        'רשימת תהליכי המוח הוויזואלי: 7 קטגוריות · 22 תהליכים · 17 נבנו · 2 בבנייה · 3 ממתינים.',
+      );
+      expect(renderedText).toContain('נתוני התהליכים מתארים את המוח הוויזואלי בלבד, ולא מוכנות תפעולית של המערכת.');
+      expect(renderedText).not.toContain('סטטוס תהליכים 17/2/3');
+      expect(renderedText).not.toContain('הוכחת תצוגה');
       expect(renderedText).toContain('אין קריאת תיקיות');
       expect(renderedText).toContain('אין OCR');
       expect(renderedText).toContain('אין חיבור Gmail/Drive/Maven');
@@ -371,7 +378,9 @@ describe('BrainBuildProgressConsole', () => {
       const registryText = registry!.textContent ?? '';
       expect(registryText).toContain(BRAIN_VISUAL_PROCESS_REGISTRY_TITLE);
       expect(registryText).toContain(BRAIN_VISUAL_PROCESS_REGISTRY_WARNING);
-      expect(registryText).toContain('17 נבנו · 2 בבנייה · 3 ממתינים');
+      expect(registryText).toContain(
+        'רשימת תהליכי המוח הוויזואלי: 7 קטגוריות · 22 תהליכים · 17 נבנו · 2 בבנייה · 3 ממתינים.',
+      );
       expect(registry!.querySelectorAll('[data-testid="brain-visual-process-group"]')).toHaveLength(7);
       expect(registry!.querySelectorAll('[data-testid="brain-visual-process-row"]')).toHaveLength(22);
       expect(BRAIN_VISUAL_PROCESS_REGISTRY_ROWS).toHaveLength(22);
@@ -436,7 +445,7 @@ describe('BrainBuildStageRoadmap', () => {
         )}`,
       );
       expect(text).toContain(BRAIN_BUILD_STAGE_ROADMAP_DIVIDER);
-      expect(text).toContain('17 נבנו · 1 עכשיו · 1 ממתין · 1 חסום');
+      expect(text).toContain('מפת שלבי בניית המוח: 17 נבנו · 1 עכשיו · 1 ממתין · 1 חסום.');
       for (const group of BRAIN_BUILD_STAGE_ROADMAP_GROUPS) {
         expect(text).toContain(group.title);
         expect(text).toContain(group.subtitle);
@@ -475,7 +484,7 @@ describe('BrainBuildStageRoadmap', () => {
     const { container, cleanup } = mountConsole();
     try {
       const counterText = container.querySelector('[data-testid="roadmap-summary-counter"]')?.textContent ?? '';
-      expect(counterText).toBe('17 נבנו · 1 עכשיו · 1 ממתין · 1 חסום');
+      expect(counterText).toBe('מפת שלבי בניית המוח: 17 נבנו · 1 עכשיו · 1 ממתין · 1 חסום.');
     } finally {
       cleanup();
     }
@@ -560,7 +569,7 @@ describe('BrainBuildStageRoadmap', () => {
       expect(firstHistoryItemElement).not.toBeNull();
       expect(Boolean(roadmap!.compareDocumentPosition(firstHistoryItemElement!) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
       const firstHistoryItem = firstHistoryItemElement!.textContent ?? '';
-      expect(firstHistoryItem).toContain('הוכחת תצוגה');
+      expect(firstHistoryItem).toContain('מה מוצג במסך');
       expect(firstHistoryItem).toContain('מה נבנה');
       expect(firstHistoryItem).toContain('מה אלדד רואה');
       expect(firstHistoryItem).toContain('השלב הבטוח הבא');

@@ -65,14 +65,14 @@ const DETAIL_LABELS = {
   title: 'כותרת',
   relatedCommit: 'Commit קשור',
   visibleRoute: 'איפה רואים',
-  proofScenario: 'הוכחת תצוגה',
+  proofScenario: 'מה מוצג במסך',
   whatChanged: 'מה השתנה',
   whatWasBuilt: 'מה נבנה',
   whatEldadCanSee: 'מה אלדד רואה',
   nextSafeStep: 'השלב הבטוח הבא',
   safetyStatus: 'סטטוס בטיחות',
   currentStatus: 'סטטוס נוכחי',
-  proofStatus: 'סטטוס הוכחה',
+  proofStatus: 'סטטוס תצוגה',
   surfaceClassification: 'סיווג משטח',
   domain: 'תחום',
   layer: 'שכבה',
@@ -87,7 +87,7 @@ const STATUS_LABELS: Record<BrainBuildProgressStatus, string> = {
 };
 
 const PROOF_STATUS_LABELS: Record<BrainBuildProofStatus, string> = {
-  visible_static_preview: 'הוכחת תצוגה סטטית',
+  visible_static_preview: 'מוצג במסך כ-preview סטטי',
   static_reference_recorded: 'נרשם כמקור סטטי',
   not_visible_as_screen: 'לא מוצג כמסך עצמאי',
   blocked_by_design: 'חסום בתכנון',
@@ -220,7 +220,7 @@ const roadmapSummaryCounter = (): string => {
   const current = stages.filter((s) => s.status === 'current').length;
   const next = stages.filter((s) => s.status === 'next').length;
   const blocked = stages.filter((s) => s.status === 'blocked').length;
-  return `${built} נבנו · ${current} עכשיו · ${next} ${next === 1 ? 'ממתין' : 'ממתינים'} · ${blocked} חסום`;
+  return `מפת שלבי בניית המוח: ${built} נבנו · ${current} עכשיו · ${next} ${next === 1 ? 'ממתין' : 'ממתינים'} · ${blocked} חסום.`;
 };
 
 // #region Source Map Helpers
@@ -266,7 +266,10 @@ const visualProcessStatusCounter = (): string => {
     { built: 0, building: 0, pending: 0 },
   );
 
-  return `${counts.built} נבנו · ${counts.building} בבנייה · ${counts.pending} ממתינים`;
+  const categories = new Set(BRAIN_VISUAL_PROCESS_REGISTRY_ROWS.map((processRow) => processRow.categoryId)).size;
+  const processes = BRAIN_VISUAL_PROCESS_REGISTRY_ROWS.length;
+
+  return `רשימת תהליכי המוח הוויזואלי: ${categories} קטגוריות · ${processes} תהליכים · ${counts.built} נבנו · ${counts.building} בבנייה · ${counts.pending} ממתינים.`;
 };
 
 const groupedVisualProcesses = (): readonly [string, readonly BrainVisualProcessRegistryRow[]][] =>
@@ -348,7 +351,7 @@ function ProgressMetrics() {
   return (
     <section data-testid="build-progress-top-metrics" style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', marginTop: 18 }}>
       <MetricCard label="נקודות בנייה שננעלו" value={BRAIN_BUILD_PROGRESS_ITEMS.length} />
-      <MetricCard label="הוכחות תצוגה פעילות" value={visibleProofScreenCount()} />
+      <MetricCard label="מסכים מוצגים פעילים" value={visibleProofScreenCount()} />
       <MetricCard label="פעולות חיות פעילות" value={0} />
     </section>
   );
