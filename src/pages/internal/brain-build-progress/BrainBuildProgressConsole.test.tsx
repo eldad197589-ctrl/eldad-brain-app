@@ -209,6 +209,7 @@ const textWithoutAllowedNegativeSections = (container: HTMLElement): string => {
         '[data-testid="build-progress-safety-notices"]',
         '[data-testid="build-progress-still-blocked"]',
         '[data-testid="build-progress-blocked-actions"]',
+        '[data-testid="build-progress-latest-blocked"]',
         '[data-testid="build-progress-top-metrics"]',
         '[data-testid="roadmap-not-done"]',
         '[data-testid="roadmap-blocked-reason"]',
@@ -234,7 +235,7 @@ describe('BrainBuildProgressConsole', () => {
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_WARNING);
     expect(html.indexOf('מה השתנה עכשיו')).toBeLessThan(html.indexOf('נקודות בנייה שננעלו'));
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title);
-    expect(html).toContain('16bfd89');
+    expect(html).toContain('eda5b7c');
     for (const text of HEBREW_COPY) {
       expect(html).toContain(text);
     }
@@ -604,8 +605,29 @@ describe('BrainBuildStageRoadmap', () => {
       expect(stage20).toBeDefined();
       expect(stage18!.textContent ?? '').toContain('מפת מקורות ידע חיצוניים');
       expect(stage18!.textContent ?? '').toContain('עכשיו');
+      expect(stage18!.textContent ?? '').toContain('Stage 18: index-complete_with_18D_deferred');
+      expect(stage18!.textContent ?? '').toContain('18D deferred/HOLD');
+      expect(stage18!.textContent ?? '').toContain('Stage 19 pending explicit approval');
       expect(stage20!.textContent ?? '').toContain('שער תפעולי מוגבל ראשון');
       expect(stage20!.textContent ?? '').toContain('חסום');
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders the Stage 18 index status in the latest change without moving to Stage 19', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const latestChangeText = container.querySelector('[data-testid="build-progress-latest-change"]')?.textContent ?? '';
+      expect(latestChangeText).toContain('Stage 18 index status with 18D deferred');
+      expect(latestChangeText).toContain('eda5b7c');
+      expect(latestChangeText).toContain('Stage 18: index-complete_with_18D_deferred');
+      expect(latestChangeText).toContain('18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts');
+      expect(latestChangeText).toContain('Stage 19: pending explicit approval');
+      expect(latestChangeText).toContain('Stage 20: blocked');
+      expect(latestChangeText).toContain('No operational capability introduced');
+      expect(latestChangeText).toContain('לא לפתור את 18D');
+      expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {
       cleanup();
     }

@@ -154,26 +154,34 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
   });
 
   it('exports the latest committed change summary for the top console section', () => {
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('Section 102/102A external knowledge source mapping');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('16bfd89');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('Stage 18 index status with 18D deferred');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('eda5b7c');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee).toBe(BRAIN_BUILD_PROGRESS_ROUTE);
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('Section 102/102A');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('Stage 18');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('Stage 18: index-complete_with_18D_deferred');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('18A, 18B, 18C, 18E, 18F+18G');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('18D Visual Brain Alignment');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('src/data/neurons.ts dirty');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('מה מוצג במסך');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Section 102/102A external knowledge source mapping');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 18 נשאר מפת מקורות ידע חיצוניים');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 19 נשאר ממתין');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 20 נשאר חסום');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('לא נוספו כריית תוכן');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('חיבור ספקים');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('פעולה תפעולית');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 18: index-complete_with_18D_deferred');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 19: pending explicit approval');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 20: blocked');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('לא נוספה יכולת פעולה');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain(
+      '18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts',
+    );
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('Stage 19: pending explicit approval');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('Stage 20: blocked');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('No operational capability introduced');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין כריית תוכן');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין OCR');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין חיבור ספקים');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין WorkItem');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין Matter');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין DocumentRef');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe('עדכון מפת מקורות ידע חיצוניים לקריאה בלבד');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe(
+      'Stage 18 index-complete_with_18D_deferred — סטטוס סטטי בלבד',
+    );
   });
 
   it('includes every required field and static safety marker', () => {
@@ -313,6 +321,14 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
     expect(stage17!.compactLine).toBe('מפת מקורות + רשימת תהליכי המוח הוויזואלי — אינדקס בלבד, לא פעולה.');
     expect(stage18!.title).toBe('מפת מקורות ידע חיצוניים');
     expect(stage18!.status).toBe('current');
+    expect(stage18!.compactLine).toContain('Stage 18: index-complete_with_18D_deferred');
+    expect(stage18!.compactLine).toContain('18D deferred/HOLD');
+    expect(stage18!.compactLine).toContain('Stage 19 pending explicit approval');
+    expect(stage18!.proofScenario).toContain('18D deferred/HOLD');
+    expect(stage18!.proofScenario).toContain('src/data/neurons.ts dirty');
+    expect(stage18!.whatIsNotDone).toContain('18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts');
+    expect(stage18!.whatIsNotDone).toContain('Stage 19: pending explicit approval');
+    expect(stage18!.whatIsNotDone).toContain('No operational capability introduced');
   });
 
   it('marks every roadmap stage as static roadmap only', () => {

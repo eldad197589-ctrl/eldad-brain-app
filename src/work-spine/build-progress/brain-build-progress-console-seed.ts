@@ -155,16 +155,27 @@ const builtRoadmapStage = (
 // #region Static Data
 /** Latest committed build-state summary shown above the full progress history. */
 export const BRAIN_BUILD_LATEST_CHANGE_SUMMARY = {
-  title: 'Section 102/102A external knowledge source mapping',
-  relatedCommit: '16bfd89',
+  title: 'Stage 18 index status with 18D deferred',
+  relatedCommit: 'eda5b7c',
   whereToSee: BRAIN_BUILD_PROGRESS_ROUTE,
   whatChanged:
-    'נוסף מיפוי Section 102/102A למפת מקורות הידע החיצוניים של Stage 18 כאינדקס סטטי בלבד.',
+    'Stage 18: index-complete_with_18D_deferred. 18A, 18B, 18C, 18E, 18F+18G קיימים כאינדקס סטטי; 18D Visual Brain Alignment נשאר deferred/HOLD בגלל src/data/neurons.ts dirty.',
   proofOfLife:
-    'מה מוצג במסך: Latest change מציג Section 102/102A external knowledge source mapping. Stage 18 נשאר מפת מקורות ידע חיצוניים. Stage 19 נשאר ממתין. Stage 20 נשאר חסום. לא נוספו כריית תוכן, OCR, חיבור ספקים או פעולה תפעולית.',
-  stillBlocked: ['אין כריית תוכן', 'אין OCR', 'אין חיבור ספקים', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין פעולה תפעולית'],
-  nextSafeStep: 'להשאיר את Stage 18 כמפת מקורות ידע חיצוניים סטטית עד אישור נפרד.',
-  safetyStatus: 'עדכון מפת מקורות ידע חיצוניים לקריאה בלבד',
+    'מה מוצג במסך: Stage 18: index-complete_with_18D_deferred. 18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts. Stage 19: pending explicit approval. Stage 20: blocked. לא נוספה יכולת פעולה.',
+  stillBlocked: [
+    '18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts',
+    'Stage 19: pending explicit approval',
+    'Stage 20: blocked',
+    'No operational capability introduced',
+    'אין כריית תוכן',
+    'אין OCR',
+    'אין חיבור ספקים',
+    'אין WorkItem',
+    'אין Matter',
+    'אין DocumentRef',
+  ],
+  nextSafeStep: 'לבקש אישור מפורש לפני Stage 19; לא לפתור את 18D עד ניקוי או אישור נפרד של src/data/neurons.ts.',
+  safetyStatus: 'Stage 18 index-complete_with_18D_deferred — סטטוס סטטי בלבד',
   safetyNotes: ['מידע בנייה פנימי אמיתי לקריאה בלבד', 'לא מוכנות תפעולית', 'לא אימות מקור', 'אין חיבור ספקים', 'אין הרשאת פעולה או שמירה'],
 } as const;
 
@@ -258,7 +269,7 @@ export const BRAIN_BUILD_STAGE_ROADMAP_GROUPS = [
     subtitle: 'מה נדרש כדי שהמוח יתחיל לעבוד באמת',
     stages: [
       builtRoadmapStage('דרך לתפעול', 17, 'מפת מצב המוח ומקורותיו', '4b05db3', BRAIN_BUILD_PROGRESS_ROUTE, 'מוצגת מפת מקורות ותהליכים אינדקס בלבד.', 'מפת מקורות + רשימת תהליכי המוח הוויזואלי — אינדקס בלבד, לא פעולה.'),
-      roadmapStage('דרך לתפעול', 18, 'מפת מקורות ידע חיצוניים', 'current', null, null, 'נדרש מיפוי מקורות חיצוניים לפני חיבור כלשהו.', ['שלב תכנון נוכחי בלבד'], ['אין חיבור ספקים'], ['אין חיבור ספקים', 'אין קריאת מקור'], AGENT_A_NO_ETA, 'עכשיו — תכנון אינדקס מקורות חיצוניים בלבד.'),
+      roadmapStage('דרך לתפעול', 18, 'מפת מקורות ידע חיצוניים', 'current', null, null, 'נרשם סטטוס אינדקס של Stage 18 עם 18D deferred/HOLD בגלל src/data/neurons.ts dirty. Stage 19 ממתין לאישור מפורש. Stage 20 חסום.', ['אינדקס מקורות חיצוניים סטטי נרשם עד 18A, 18B, 18C, 18E, 18F+18G'], ['18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts', 'Stage 19: pending explicit approval', 'No operational capability introduced'], ['אין חיבור ספקים', 'אין קריאת מקור', 'אין מעבר ל־Stage 19 בלי אישור מפורש'], AGENT_A_NO_ETA, 'Stage 18: index-complete_with_18D_deferred — 18D deferred/HOLD; Stage 19 pending explicit approval.'),
       roadmapStage('דרך לתפעול', 19, 'הרחבת ראיות סריקה אמיתיות', 'next', null, null, 'נדרשת הרחבת ראיות סריקה אמיתיות רק לאחר אישור סטטי.', ['ממתין לשער Agent A'], ['אין קריאת תיקייה', 'אין OCR'], ['אין קריאת קבצים', 'אין OCR'], AGENT_A_NO_ETA, 'ממתין לשער Agent A.'),
       roadmapStage('דרך לתפעול', 20, 'שער תפעולי מוגבל ראשון', 'blocked', null, null, 'חסום עד שער אישור מפורש.', [], ['אין עדיין שער אישור מפורש, אין שכבת persistence מאושרת, ואין הרשאה ליצור WorkItem/Matter/DocumentRef.'], ['אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין persistence'], 'דורש החלטת אלדד נפרדת לפני כל עבודה תפעולית.', 'חסום — דורש החלטת אלדד נפרדת.'),
     ],
