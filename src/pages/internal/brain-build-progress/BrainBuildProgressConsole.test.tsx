@@ -235,7 +235,7 @@ describe('BrainBuildProgressConsole', () => {
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_WARNING);
     expect(html.indexOf('מה השתנה עכשיו')).toBeLessThan(html.indexOf('נקודות בנייה שננעלו'));
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title);
-    expect(html).toContain('pending-stage-21d');
+    expect(html).toContain('e77f4d1');
     for (const text of HEBREW_COPY) {
       expect(html).toContain(text);
     }
@@ -244,10 +244,10 @@ describe('BrainBuildProgressConsole', () => {
   it('renders the static progress item count and top metric values', () => {
     const { container, cleanup } = mountConsole();
     try {
-      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(19);
+      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(20);
       const metricsText = container.querySelector('[data-testid="build-progress-top-metrics"]')?.textContent ?? '';
       expect(metricsText).toContain(String(BRAIN_BUILD_PROGRESS_ITEMS.length));
-      expect(metricsText).toContain('13');
+      expect(metricsText).toContain('14');
       expect(metricsText).toContain('0');
     } finally {
       cleanup();
@@ -622,18 +622,19 @@ describe('BrainBuildStageRoadmap', () => {
     }
   });
 
-  it('renders the Stage 21D Agent Process Assignment status in the latest change', () => {
+  it('renders the Stage 21E Sidebar Separation Plan status in the latest change', () => {
     const { container, cleanup } = mountConsole();
     try {
       const latestChangeText = container.querySelector('[data-testid="build-progress-latest-change"]')?.textContent ?? '';
-      expect(latestChangeText).toContain('Stage 21D — Agent ↔ Process Assignment Map');
-      expect(latestChangeText).toContain('pending-stage-21d');
-      expect(latestChangeText).toContain('מפת שיוך סטטית');
-      expect(latestChangeText).toContain('13 static assignments');
-      expect(latestChangeText).toContain('30 internal agents');
-      expect(latestChangeText).toContain('13 process blueprints');
-      expect(latestChangeText).toContain('operationalExecution:false');
-      expect(latestChangeText).toContain('canRun:false');
+      expect(latestChangeText).toContain('Stage 21E — Sidebar / Process Library Separation Plan');
+      expect(latestChangeText).toContain('e77f4d1');
+      expect(latestChangeText).toContain('תוכנית הפרדה סטטית');
+      expect(latestChangeText).toContain('23 planning rows');
+      expect(latestChangeText).toContain('13 movesToProcessLibrary');
+      expect(latestChangeText).toContain('8 staysInSidebar');
+      expect(latestChangeText).toContain('2 needsEldadDecision');
+      expect(latestChangeText).toContain('implementationAllowed:false');
+      expect(latestChangeText).toContain('requiresEldadApproval:true');
       expect(latestChangeText).toContain('18D remains HOLD');
       expect(latestChangeText).toContain('Stage 20 remains blocked');
       expect(latestChangeText).toContain('אין runtime agents');
@@ -643,7 +644,7 @@ describe('BrainBuildStageRoadmap', () => {
       expect(latestChangeText).toContain('אין שינוי routes');
       expect(latestChangeText).toContain('אין שינוי neurons.ts');
       expect(latestChangeText).toContain('No operational capability introduced');
-      expect(latestChangeText).toContain('static preview only');
+      expect(latestChangeText).toContain('static planning only');
       expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {
       cleanup();
@@ -697,7 +698,7 @@ describe('BrainBuildStageRoadmap', () => {
     try {
       const renderedText = container.textContent ?? '';
       expect(renderedText).toContain('Stage 21D — Agent ↔ Process Assignment Map');
-      expect(renderedText).toContain('pending-stage-21d');
+      expect(renderedText).toContain('9e42b19');
       expect(renderedText).toContain('13 static assignments');
       expect(renderedText).toContain('30 internal agents');
       expect(renderedText).toContain('13 process blueprints');
@@ -706,6 +707,32 @@ describe('BrainBuildStageRoadmap', () => {
       expect(renderedText).toContain('אין runtime agents');
       expect(renderedText).toContain('אין workflow execution');
       expect(renderedText).toContain('אין UI/navigation changes');
+      expect(renderedText).toContain('Stage 20 remains blocked');
+      expect(container.querySelectorAll('button')).toHaveLength(0);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders the Stage 21E Sidebar Separation Plan checkpoint as static planning only', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const renderedText = container.textContent ?? '';
+      expect(renderedText).toContain('Stage 21E — תוכנית הפרדת Sidebar / Process Library');
+      expect(renderedText).toContain('e77f4d1');
+      expect(renderedText).toContain('23 planning rows');
+      expect(renderedText).toContain('13 movesToProcessLibrary');
+      expect(renderedText).toContain('8 staysInSidebar');
+      expect(renderedText).toContain('2 needsEldadDecision');
+      expect(renderedText).toContain('implementationAllowed:false');
+      expect(renderedText).toContain('requiresEldadApproval:true');
+      expect(renderedText).toContain('אין UI/navigation changes');
+      expect(renderedText).toContain('אין Sidebar/Layout/Dashboard changes');
+      expect(renderedText).toContain('אין routes changes');
+      expect(renderedText).toContain('אין neurons.ts changes');
+      expect(renderedText).toContain('אין שינוי sidebarNav.ts');
+      expect(renderedText).toContain('אין שינוי Layout.tsx');
+      expect(renderedText).toContain('אין שינוי dashboard files');
       expect(renderedText).toContain('Stage 20 remains blocked');
       expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {
