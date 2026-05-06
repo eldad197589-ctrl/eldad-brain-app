@@ -129,25 +129,7 @@ export const SIDEBAR_SECTIONS: NavSection[] = [
     items: [
       // הנהלת חשבונות
       { to: '#', emoji: '📊', label: 'הנהלת חשבונות', isDivider: true },
-      { to: '/flow/institutional-reports', emoji: '📋', label: 'דיווחי מוסדות' },
-      { to: '/flow/penalty-cancellation', emoji: '🚨', label: 'ביטול קנסות' },
-      { to: '/flow/declaration-of-capital', emoji: '📜', label: 'הצהרת הון' },
       { to: '/coming-soon', emoji: '📊', label: 'דו"ח מע"מ', dim: true },
-      // עובדים ושכר
-      { to: '#', emoji: '👷', label: 'עובדים ושכר', isDivider: true },
-      { to: '/flow/attendance', emoji: '⏰', label: 'מנוע נוכחות' },
-      { to: '/flow/attendance-agents', emoji: '🤖', label: 'סוכני נוכחות' },
-      { to: '/flow/payroll-processing', emoji: '💰', label: 'עיבוד שכר' },
-      // דיני עבודה
-      { to: '#', emoji: '⚖️', label: 'דיני עבודה', isDivider: true },
-      { to: '/flow/worklaw', emoji: '⚖️', label: 'דיני עבודה' },
-      { to: '/flow/expert-opinion', emoji: '📝', label: 'חוות דעת כלכלית' },
-      // חישובים מיוחדים
-      { to: '#', emoji: '💼', label: 'חישובים מיוחדים', isDivider: true },
-      { to: '/flow/capital-gains', emoji: '💰', label: 'רווח הון בחו"ל' },
-      { to: '/flow/guardian-pro', emoji: '🏛️', label: 'אפוטרופוס' },
-      { to: '/flow/war-compensation', emoji: '🛡️', label: 'פיצויי מלחמה' },
-      { to: '/flow/insolvency', emoji: '📉', label: 'חדלות פירעון' },
     ],
   },
 
