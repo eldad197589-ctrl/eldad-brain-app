@@ -61,6 +61,7 @@ const REQUIRED_PROGRESS_IDS = [
   'progress-work-spine-bootstrap-idempotency-fix-v1',
   'progress-brain-system-source-map-v1',
   'progress-stage-21a-internal-agent-workforce-v1',
+  'progress-stage-19a-metadata-only-scan-intake-preview-v1',
 ] as const;
 
 const REQUIRED_ROADMAP_STAGE_TITLES = [
@@ -139,8 +140,8 @@ const serializedRoadmapText = (): string => JSON.stringify(BRAIN_BUILD_STAGE_ROA
 
 // #region Tests
 describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
-  it('exports exactly the 15 approved build progress items', () => {
-    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(15);
+  it('exports exactly the 16 approved build progress items', () => {
+    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(16);
     expect(progressIds()).toEqual(REQUIRED_PROGRESS_IDS);
   });
 
@@ -155,34 +156,20 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
   });
 
   it('exports the latest committed change summary for the top console section', () => {
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('Stage 21A internal agent workforce static index');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('b25d276');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee).toBe(BRAIN_BUILD_PROGRESS_ROUTE);
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('Stage 21A');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('30 סוכנים פנימיים');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('דגל הפעלה false');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('לא נוספו סוכני runtime');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('מה מוצג במסך');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 21A');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('30 סוכנים פנימיים');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('דגל ההפעלה נשאר false');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 19 לא התחיל');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 20 חסום');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('לא נוספה יכולת פעולה');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain(
-      '18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts',
-    );
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('Stage 19: pending explicit approval');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('Stage 20: blocked');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('No operational capability introduced');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין כריית תוכן');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין OCR');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין חיבור ספקים');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין WorkItem');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין Matter');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין DocumentRef');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('Stage 19A — תצוגת מטא־דאטה סריקות סטטית');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('3dbf61f');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee).toBe('/internal/manual-preview-workbench');
+    for (const expectedText of ['Stage 19A', 'SCANNED_INTAKE_STATIC_SNAPSHOT בלבד', 'ספירות', 'תוויות תיקייה יחסיות']) {
+      expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain(expectedText);
+    }
+    for (const expectedText of ['מה מוצג במסך', 'רמזי סריקות', 'SCANNED_INTAKE_STATIC_SNAPSHOT בלבד', 'אין קריאת תיקייה חיה', 'אין OCR', 'אין קריאת תוכן מקור', 'אין יצירת Matter / WorkItem / DocumentRef']) {
+      expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain(expectedText);
+    }
+    for (const expectedText of ['18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts', 'Stage 19: not complete; pending explicit approval', 'Stage 20: blocked', 'No operational capability introduced', 'אין קריאת תיקייה חיה', 'אין OCR', 'אין קריאת תוכן מקור', 'אין חיבור ספקים', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין persistence']) {
+      expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain(expectedText);
+    }
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe(
-      'Stage 21A static agent workforce index — סטטוס תכנון סטטי בלבד',
+      'Stage 19A metadata-only preview — סטטוס תצוגה סטטית בלבד',
     );
   });
 
@@ -206,6 +193,7 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     expect(relatedCommits).toContain('e6c15e9');
     expect(relatedCommits).toContain('4b05db3');
     expect(relatedCommits).toContain('b25d276');
+    expect(relatedCommits).toContain('3dbf61f');
   });
 
   it('includes the Work Spine bootstrap idempotency fix checkpoint', () => {
@@ -279,8 +267,30 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     expect(checkpoint!.proofScenario.expectedVisibleResult).toContain('דגל הפעלה false');
     expect(checkpoint!.whatIsStillBlocked).toContain('אין runtime agents');
     expect(checkpoint!.whatIsStillBlocked).toContain('אין UI integration');
-    expect(checkpoint!.whatIsStillBlocked).toContain('Stage 19 לא התחיל');
+    expect(checkpoint!.whatIsStillBlocked).toContain('Stage 19 הרחב לא נפתח');
     expect(checkpoint!.whatIsStillBlocked).toContain('Stage 20 חסום');
+  });
+
+  it('includes the Stage 19A metadata-only scan intake preview checkpoint', () => {
+    const checkpoint = BRAIN_BUILD_PROGRESS_ITEMS.find(
+      (progressItem) => progressItem.progressItemId === 'progress-stage-19a-metadata-only-scan-intake-preview-v1',
+    );
+
+    expect(checkpoint).toBeDefined();
+    expect(checkpoint!.title).toBe('Stage 19A — תצוגת מטא־דאטה סריקות סטטית');
+    expect(checkpoint!.relatedCommit).toBe('3dbf61f');
+    expect(checkpoint!.visibleRoute).toBe('/internal/manual-preview-workbench');
+    expect(checkpoint!.currentStatus).toBe('built_and_visible');
+    expect(checkpoint!.proofStatus).toBe('visible_static_preview');
+    expect(checkpoint!.surfaceClassification).toBe('preview_only');
+    for (const expectedText of ['61 מועמדי מטא־דאטה', '18 קבוצות סריקה', 'SCANNED_INTAKE_STATIC_SNAPSHOT בלבד']) {
+      expect(checkpoint!.proofScenario.expectedVisibleResult).toContain(expectedText);
+    }
+    expect(checkpoint!.whatWasBuilt).toContain('SCANNED_INTAKE_STATIC_SNAPSHOT בלבד');
+    expect(checkpoint!.whatEldadCanSee).toContain('snapshot סטטי בלבד');
+    for (const expectedText of ['אין קריאת תיקייה חיה', 'אין OCR', 'אין קריאת תוכן מקור', 'אין הסקת סוג מסמך/לקוח/מס/שכר/דחיפות', 'אין Matter', 'אין WorkItem', 'אין DocumentRef', 'Stage 19 לא נחתם', 'Stage 20 חסום']) {
+      expect(checkpoint!.whatIsStillBlocked).toContain(expectedText);
+    }
   });
 
   it('keeps proof scenarios and blocked actions visible in the static data', () => {
@@ -352,6 +362,15 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
     expect(stage18!.whatIsNotDone).toContain('18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts');
     expect(stage18!.whatIsNotDone).toContain('Stage 19: pending explicit approval');
     expect(stage18!.whatIsNotDone).toContain('No operational capability introduced');
+    const stage19 = roadmapStages().find((stage) => stage.order === 19);
+    expect(stage19).toBeDefined();
+    expect(stage19!.status).toBe('next');
+    expect(stage19!.relatedCommit).toBeNull();
+    expect(stage19!.compactLine).toContain('Stage 19A מטא־דאטה סטטי נרשם');
+    expect(stage19!.compactLine).toContain('Stage 19 הרחב עדיין ממתין לאישור מפורש');
+    expect(stage19!.proofScenario).toContain('SCANNED_INTAKE_STATIC_SNAPSHOT בלבד');
+    expect(stage19!.whatIsDone).toContain('Stage 19A metadata-only scan intake preview נרשם כתצוגה סטטית בלבד');
+    expect(stage19!.whatIsNotDone).toContain('Stage 19 הרחב לא נפתח');
   });
 
   it('marks every roadmap stage as static roadmap only', () => {

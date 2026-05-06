@@ -155,27 +155,29 @@ const builtRoadmapStage = (
 // #region Static Data
 /** Latest committed build-state summary shown above the full progress history. */
 export const BRAIN_BUILD_LATEST_CHANGE_SUMMARY = {
-  title: 'Stage 21A internal agent workforce static index',
-  relatedCommit: 'b25d276',
-  whereToSee: BRAIN_BUILD_PROGRESS_ROUTE,
+  title: 'Stage 19A — תצוגת מטא־דאטה סריקות סטטית',
+  relatedCommit: '3dbf61f',
+  whereToSee: MANUAL_WORKBENCH_ROUTE,
   whatChanged:
-    'נוסף אינדקס סטטי של Stage 21A עם 30 סוכנים פנימיים מתוכננים. לכל סוכן דגל הפעלה false. לא נוספו סוכני runtime, לא UI, לא חיבור ספקים, ולא יצירת אובייקטים תפעוליים.',
+    'נוספה ל־Manual Workbench תצוגת Stage 19A שמציגה מטא־דאטה מתוך SCANNED_INTAKE_STATIC_SNAPSHOT בלבד: ספירות, קבוצות, תוויות תיקייה יחסיות ושמות קבצים לדוגמה שכבר קיימים ב־snapshot.',
   proofOfLife:
-    'מה מוצג במסך: Stage 21A נרשם כשכבת תכנון סטטית בלבד עם 30 סוכנים פנימיים. דגל ההפעלה נשאר false לכל סוכן. Stage 19 לא התחיל. Stage 20 חסום. לא נוספה יכולת פעולה.',
+    'מה מוצג במסך: בקלט עם רמזי סריקות מוצגת תצוגת מטא־דאטה סטטית בלבד. היא משתמשת ב־SCANNED_INTAKE_STATIC_SNAPSHOT בלבד. אין קריאת תיקייה חיה, אין OCR, אין קריאת תוכן מקור, אין הסקת סוג מסמך/לקוח/מס/שכר/דחיפות, ואין יצירת Matter / WorkItem / DocumentRef.',
   stillBlocked: [
     '18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts',
-    'Stage 19: pending explicit approval',
+    'Stage 19: not complete; pending explicit approval',
     'Stage 20: blocked',
     'No operational capability introduced',
-    'אין כריית תוכן',
+    'אין קריאת תיקייה חיה',
     'אין OCR',
+    'אין קריאת תוכן מקור',
     'אין חיבור ספקים',
     'אין WorkItem',
     'אין Matter',
     'אין DocumentRef',
+    'אין persistence',
   ],
-  nextSafeStep: 'להציג את Stage 21A כמדד תכנון בלבד; לא ליצור runtime agents ולא לפתוח Stage 19 בלי אישור מפורש.',
-  safetyStatus: 'Stage 21A static agent workforce index — סטטוס תכנון סטטי בלבד',
+  nextSafeStep: 'להשאיר את Stage 19A כתצוגת מטא־דאטה בלבד; לא לפתוח קריאת תיקייה חיה או Stage 19 מלא בלי אישור מפורש.',
+  safetyStatus: 'Stage 19A metadata-only preview — סטטוס תצוגה סטטית בלבד',
   safetyNotes: ['מידע בנייה פנימי אמיתי לקריאה בלבד', 'לא מוכנות תפעולית', 'לא אימות מקור', 'אין חיבור ספקים', 'אין הרשאת פעולה או שמירה'],
 } as const;
 
@@ -244,9 +246,10 @@ export const BRAIN_BUILD_PROGRESS_ITEMS: readonly BrainBuildProgressItem[] = [
     'נוסף אינדקס סטטי של 30 סוכנים פנימיים מתוכננים בלבד.',
     'אלדד רואה ב־Brain Build Progress ש־Stage 21A קיים כשכבת תכנון סטטית בלבד.',
     'לא לפתוח Stage 19 ולא ליצור סוכני runtime בלי אישור מפורש.',
-    ['אין runtime agents', 'אין UI integration', 'אין חיבור ספקים', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'Stage 19 לא התחיל', 'Stage 20 חסום'],
+    ['אין runtime agents', 'אין UI integration', 'אין חיבור ספקים', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'Stage 19 הרחב לא נפתח', 'Stage 20 חסום'],
     'Codex ראשי',
   ),
+  progressItem('progress-stage-19a-metadata-only-scan-intake-preview-v1', 'Stage 19A — תצוגת מטא־דאטה סריקות סטטית', 'scanned_evidence', 'manual_workbench', '3dbf61f', MANUAL_WORKBENCH_ROUTE, 'סריקות', 'מה מוצג במסך: תצוגת Stage 19A מציגה 61 מועמדי מטא־דאטה, 18 קבוצות סריקה, 61 קבצים נתמכים ו־35 תיקיות מתוך SCANNED_INTAKE_STATIC_SNAPSHOT בלבד.', 'built_and_visible', 'visible_static_preview', 'preview_only', 'נוספה תצוגת מטא־דאטה סריקות סטטית על בסיס SCANNED_INTAKE_STATIC_SNAPSHOT בלבד.', 'אלדד רואה ספירות, קבוצות, תוויות יחסיות ושמות קבצים לדוגמה מתוך snapshot סטטי בלבד.', 'לא להפוך את Stage 19 לקריאת תיקייה חיה ולא לפתוח OCR בלי שער אישור נפרד.', ['אין קריאת תיקייה חיה', 'אין OCR', 'אין קריאת תוכן מקור', 'אין הסקת סוג מסמך/לקוח/מס/שכר/דחיפות', 'אין Matter', 'אין WorkItem', 'אין DocumentRef', 'Stage 19 לא נחתם', 'Stage 20 חסום']),
 ];
 
 /** Static roadmap for build-stage planning only. */
@@ -288,7 +291,7 @@ export const BRAIN_BUILD_STAGE_ROADMAP_GROUPS = [
     stages: [
       builtRoadmapStage('דרך לתפעול', 17, 'מפת מצב המוח ומקורותיו', '4b05db3', BRAIN_BUILD_PROGRESS_ROUTE, 'מוצגת מפת מקורות ותהליכים אינדקס בלבד.', 'מפת מקורות + רשימת תהליכי המוח הוויזואלי — אינדקס בלבד, לא פעולה.'),
       roadmapStage('דרך לתפעול', 18, 'מפת מקורות ידע חיצוניים', 'current', null, null, 'נרשם סטטוס אינדקס של Stage 18 עם 18D deferred/HOLD בגלל src/data/neurons.ts dirty. Stage 19 ממתין לאישור מפורש. Stage 20 חסום.', ['אינדקס מקורות חיצוניים סטטי נרשם עד 18A, 18B, 18C, 18E, 18F+18G'], ['18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts', 'Stage 19: pending explicit approval', 'No operational capability introduced'], ['אין חיבור ספקים', 'אין קריאת מקור', 'אין מעבר ל־Stage 19 בלי אישור מפורש'], AGENT_A_NO_ETA, 'Stage 18: index-complete_with_18D_deferred — 18D deferred/HOLD; Stage 19 pending explicit approval.'),
-      roadmapStage('דרך לתפעול', 19, 'הרחבת ראיות סריקה אמיתיות', 'next', null, null, 'נדרשת הרחבת ראיות סריקה אמיתיות רק לאחר אישור סטטי.', ['ממתין לשער Agent A'], ['אין קריאת תיקייה', 'אין OCR'], ['אין קריאת קבצים', 'אין OCR'], AGENT_A_NO_ETA, 'ממתין לשער Agent A.'),
+      roadmapStage('דרך לתפעול', 19, 'הרחבת ראיות סריקה אמיתיות', 'next', null, null, 'Stage 19A נרשם כתצוגת מטא־דאטה סריקות סטטית על בסיס SCANNED_INTAKE_STATIC_SNAPSHOT בלבד; Stage 19 הרחב עדיין ממתין לאישור מפורש.', ['Stage 19A metadata-only scan intake preview נרשם כתצוגה סטטית בלבד'], ['Stage 19 הרחב לא נפתח', 'אין קריאת תיקייה חיה', 'אין OCR', 'אין קריאת תוכן מקור'], ['אין קריאת קבצים', 'אין OCR', 'אין יצירת Matter/WorkItem/DocumentRef'], AGENT_A_NO_ETA, 'Stage 19A מטא־דאטה סטטי נרשם; Stage 19 הרחב עדיין ממתין לאישור מפורש.'),
       roadmapStage('דרך לתפעול', 20, 'שער תפעולי מוגבל ראשון', 'blocked', null, null, 'חסום עד שער אישור מפורש.', [], ['אין עדיין שער אישור מפורש, אין שכבת persistence מאושרת, ואין הרשאה ליצור WorkItem/Matter/DocumentRef.'], ['אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין persistence'], 'דורש החלטת אלדד נפרדת לפני כל עבודה תפעולית.', 'חסום — דורש החלטת אלדד נפרדת.'),
     ],
   },
