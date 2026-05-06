@@ -12,6 +12,7 @@ import { SCANNED_INTAKE_STATIC_SNAPSHOT } from '../../../work-spine/intake/scann
 import EldadDecisionQueuePreview from './EldadDecisionQueuePreview';
 import type { EldadDecisionQueuePreviewItem } from './EldadDecisionQueuePreview';
 import EldadReviewGatePreview from './EldadReviewGatePreview';
+import MetadataApprovalPackagePreview from './MetadataApprovalPackagePreview';
 // #endregion
 
 // #region Types
@@ -294,6 +295,7 @@ export default function ScannedIntakeMetadataPreview({ searchableText }: Props) 
   const { summary, listing } = SCANNED_INTAKE_STATIC_SNAPSHOT;
   const groups = getSnapshotGroups();
   const decisionQueueItems = buildDecisionQueueItems(groups);
+  const approvalPackageCandidate = decisionQueueItems[0] ?? null;
 
   return (
     <article data-testid="scanned-intake-metadata-preview" style={wrapperStyle}>
@@ -319,6 +321,7 @@ export default function ScannedIntakeMetadataPreview({ searchableText }: Props) 
       />
       <SafetyFlags />
       <EldadDecisionQueuePreview items={decisionQueueItems} />
+      {approvalPackageCandidate ? <MetadataApprovalPackagePreview candidate={approvalPackageCandidate} /> : null}
       <GroupsSection groups={groups} />
     </article>
   );

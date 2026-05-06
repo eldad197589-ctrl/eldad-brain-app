@@ -20,6 +20,7 @@ import EldadReviewGatePreview from './EldadReviewGatePreview';
 import HypotheticalScannedTaskShapePreview from './HypotheticalScannedTaskShapePreview';
 import IntakeSignalSummary from './IntakeSignalSummary';
 import ManualPreviewWorkbench from './ManualPreviewWorkbench';
+import MetadataApprovalPackagePreview from './MetadataApprovalPackagePreview';
 import ScannedEvidenceApprovalGatePreview from './ScannedEvidenceApprovalGatePreview';
 import ScannedEvidenceBatchPreview from './ScannedEvidenceBatchPreview';
 import ScannedIntakeMetadataPreview from './ScannedIntakeMetadataPreview';
@@ -415,6 +416,9 @@ const getEldadReviewGatePreviews = (container: HTMLElement): HTMLElement[] =>
 
 const getEldadDecisionQueuePreview = (container: HTMLElement): HTMLElement | null =>
   container.querySelector<HTMLElement>('[data-testid="eldad-decision-queue-preview"]');
+
+const getMetadataApprovalPackagePreview = (container: HTMLElement): HTMLElement | null =>
+  container.querySelector<HTMLElement>('[data-testid="metadata-approval-package-preview"]');
 
 const getIntakeSignalSummary = (container: HTMLElement): HTMLElement | null =>
   container.querySelector<HTMLElement>('[data-testid="intake-signal-summary"]');
@@ -989,6 +993,41 @@ describe('ManualPreviewWorkbench', () => {
     expect(queueSource).not.toContain('createWorkItem');
     expect(queueSource).not.toContain('createDocumentRef');
     expect(EldadDecisionQueuePreview.toString()).not.toContain('persist(');
+    cleanup();
+  });
+
+  it('renders Stage 20A one-candidate approval package preview without persistence or entity creation', async () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    const packagePreview = getMetadataApprovalPackagePreview(container);
+    const packageText = packagePreview?.textContent ?? '';
+    const packageSource = await readFile('src/pages/internal/manual-preview-workbench/MetadataApprovalPackagePreview.tsx', 'utf8');
+    const helperSource = await readFile('src/work-spine/intake/metadata-approval-package-preview.ts', 'utf8');
+
+    expect(packagePreview).not.toBeNull();
+    expect(container.querySelectorAll('[data-testid="metadata-approval-package-preview"]')).toHaveLength(1);
+    expect(packageText).toContain('תצוגת חבילת אישור בלבד');
+    expect(packageText).toContain('לא בוצעה פעולה במערכת');
+    expect(packageText).toContain('מבוסס מטא־דאטה סטטי');
+    expect(packageText).toContain('אין שמירה');
+    expect(packageText).toContain('אין יצירת תיק / משימה / הפניית מסמך');
+    expect(packageText).toContain('אין OCR / קריאת תוכן');
+    expect(packageText.replace(/\s+/g, '')).toContain('previewPackageOnly:true');
+    expect(packageText.replace(/\s+/g, '')).toContain('persistenceAllowed:false');
+    expect(packageText.replace(/\s+/g, '')).toContain('entityCreationBlocked:true');
+    expect(packageText.replace(/\s+/g, '')).toContain('contentUnverified:true');
+    expect(packageText).toContain('packageStatus');
+    expect(packagePreview?.querySelector('button')).toBeNull();
+    expect(container.querySelectorAll('button')).toHaveLength(2);
+    expect(packageSource).toContain('buildMetadataApprovalPackagePreview');
+    expect(helperSource).not.toContain('localStorage');
+    expect(helperSource).not.toContain('sessionStorage');
+    expect(helperSource).not.toContain('createMatter');
+    expect(helperSource).not.toContain('createWorkItem');
+    expect(helperSource).not.toContain('createDocumentRef');
+    expect(MetadataApprovalPackagePreview.toString()).not.toContain('persist(');
     cleanup();
   });
 

@@ -404,6 +404,8 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
     expect(blockedText).toContain('WorkItem');
     expect(blockedText).toContain('Matter');
     expect(blockedText).toContain('DocumentRef');
+    expect(blockedStage!.proofScenario).toContain('Stage 20A');
+    expect(blockedStage!.whatIsDone).toContain('תצוגת חבילת אישור בלבד — מבוסס מטא־דאטה סטטי');
   });
 
   it('exports the exact roadmap banner', () => {

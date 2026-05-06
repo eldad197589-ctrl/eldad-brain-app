@@ -616,6 +616,7 @@ describe('BrainBuildStageRoadmap', () => {
       expect(stage19!.textContent ?? '').toContain('אין סריקת תוכן');
       expect(stage20!.textContent ?? '').toContain('שער תפעולי מוגבל ראשון');
       expect(stage20!.textContent ?? '').toContain('חסום');
+      expect(stage20!.textContent ?? '').toContain('Stage 20A תצוגת חבילת אישור בלבד');
     } finally {
       cleanup();
     }
