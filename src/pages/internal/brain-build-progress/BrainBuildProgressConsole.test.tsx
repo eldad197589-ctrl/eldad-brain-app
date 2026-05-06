@@ -235,7 +235,7 @@ describe('BrainBuildProgressConsole', () => {
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_WARNING);
     expect(html.indexOf('מה השתנה עכשיו')).toBeLessThan(html.indexOf('נקודות בנייה שננעלו'));
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title);
-    expect(html).toContain('cce44f0');
+    expect(html).toContain('7feb0c2');
     for (const text of HEBREW_COPY) {
       expect(html).toContain(text);
     }
@@ -244,10 +244,10 @@ describe('BrainBuildProgressConsole', () => {
   it('renders the static progress item count and top metric values', () => {
     const { container, cleanup } = mountConsole();
     try {
-      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(17);
+      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(18);
       const metricsText = container.querySelector('[data-testid="build-progress-top-metrics"]')?.textContent ?? '';
       expect(metricsText).toContain(String(BRAIN_BUILD_PROGRESS_ITEMS.length));
-      expect(metricsText).toContain('11');
+      expect(metricsText).toContain('12');
       expect(metricsText).toContain('0');
     } finally {
       cleanup();
@@ -622,21 +622,23 @@ describe('BrainBuildStageRoadmap', () => {
     }
   });
 
-  it('renders the Stage 19 metadata-only preview completion status in the latest change', () => {
+  it('renders the Stage 21C Process Library status in the latest change', () => {
     const { container, cleanup } = mountConsole();
     try {
       const latestChangeText = container.querySelector('[data-testid="build-progress-latest-change"]')?.textContent ?? '';
-      expect(latestChangeText).toContain('Stage 19: preview-complete_metadata_only');
-      expect(latestChangeText).toContain('cce44f0');
-      expect(latestChangeText).toContain('הושלמה תצוגת מטא-דאטה בלבד');
+      expect(latestChangeText).toContain('Stage 21C — ספריית תהליכים מקצועיים');
+      expect(latestChangeText).toContain('7feb0c2');
+      expect(latestChangeText).toContain('שכבת Blueprint סטטית');
+      expect(latestChangeText).toContain('13 תהליכים');
+      expect(latestChangeText).toContain('דגל הפעלה false');
       expect(latestChangeText).toContain('18D remains HOLD');
       expect(latestChangeText).toContain('Stage 20 remains blocked');
-      expect(latestChangeText).toContain('אין סריקת תוכן');
-      expect(latestChangeText).toContain('אין OCR');
-      expect(latestChangeText).toContain('אין שמירת נתונים במסד');
-      expect(latestChangeText).toContain('אין Matter / WorkItem / DocumentRef');
+      expect(latestChangeText).toContain('אין שינוי Sidebar/Layout/Dashboard');
+      expect(latestChangeText).toContain('אין שינוי routes');
+      expect(latestChangeText).toContain('אין שינוי neurons.ts');
+      expect(latestChangeText).toContain('אין runtime workflow');
       expect(latestChangeText).toContain('No operational capability introduced');
-      expect(latestChangeText).toContain('לא לפתוח Stage 20');
+      expect(latestChangeText).toContain('לבקר את ספריית התהליכים');
       expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {
       cleanup();
@@ -654,6 +656,30 @@ describe('BrainBuildStageRoadmap', () => {
       expect(renderedText).toContain('אין runtime agents');
       expect(renderedText).toContain('אין UI integration');
       expect(renderedText).toContain('Stage 19 נרשם כ־preview-complete_metadata_only בלבד');
+      expect(renderedText).toContain('Stage 20 חסום');
+      expect(container.querySelectorAll('button')).toHaveLength(0);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders the Stage 21C Process Library checkpoint as static blueprint layer', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const renderedText = container.textContent ?? '';
+      expect(renderedText).toContain('Stage 21C — ספריית תהליכים מקצועיים');
+      expect(renderedText).toContain('7feb0c2');
+      expect(renderedText).toContain('13 תהליכים מקצועיים');
+      expect(renderedText).toContain('דגל הפעלה false');
+      expect(renderedText).toContain('Stage 21B Professional Process Blueprints');
+      expect(renderedText).toContain('אין UI/navigation changes');
+      expect(renderedText).toContain('אין Sidebar/Layout/Dashboard changes');
+      expect(renderedText).toContain('אין routes changes');
+      expect(renderedText).toContain('אין neurons.ts changes');
+      expect(renderedText).toContain('אין runtime workflows');
+      expect(renderedText).toContain('אין WorkItem');
+      expect(renderedText).toContain('אין Matter');
+      expect(renderedText).toContain('אין DocumentRef');
       expect(renderedText).toContain('Stage 20 חסום');
       expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {
