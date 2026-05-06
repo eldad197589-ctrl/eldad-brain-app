@@ -235,7 +235,7 @@ describe('BrainBuildProgressConsole', () => {
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_WARNING);
     expect(html.indexOf('מה השתנה עכשיו')).toBeLessThan(html.indexOf('נקודות בנייה שננעלו'));
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title);
-    expect(html).toContain('eda5b7c');
+    expect(html).toContain('b25d276');
     for (const text of HEBREW_COPY) {
       expect(html).toContain(text);
     }
@@ -244,10 +244,10 @@ describe('BrainBuildProgressConsole', () => {
   it('renders the static progress item count and top metric values', () => {
     const { container, cleanup } = mountConsole();
     try {
-      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(14);
+      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(15);
       const metricsText = container.querySelector('[data-testid="build-progress-top-metrics"]')?.textContent ?? '';
       expect(metricsText).toContain(String(BRAIN_BUILD_PROGRESS_ITEMS.length));
-      expect(metricsText).toContain('8');
+      expect(metricsText).toContain('9');
       expect(metricsText).toContain('0');
     } finally {
       cleanup();
@@ -615,18 +615,38 @@ describe('BrainBuildStageRoadmap', () => {
     }
   });
 
-  it('renders the Stage 18 index status in the latest change without moving to Stage 19', () => {
+  it('renders the Stage 21A workforce index status in the latest change without moving to Stage 19', () => {
     const { container, cleanup } = mountConsole();
     try {
       const latestChangeText = container.querySelector('[data-testid="build-progress-latest-change"]')?.textContent ?? '';
-      expect(latestChangeText).toContain('Stage 18 index status with 18D deferred');
-      expect(latestChangeText).toContain('eda5b7c');
-      expect(latestChangeText).toContain('Stage 18: index-complete_with_18D_deferred');
-      expect(latestChangeText).toContain('18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts');
+      expect(latestChangeText).toContain('Stage 21A internal agent workforce static index');
+      expect(latestChangeText).toContain('b25d276');
+      expect(latestChangeText).toContain('Stage 21A');
+      expect(latestChangeText).toContain('30 סוכנים פנימיים');
+      expect(latestChangeText).toContain('דגל ההפעלה נשאר false');
+      expect(latestChangeText).toContain('לא נוספו סוכני runtime');
       expect(latestChangeText).toContain('Stage 19: pending explicit approval');
       expect(latestChangeText).toContain('Stage 20: blocked');
       expect(latestChangeText).toContain('No operational capability introduced');
-      expect(latestChangeText).toContain('לא לפתור את 18D');
+      expect(latestChangeText).toContain('לא ליצור runtime agents');
+      expect(container.querySelectorAll('button')).toHaveLength(0);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders the Stage 21A internal agent workforce checkpoint as planning-only', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const renderedText = container.textContent ?? '';
+      expect(renderedText).toContain('Stage 21A — אינדקס כוח סוכנים פנימי');
+      expect(renderedText).toContain('b25d276');
+      expect(renderedText).toContain('30 סוכנים פנימיים');
+      expect(renderedText).toContain('דגל הפעלה false');
+      expect(renderedText).toContain('אין runtime agents');
+      expect(renderedText).toContain('אין UI integration');
+      expect(renderedText).toContain('Stage 19 לא התחיל');
+      expect(renderedText).toContain('Stage 20 חסום');
       expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {
       cleanup();

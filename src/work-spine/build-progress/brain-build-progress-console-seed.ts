@@ -155,13 +155,13 @@ const builtRoadmapStage = (
 // #region Static Data
 /** Latest committed build-state summary shown above the full progress history. */
 export const BRAIN_BUILD_LATEST_CHANGE_SUMMARY = {
-  title: 'Stage 18 index status with 18D deferred',
-  relatedCommit: 'eda5b7c',
+  title: 'Stage 21A internal agent workforce static index',
+  relatedCommit: 'b25d276',
   whereToSee: BRAIN_BUILD_PROGRESS_ROUTE,
   whatChanged:
-    'Stage 18: index-complete_with_18D_deferred. 18A, 18B, 18C, 18E, 18F+18G קיימים כאינדקס סטטי; 18D Visual Brain Alignment נשאר deferred/HOLD בגלל src/data/neurons.ts dirty.',
+    'נוסף אינדקס סטטי של Stage 21A עם 30 סוכנים פנימיים מתוכננים. לכל סוכן דגל הפעלה false. לא נוספו סוכני runtime, לא UI, לא חיבור ספקים, ולא יצירת אובייקטים תפעוליים.',
   proofOfLife:
-    'מה מוצג במסך: Stage 18: index-complete_with_18D_deferred. 18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts. Stage 19: pending explicit approval. Stage 20: blocked. לא נוספה יכולת פעולה.',
+    'מה מוצג במסך: Stage 21A נרשם כשכבת תכנון סטטית בלבד עם 30 סוכנים פנימיים. דגל ההפעלה נשאר false לכל סוכן. Stage 19 לא התחיל. Stage 20 חסום. לא נוספה יכולת פעולה.',
   stillBlocked: [
     '18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts',
     'Stage 19: pending explicit approval',
@@ -174,8 +174,8 @@ export const BRAIN_BUILD_LATEST_CHANGE_SUMMARY = {
     'אין Matter',
     'אין DocumentRef',
   ],
-  nextSafeStep: 'לבקש אישור מפורש לפני Stage 19; לא לפתור את 18D עד ניקוי או אישור נפרד של src/data/neurons.ts.',
-  safetyStatus: 'Stage 18 index-complete_with_18D_deferred — סטטוס סטטי בלבד',
+  nextSafeStep: 'להציג את Stage 21A כמדד תכנון בלבד; לא ליצור runtime agents ולא לפתוח Stage 19 בלי אישור מפורש.',
+  safetyStatus: 'Stage 21A static agent workforce index — סטטוס תכנון סטטי בלבד',
   safetyNotes: ['מידע בנייה פנימי אמיתי לקריאה בלבד', 'לא מוכנות תפעולית', 'לא אימות מקור', 'אין חיבור ספקים', 'אין הרשאת פעולה או שמירה'],
 } as const;
 
@@ -228,6 +228,24 @@ export const BRAIN_BUILD_PROGRESS_ITEMS: readonly BrainBuildProgressItem[] = [
     'להמשיך לשלב מפת מקורות ידע חיצוניים כתכנון אינדקס בלבד.',
     ['אין קריאת תיקיות', 'אין OCR', 'אין חיבור Gmail/Drive/Maven', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין פעולה חיה'],
     'Codex ראשי + Gravity א׳',
+  ),
+  progressItem(
+    'progress-stage-21a-internal-agent-workforce-v1',
+    'Stage 21A — אינדקס כוח סוכנים פנימי',
+    'knowledge',
+    'knowledge_inventory',
+    'b25d276',
+    BRAIN_BUILD_PROGRESS_ROUTE,
+    'פתיחת /internal/brain-build-progress לאחר Stage 21A',
+    'מה מוצג במסך: נרשמה שכבת תכנון סטטית של 30 סוכנים פנימיים. דגל הפעלה false לכל סוכן. אין runtime agents ואין UI integration.',
+    'built_and_visible',
+    'visible_static_preview',
+    'preview_only',
+    'נוסף אינדקס סטטי של 30 סוכנים פנימיים מתוכננים בלבד.',
+    'אלדד רואה ב־Brain Build Progress ש־Stage 21A קיים כשכבת תכנון סטטית בלבד.',
+    'לא לפתוח Stage 19 ולא ליצור סוכני runtime בלי אישור מפורש.',
+    ['אין runtime agents', 'אין UI integration', 'אין חיבור ספקים', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'Stage 19 לא התחיל', 'Stage 20 חסום'],
+    'Codex ראשי',
   ),
 ];
 

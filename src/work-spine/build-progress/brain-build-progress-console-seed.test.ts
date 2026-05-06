@@ -60,6 +60,7 @@ const REQUIRED_PROGRESS_IDS = [
   'progress-visual-brain-surface-inventory-v1',
   'progress-work-spine-bootstrap-idempotency-fix-v1',
   'progress-brain-system-source-map-v1',
+  'progress-stage-21a-internal-agent-workforce-v1',
 ] as const;
 
 const REQUIRED_ROADMAP_STAGE_TITLES = [
@@ -138,8 +139,8 @@ const serializedRoadmapText = (): string => JSON.stringify(BRAIN_BUILD_STAGE_ROA
 
 // #region Tests
 describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
-  it('exports exactly the 14 approved build progress items', () => {
-    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(14);
+  it('exports exactly the 15 approved build progress items', () => {
+    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(15);
     expect(progressIds()).toEqual(REQUIRED_PROGRESS_IDS);
   });
 
@@ -154,18 +155,19 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
   });
 
   it('exports the latest committed change summary for the top console section', () => {
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('Stage 18 index status with 18D deferred');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('eda5b7c');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('Stage 21A internal agent workforce static index');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('b25d276');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee).toBe(BRAIN_BUILD_PROGRESS_ROUTE);
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('Stage 18: index-complete_with_18D_deferred');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('18A, 18B, 18C, 18E, 18F+18G');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('18D Visual Brain Alignment');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('src/data/neurons.ts dirty');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('Stage 21A');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('30 סוכנים פנימיים');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('דגל הפעלה false');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('לא נוספו סוכני runtime');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('מה מוצג במסך');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 18: index-complete_with_18D_deferred');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 19: pending explicit approval');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 20: blocked');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 21A');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('30 סוכנים פנימיים');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('דגל ההפעלה נשאר false');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 19 לא התחיל');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 20 חסום');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('לא נוספה יכולת פעולה');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain(
       '18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts',
@@ -180,7 +182,7 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין Matter');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין DocumentRef');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe(
-      'Stage 18 index-complete_with_18D_deferred — סטטוס סטטי בלבד',
+      'Stage 21A static agent workforce index — סטטוס תכנון סטטי בלבד',
     );
   });
 
@@ -203,6 +205,7 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     expect(relatedCommits).toContain('edf165d');
     expect(relatedCommits).toContain('e6c15e9');
     expect(relatedCommits).toContain('4b05db3');
+    expect(relatedCommits).toContain('b25d276');
   });
 
   it('includes the Work Spine bootstrap idempotency fix checkpoint', () => {
@@ -258,6 +261,26 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     expect(checkpoint!.whatIsStillBlocked).toContain('אין Matter');
     expect(checkpoint!.whatIsStillBlocked).toContain('אין DocumentRef');
     expect(checkpoint!.whatIsStillBlocked).toContain('אין פעולה חיה');
+  });
+
+  it('includes the Stage 21A internal agent workforce checkpoint', () => {
+    const checkpoint = BRAIN_BUILD_PROGRESS_ITEMS.find(
+      (progressItem) => progressItem.progressItemId === 'progress-stage-21a-internal-agent-workforce-v1',
+    );
+
+    expect(checkpoint).toBeDefined();
+    expect(checkpoint!.title).toBe('Stage 21A — אינדקס כוח סוכנים פנימי');
+    expect(checkpoint!.relatedCommit).toBe('b25d276');
+    expect(checkpoint!.visibleRoute).toBe(BRAIN_BUILD_PROGRESS_ROUTE);
+    expect(checkpoint!.currentStatus).toBe('built_and_visible');
+    expect(checkpoint!.proofStatus).toBe('visible_static_preview');
+    expect(checkpoint!.surfaceClassification).toBe('preview_only');
+    expect(checkpoint!.proofScenario.expectedVisibleResult).toContain('30 סוכנים פנימיים');
+    expect(checkpoint!.proofScenario.expectedVisibleResult).toContain('דגל הפעלה false');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין runtime agents');
+    expect(checkpoint!.whatIsStillBlocked).toContain('אין UI integration');
+    expect(checkpoint!.whatIsStillBlocked).toContain('Stage 19 לא התחיל');
+    expect(checkpoint!.whatIsStillBlocked).toContain('Stage 20 חסום');
   });
 
   it('keeps proof scenarios and blocked actions visible in the static data', () => {
