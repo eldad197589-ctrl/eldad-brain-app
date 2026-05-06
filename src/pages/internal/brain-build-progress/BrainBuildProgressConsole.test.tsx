@@ -235,7 +235,7 @@ describe('BrainBuildProgressConsole', () => {
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_WARNING);
     expect(html.indexOf('מה השתנה עכשיו')).toBeLessThan(html.indexOf('נקודות בנייה שננעלו'));
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title);
-    expect(html).toContain('e77f4d1');
+    expect(html).toContain('1ae2c22');
     for (const text of HEBREW_COPY) {
       expect(html).toContain(text);
     }
@@ -244,10 +244,10 @@ describe('BrainBuildProgressConsole', () => {
   it('renders the static progress item count and top metric values', () => {
     const { container, cleanup } = mountConsole();
     try {
-      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(20);
+      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(21);
       const metricsText = container.querySelector('[data-testid="build-progress-top-metrics"]')?.textContent ?? '';
       expect(metricsText).toContain(String(BRAIN_BUILD_PROGRESS_ITEMS.length));
-      expect(metricsText).toContain('14');
+      expect(metricsText).toContain('15');
       expect(metricsText).toContain('0');
     } finally {
       cleanup();
@@ -622,28 +622,32 @@ describe('BrainBuildStageRoadmap', () => {
     }
   });
 
-  it('renders the Stage 21E Sidebar Separation Plan status in the latest change', () => {
+  it('renders the Stage 22A Visual Architecture Map status in the latest change', () => {
     const { container, cleanup } = mountConsole();
     try {
       const latestChangeText = container.querySelector('[data-testid="build-progress-latest-change"]')?.textContent ?? '';
-      expect(latestChangeText).toContain('Stage 21E — Sidebar / Process Library Separation Plan');
-      expect(latestChangeText).toContain('e77f4d1');
-      expect(latestChangeText).toContain('תוכנית הפרדה סטטית');
-      expect(latestChangeText).toContain('23 planning rows');
-      expect(latestChangeText).toContain('13 movesToProcessLibrary');
-      expect(latestChangeText).toContain('8 staysInSidebar');
-      expect(latestChangeText).toContain('2 needsEldadDecision');
-      expect(latestChangeText).toContain('implementationAllowed:false');
-      expect(latestChangeText).toContain('requiresEldadApproval:true');
+      expect(latestChangeText).toContain('Stage 22A — Visual Architecture Map');
+      expect(latestChangeText).toContain('1ae2c22');
+      expect(latestChangeText).toContain('מפת ארכיטקטורה חזותית סטטית');
+      expect(latestChangeText).toContain('12 visual surfaces');
+      expect(latestChangeText).toContain('7 architecture buckets');
+      expect(latestChangeText).toContain('Command Center');
+      expect(latestChangeText).toContain('Work Desk');
+      expect(latestChangeText).toContain('Process Library');
+      expect(latestChangeText).toContain('Knowledge Center');
+      expect(latestChangeText).toContain('Client Workspace');
+      expect(latestChangeText).toContain('Products & Systems');
+      expect(latestChangeText).toContain('Internal Dev Tools');
       expect(latestChangeText).toContain('18D remains HOLD');
       expect(latestChangeText).toContain('Stage 20 remains blocked');
       expect(latestChangeText).toContain('אין runtime agents');
       expect(latestChangeText).toContain('אין workflow execution');
-      expect(latestChangeText).toContain('אין UI/navigation changes');
+      expect(latestChangeText).toContain('אין UI/runtime/navigation changes');
       expect(latestChangeText).toContain('אין שינוי Sidebar/Layout/Dashboard');
       expect(latestChangeText).toContain('אין שינוי routes');
       expect(latestChangeText).toContain('אין שינוי neurons.ts');
       expect(latestChangeText).toContain('No operational capability introduced');
+      expect(latestChangeText).toContain('visual reorg implementation still blocked pending Eldad approval');
       expect(latestChangeText).toContain('static planning only');
       expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {
@@ -733,6 +737,33 @@ describe('BrainBuildStageRoadmap', () => {
       expect(renderedText).toContain('אין שינוי sidebarNav.ts');
       expect(renderedText).toContain('אין שינוי Layout.tsx');
       expect(renderedText).toContain('אין שינוי dashboard files');
+      expect(renderedText).toContain('Stage 20 remains blocked');
+      expect(container.querySelectorAll('button')).toHaveLength(0);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders the Stage 22A Visual Architecture Map checkpoint as static planning only', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const renderedText = container.textContent ?? '';
+      expect(renderedText).toContain('Stage 22A — Visual Architecture Map');
+      expect(renderedText).toContain('1ae2c22');
+      expect(renderedText).toContain('12 visual surfaces');
+      expect(renderedText).toContain('7 architecture buckets');
+      expect(renderedText).toContain('Command Center');
+      expect(renderedText).toContain('Work Desk');
+      expect(renderedText).toContain('Process Library');
+      expect(renderedText).toContain('Knowledge Center');
+      expect(renderedText).toContain('Client Workspace');
+      expect(renderedText).toContain('Products & Systems');
+      expect(renderedText).toContain('Internal Dev Tools');
+      expect(renderedText).toContain('אין UI/runtime/navigation changes');
+      expect(renderedText).toContain('אין שינוי Layout.tsx');
+      expect(renderedText).toContain('אין שינוי sidebar/routes/dashboard/CEO/UI files');
+      expect(renderedText).toContain('אין שינוי neurons.ts');
+      expect(renderedText).toContain('visual reorg implementation still blocked pending Eldad approval');
       expect(renderedText).toContain('Stage 20 remains blocked');
       expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {

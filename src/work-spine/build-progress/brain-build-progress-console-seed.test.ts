@@ -47,6 +47,7 @@ const REQUIRED_PROGRESS_IDS = [
   'progress-stage-21c-process-library-blueprints-v1',
   'progress-stage-21d-agent-process-assignment-map-v1',
   'progress-stage-21e-sidebar-separation-plan-v1',
+  'progress-stage-22a-visual-architecture-map-v1',
   'progress-stage-19a-metadata-only-scan-intake-preview-v1',
   'progress-stage-19-metadata-only-preview-status-v1',
 ] as const;
@@ -127,8 +128,8 @@ const serializedRoadmapText = (): string => JSON.stringify(BRAIN_BUILD_STAGE_ROA
 
 // #region Tests
 describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
-  it('exports exactly the 20 approved build progress items', () => {
-    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(20);
+  it('exports exactly the 21 approved build progress items', () => {
+    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(21);
     expect(progressIds()).toEqual(REQUIRED_PROGRESS_IDS);
   });
 
@@ -141,23 +142,21 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
       'סיכום שינוי סטטי בלבד — לא פריסה חיה, לא מוכנות תפעולית, לא אימות מקור, לא חיבור ספקים, ולא הרשאה לפעול.',
     );
   });
-
   it('exports the latest committed change summary for the top console section', () => {
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('Stage 21E — Sidebar / Process Library Separation Plan');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('e77f4d1');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('Stage 22A — Visual Architecture Map');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('1ae2c22');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee).toBe('/internal/brain-build-progress');
-    for (const expectedText of ['תוכנית הפרדה סטטית', 'Professional Process Blueprints', 'Sidebar תפעוליים']) {
+    for (const expectedText of ['מפת ארכיטקטורה חזותית סטטית', '12 visual surfaces', '7 architecture buckets']) {
       expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain(expectedText);
     }
-    for (const expectedText of ['מה מוצג במסך', '23 planning rows', '13 movesToProcessLibrary', '8 staysInSidebar', '2 needsEldadDecision', 'implementationAllowed:false', 'requiresEldadApproval:true']) {
+    for (const expectedText of ['מה מוצג במסך', 'static planning only', '12 visual surfaces', 'Command Center', 'Work Desk', 'Process Library', 'Knowledge Center', 'Client Workspace', 'Products & Systems', 'Internal Dev Tools']) {
       expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain(expectedText);
     }
-    for (const expectedText of ['18D remains HOLD', '18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts', 'Stage 20 remains blocked', 'No operational capability introduced', 'Stage 21E is a static sidebar separation planning layer only', 'אין runtime agents', 'אין workflow execution', 'אין UI/navigation changes', 'אין שינוי Sidebar/Layout/Dashboard', 'אין שינוי routes', 'אין שינוי neurons.ts', 'אין provider', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין persistence']) {
+    for (const expectedText of ['18D remains HOLD', '18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts', 'Stage 20 remains blocked', 'No operational capability introduced', 'Stage 22A is a static visual architecture planning layer only', 'visual reorg implementation still blocked pending Eldad approval', 'אין runtime agents', 'אין workflow execution', 'אין UI/runtime/navigation changes', 'אין שינוי Sidebar/Layout/Dashboard', 'אין שינוי routes', 'אין שינוי neurons.ts', 'אין provider', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין persistence']) {
       expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain(expectedText);
     }
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe('Stage 21E Sidebar Separation Plan — static planning only, implementationAllowed:false');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe('Stage 22A Visual Architecture Map — static planning only, implementationAllowed:false');
   });
-
   it('includes every required field and static safety marker', () => {
     for (const progressItem of BRAIN_BUILD_PROGRESS_ITEMS) {
       for (const fieldName of REQUIRED_PROGRESS_FIELDS) {
@@ -169,11 +168,10 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
       expect(BRAIN_BUILD_PROGRESS_STATUSES).toContain(progressItem.currentStatus);
     }
   });
-
   it('contains the recent commit and pending anchors needed for the console proof chain', () => {
     const relatedCommits = BRAIN_BUILD_PROGRESS_ITEMS.map((progressItem) => progressItem.relatedCommit);
 
-    for (const relatedCommit of ['ee3a06f', 'edf165d', 'e6c15e9', '4b05db3', 'b25d276', '3dbf61f', '7feb0c2', '9e42b19', 'e77f4d1']) {
+    for (const relatedCommit of ['ee3a06f', 'edf165d', 'e6c15e9', '4b05db3', 'b25d276', '3dbf61f', '7feb0c2', '9e42b19', 'e77f4d1', '1ae2c22']) {
       expect(relatedCommits).toContain(relatedCommit);
     }
   });
@@ -263,7 +261,13 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     for (const expectedText of ['תוכנית הפרדה סטטית', 'Sidebar', 'Process Library']) expect(checkpoint!.whatWasBuilt).toContain(expectedText);
     for (const expectedText of ['אין UI/navigation changes', 'אין Sidebar/Layout/Dashboard changes', 'אין routes changes', 'אין neurons.ts changes', 'אין שינוי sidebarNav.ts', 'אין שינוי Layout.tsx', 'אין שינוי dashboard files', 'אין runtime behavior', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'Stage 20 remains blocked']) expect(checkpoint!.whatIsStillBlocked).toContain(expectedText);
   });
-
+  it('includes the Stage 22A static visual architecture map checkpoint', () => {
+    const checkpoint = BRAIN_BUILD_PROGRESS_ITEMS.find((progressItem) => progressItem.progressItemId === 'progress-stage-22a-visual-architecture-map-v1');
+    expect(checkpoint).toMatchObject({ title: 'Stage 22A — Visual Architecture Map', relatedCommit: '1ae2c22', visibleRoute: BRAIN_BUILD_PROGRESS_ROUTE, currentStatus: 'built_and_visible', proofStatus: 'visible_static_preview', surfaceClassification: 'preview_only' });
+    for (const expectedText of ['static planning only', '12 visual surfaces', '7 architecture buckets', 'אין UI/runtime/navigation changes']) expect(checkpoint!.proofScenario.expectedVisibleResult).toContain(expectedText);
+    for (const expectedText of ['מפת ארכיטקטורה חזותית סטטית', 'Command Center', 'Work Desk', 'Process Library', 'Knowledge Center', 'Client Workspace', 'Products & Systems', 'Internal Dev Tools']) expect(checkpoint!.whatWasBuilt).toContain(expectedText);
+    for (const expectedText of ['אין UI/runtime/navigation changes', 'אין שינוי Layout.tsx', 'אין שינוי sidebar/routes/dashboard/CEO/UI files', 'אין שינוי neurons.ts', 'visual reorg implementation still blocked pending Eldad approval', 'אין runtime behavior', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'Stage 20 remains blocked']) expect(checkpoint!.whatIsStillBlocked).toContain(expectedText);
+  });
   it('includes the Stage 19A metadata-only scan intake preview checkpoint', () => {
     const checkpoint = BRAIN_BUILD_PROGRESS_ITEMS.find(
       (progressItem) => progressItem.progressItemId === 'progress-stage-19a-metadata-only-scan-intake-preview-v1',
