@@ -154,30 +154,26 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
   });
 
   it('exports the latest committed change summary for the top console section', () => {
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('מפת מצב המוח ומקורותיו');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('4b05db3');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('Section 102/102A external knowledge source mapping');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('16bfd89');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee).toBe(BRAIN_BUILD_PROGRESS_ROUTE);
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('מפת מקורות');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('20 מקורות');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('7 קטגוריות');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('22 תהליכים');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('Section 102/102A');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain('Stage 18');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('מה מוצג במסך');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('מפת שלבי בניית המוח: 17 נבנו · 1 עכשיו · 1 ממתין · 1 חסום.');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain(
-      'רשימת תהליכי המוח הוויזואלי: 7 קטגוריות · 22 תהליכים · 17 נבנו · 2 בבנייה · 3 ממתינים.',
-    );
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain(
-      'נתוני התהליכים מתארים את המוח הוויזואלי בלבד, ולא מוכנות תפעולית של המערכת.',
-    );
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).not.toContain('סטטוס תהליכים');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין פעולה חיה');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין קריאת תיקיות');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Section 102/102A external knowledge source mapping');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 18 נשאר מפת מקורות ידע חיצוניים');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 19 נשאר ממתין');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('Stage 20 נשאר חסום');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('לא נוספו כריית תוכן');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('חיבור ספקים');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain('פעולה תפעולית');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין כריית תוכן');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין OCR');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין חיבור Gmail/Drive/Maven');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין חיבור ספקים');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין WorkItem');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין Matter');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain('אין DocumentRef');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe('מיפוי מקורות ותהליכים לקריאה בלבד');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe('עדכון מפת מקורות ידע חיצוניים לקריאה בלבד');
   });
 
   it('includes every required field and static safety marker', () => {

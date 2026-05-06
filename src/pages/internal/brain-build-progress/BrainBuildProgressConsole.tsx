@@ -29,6 +29,12 @@ import {
   BRAIN_VISUAL_PROCESS_REGISTRY_WARNING,
   BRAIN_VISUAL_PROCESS_STATUS_LABELS,
 } from '../../../work-spine/build-progress/brain-visual-process-registry-seed';
+import {
+  EXTERNAL_KNOWLEDGE_SOURCE_MAP_ROWS,
+  EXTERNAL_KNOWLEDGE_SOURCE_ROW_WARNING,
+  EXTERNAL_KNOWLEDGE_SOURCES_MAP_TITLE,
+  EXTERNAL_KNOWLEDGE_SOURCES_MAP_WARNING,
+} from '../../../work-spine/build-progress/external-knowledge-sources-map-seed';
 import type {
   BrainBuildBlockedAction,
   BrainBuildProofStatus,
@@ -49,6 +55,11 @@ import type {
   BrainVisualProcessBuildStatus,
   BrainVisualProcessRegistryRow,
 } from '../../../work-spine/build-progress/brain-visual-process-registry-types';
+import type {
+  ExternalKnowledgeSourceKind,
+  ExternalKnowledgeSourceMapRow,
+  ExternalKnowledgeSourceStatus,
+} from '../../../work-spine/build-progress/external-knowledge-sources-map-types';
 // #endregion
 
 // #region Constants
@@ -178,6 +189,37 @@ const SOURCE_RISK_LABELS: Record<BrainSystemSourceRiskLevel, string> = {
   high: 'סיכון גבוה',
   blocked: 'חסום',
 };
+
+const EXTERNAL_SOURCE_STATUS_LABELS: Record<ExternalKnowledgeSourceStatus, string> = {
+  known_external_source: 'מקור חיצוני ידוע',
+  partial_static_pointer: 'מצביע סטטי חלקי',
+  needs_source_audit: 'נדרש Audit מקור',
+  blocked_live_connection: 'חיבור חי חסום',
+  blocked_file_access: 'גישה לקובץ/תיקייה חסומה',
+  unknown_needs_audit: 'לא ידוע, נדרש Audit',
+};
+
+const EXTERNAL_SOURCE_KIND_LABELS: Record<ExternalKnowledgeSourceKind, string> = {
+  professional_system: 'מערכת מקצועית',
+  professional_domain: 'דומיין מקצועי',
+  product_system: 'מערכת מוצר',
+  product_context: 'הקשר מוצר',
+  source_vault: 'כספת מקור',
+  provider_export: 'ייצוא ספק חסום',
+  file_folder: 'תיקיית מקור חסומה',
+  legacy_source_folder: 'מקור Legacy נדרש Audit',
+};
+
+const EXTERNAL_BLOCKED_ACTION_LABELS: Record<string, string> = {
+  content_reading_blocked: 'קריאת תוכן חסומה',
+  source_parsing_blocked: 'פענוח מקור חסום',
+  folder_mining_blocked: 'כריית תיקייה חסומה',
+  ocr_blocked: 'פענוח תמונה חסום',
+  provider_connection_blocked: 'חיבור ספק חסום',
+  source_verification_blocked: 'אימות מקור חסום',
+  record_creation_blocked: 'יצירת רשומה חסומה',
+  source_action_blocked: 'פעולה על מקור חסומה',
+};
 // #endregion
 
 // #region Helpers
@@ -279,6 +321,42 @@ const groupedVisualProcesses = (): readonly [string, readonly BrainVisualProcess
   ]);
 // #endregion
 
+// #region External Source Helpers
+const externalSourceStatusCounter = (): string => {
+  const counts = EXTERNAL_KNOWLEDGE_SOURCE_MAP_ROWS.reduce<Record<ExternalKnowledgeSourceStatus, number>>(
+    (currentCounts, sourceRow) => ({
+      ...currentCounts,
+      [sourceRow.status]: currentCounts[sourceRow.status] + 1,
+    }),
+    {
+      known_external_source: 0,
+      partial_static_pointer: 0,
+      needs_source_audit: 0,
+      blocked_live_connection: 0,
+      blocked_file_access: 0,
+      unknown_needs_audit: 0,
+    },
+  );
+
+  return Object.entries(counts)
+    .filter(([, count]) => count > 0)
+    .map(([status, count]) => `${EXTERNAL_SOURCE_STATUS_LABELS[status as ExternalKnowledgeSourceStatus]}: ${count}`)
+    .join(' · ');
+};
+
+const groupedExternalSourceRows = (): readonly [ExternalKnowledgeSourceKind, readonly ExternalKnowledgeSourceMapRow[]][] => {
+  const sourceKinds = Array.from(new Set(EXTERNAL_KNOWLEDGE_SOURCE_MAP_ROWS.map((sourceRow) => sourceRow.sourceKind)));
+
+  return sourceKinds.map((sourceKind) => [
+    sourceKind,
+    EXTERNAL_KNOWLEDGE_SOURCE_MAP_ROWS.filter((sourceRow) => sourceRow.sourceKind === sourceKind),
+  ]);
+};
+
+const translatedExternalBlockedActions = (items: readonly string[]): readonly string[] =>
+  items.map((item) => EXTERNAL_BLOCKED_ACTION_LABELS[item] ?? item);
+// #endregion
+
 // #region Types
 type RoadmapStageStatus = (typeof BRAIN_BUILD_STAGE_ROADMAP_STATUSES)[number];
 type BrainBuildRoadmapGroup = (typeof BRAIN_BUILD_STAGE_ROADMAP_GROUPS)[number];
@@ -332,6 +410,20 @@ interface VisualProcessGroupProps {
   categoryLabel: string;
   /** Visual process rows in the category. */
   processRows: readonly BrainVisualProcessRegistryRow[];
+}
+
+/** Props for one external knowledge source row. */
+interface ExternalSourceRowProps {
+  /** External source row to render. */
+  sourceRow: ExternalKnowledgeSourceMapRow;
+}
+
+/** Props for one external source group. */
+interface ExternalSourceGroupProps {
+  /** External source kind. */
+  sourceKind: ExternalKnowledgeSourceKind;
+  /** External source rows in the group. */
+  sourceRows: readonly ExternalKnowledgeSourceMapRow[];
 }
 // #endregion
 
@@ -601,6 +693,57 @@ function BrainVisualProcessRegistrySection() {
 }
 // #endregion
 
+// #region External Knowledge Sources Components
+function ExternalSourceRow({ sourceRow }: ExternalSourceRowProps) {
+  return (
+    <article data-testid="external-knowledge-source-row" style={{ borderBottom: '1px solid rgba(148, 163, 184, 0.08)', padding: '8px 0' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'baseline' }}>
+        <strong>{sourceRow.label}</strong>
+        <span style={{ color: '#93c5fd' }}>{EXTERNAL_SOURCE_STATUS_LABELS[sourceRow.status]}</span>
+        <span style={{ color: '#94a3b8' }}>תחום: {sourceRow.domain}</span>
+        <span style={{ color: '#94a3b8' }}>רמז מיקום: {sourceRow.locationHint}</span>
+      </div>
+      <p style={{ color: '#cbd5e1', fontSize: 13, margin: '4px 0 0' }}>
+        indexOnly:{String(sourceRow.indexOnly)} · contentRead:{String(sourceRow.contentRead)} · sourceParsed:{String(sourceRow.sourceParsed)} · ocrPerformed:{String(sourceRow.ocrPerformed)} · providerConnected:{String(sourceRow.providerConnected)}
+      </p>
+      <p style={{ color: '#fecaca', fontSize: 13, margin: '4px 0 0' }}>
+        sourceVerified:{String(sourceRow.sourceVerified)} · dataCurrentVerified:{String(sourceRow.dataCurrentVerified)} · canCreateRecord:{String(sourceRow.canCreateRecord)} · canActOnSource:{String(sourceRow.canActOnSource)}
+      </p>
+      <p style={{ color: '#fde68a', fontSize: 12, margin: '4px 0 0' }}>{sourceRow.visibleWarning}</p>
+      <p style={{ color: '#cbd5e1', fontSize: 12, margin: '4px 0 0' }}>
+        שער לפני גישה: {sourceRow.requiredGateBeforeAccess}
+      </p>
+      <p style={{ color: '#fecaca', fontSize: 12, margin: '4px 0 0' }}>
+        חסימות: {translatedExternalBlockedActions(sourceRow.blockedActions).join(' · ')}
+      </p>
+    </article>
+  );
+}
+
+function ExternalSourceGroup({ sourceKind, sourceRows }: ExternalSourceGroupProps) {
+  return (
+    <section data-testid="external-knowledge-source-group" style={{ marginTop: 14 }}>
+      <h3 style={{ color: '#bae6fd', fontSize: 16, margin: '0 0 4px' }}>{EXTERNAL_SOURCE_KIND_LABELS[sourceKind]}</h3>
+      {sourceRows.map((sourceRow) => <ExternalSourceRow key={sourceRow.sourceId} sourceRow={sourceRow} />)}
+    </section>
+  );
+}
+
+function ExternalKnowledgeSourcesMapSection() {
+  return (
+    <section data-testid="external-knowledge-sources-map" style={{ background: 'rgba(15, 23, 42, 0.58)', border: '1px solid rgba(34, 197, 94, 0.18)', borderRadius: 12, marginTop: 18, padding: 18 }}>
+      <h2 style={{ fontSize: 22, margin: '0 0 8px' }}>{EXTERNAL_KNOWLEDGE_SOURCES_MAP_TITLE}</h2>
+      <p style={{ color: '#fbbf24', fontWeight: 700, margin: '0 0 10px' }}>{EXTERNAL_KNOWLEDGE_SOURCES_MAP_WARNING}</p>
+      <p data-testid="external-knowledge-source-counter" style={{ color: '#e2e8f0', fontWeight: 700, margin: '0 0 12px' }}>{externalSourceStatusCounter()}</p>
+      <p style={{ color: '#fde68a', fontSize: 13, margin: '0 0 12px' }}>{EXTERNAL_KNOWLEDGE_SOURCE_ROW_WARNING}</p>
+      {groupedExternalSourceRows().map(([sourceKind, sourceRows]) => (
+        <ExternalSourceGroup key={sourceKind} sourceKind={sourceKind} sourceRows={sourceRows} />
+      ))}
+    </section>
+  );
+}
+// #endregion
+
 /**
  * BrainBuildProgressConsole — Static read-only project-control screen for Brain build progress.
  * @example
@@ -614,6 +757,7 @@ export default function BrainBuildProgressConsole() {
       <StageRoadmapSection />
       <BrainSystemSourceMapSection />
       <BrainVisualProcessRegistrySection />
+      <ExternalKnowledgeSourcesMapSection />
       <ProgressMetrics />
       {groupProgressItems().map(([layer, progressItems]) => (
         <ProgressLayerSection key={layer} layer={layer} progressItems={progressItems} />

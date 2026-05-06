@@ -155,15 +155,16 @@ const builtRoadmapStage = (
 // #region Static Data
 /** Latest committed build-state summary shown above the full progress history. */
 export const BRAIN_BUILD_LATEST_CHANGE_SUMMARY = {
-  title: 'מפת מצב המוח ומקורותיו',
-  relatedCommit: '4b05db3',
+  title: 'Section 102/102A external knowledge source mapping',
+  relatedCommit: '16bfd89',
   whereToSee: BRAIN_BUILD_PROGRESS_ROUTE,
-  whatChanged: 'נוספה מפת מקורות ומערכות של המוח יחד עם רשימת תהליכי המוח הוויזואלי.',
+  whatChanged:
+    'נוסף מיפוי Section 102/102A למפת מקורות הידע החיצוניים של Stage 18 כאינדקס סטטי בלבד.',
   proofOfLife:
-    'מה מוצג במסך: מוצגת מפת מקורות ומערכות, יחד עם רשימת תהליכי המוח הוויזואלי. מפת מקורות ומערכות: 20 מקורות. מפת שלבי בניית המוח: 17 נבנו · 1 עכשיו · 1 ממתין · 1 חסום. רשימת תהליכי המוח הוויזואלי: 7 קטגוריות · 22 תהליכים · 17 נבנו · 2 בבנייה · 3 ממתינים. נתוני התהליכים מתארים את המוח הוויזואלי בלבד, ולא מוכנות תפעולית של המערכת.',
-  stillBlocked: ['אין קריאת תיקיות', 'אין OCR', 'אין חיבור Gmail/Drive/Maven', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין פעולה חיה'],
-  nextSafeStep: 'להמשיך לשלב מפת מקורות ידע חיצוניים כתכנון אינדקס בלבד.',
-  safetyStatus: 'מיפוי מקורות ותהליכים לקריאה בלבד',
+    'מה מוצג במסך: Latest change מציג Section 102/102A external knowledge source mapping. Stage 18 נשאר מפת מקורות ידע חיצוניים. Stage 19 נשאר ממתין. Stage 20 נשאר חסום. לא נוספו כריית תוכן, OCR, חיבור ספקים או פעולה תפעולית.',
+  stillBlocked: ['אין כריית תוכן', 'אין OCR', 'אין חיבור ספקים', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין פעולה תפעולית'],
+  nextSafeStep: 'להשאיר את Stage 18 כמפת מקורות ידע חיצוניים סטטית עד אישור נפרד.',
+  safetyStatus: 'עדכון מפת מקורות ידע חיצוניים לקריאה בלבד',
   safetyNotes: ['מידע בנייה פנימי אמיתי לקריאה בלבד', 'לא מוכנות תפעולית', 'לא אימות מקור', 'אין חיבור ספקים', 'אין הרשאת פעולה או שמירה'],
 } as const;
 

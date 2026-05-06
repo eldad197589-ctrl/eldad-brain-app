@@ -32,6 +32,12 @@ import {
   BRAIN_VISUAL_PROCESS_REGISTRY_TITLE,
   BRAIN_VISUAL_PROCESS_REGISTRY_WARNING,
 } from '../../../work-spine/build-progress/brain-visual-process-registry-seed';
+import {
+  EXTERNAL_KNOWLEDGE_SOURCE_MAP_ROWS,
+  EXTERNAL_KNOWLEDGE_SOURCE_ROW_WARNING,
+  EXTERNAL_KNOWLEDGE_SOURCES_MAP_TITLE,
+  EXTERNAL_KNOWLEDGE_SOURCES_MAP_WARNING,
+} from '../../../work-spine/build-progress/external-knowledge-sources-map-seed';
 import brainBuildProgressConsoleSource from './BrainBuildProgressConsole.tsx?raw';
 import BrainBuildProgressConsole from './BrainBuildProgressConsole';
 // #endregion
@@ -66,6 +72,7 @@ const HEBREW_COPY = [
   'מלאי משטחי מוח חזותיים',
   'מפת מצב המוח ומקורותיו',
   'רשימת תהליכי המוח הוויזואלי',
+  'מפת מקורות ידע חיצוניים',
 ] as const;
 
 const INTERNAL_LABELS = [
@@ -206,6 +213,9 @@ const textWithoutAllowedNegativeSections = (container: HTMLElement): string => {
         '[data-testid="roadmap-not-done"]',
         '[data-testid="roadmap-blocked-reason"]',
         '[data-testid="roadmap-blocked-actions"]',
+        '[data-testid="brain-system-source-map"]',
+        '[data-testid="brain-visual-process-registry"]',
+        '[data-testid="external-knowledge-sources-map"]',
       ].join(', '),
     )
     .forEach((element) => element.remove());
@@ -224,7 +234,7 @@ describe('BrainBuildProgressConsole', () => {
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_WARNING);
     expect(html.indexOf('מה השתנה עכשיו')).toBeLessThan(html.indexOf('נקודות בנייה שננעלו'));
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title);
-    expect(html).toContain('4b05db3');
+    expect(html).toContain('16bfd89');
     for (const text of HEBREW_COPY) {
       expect(html).toContain(text);
     }
@@ -384,6 +394,71 @@ describe('BrainBuildProgressConsole', () => {
       expect(registry!.querySelectorAll('[data-testid="brain-visual-process-group"]')).toHaveLength(7);
       expect(registry!.querySelectorAll('[data-testid="brain-visual-process-row"]')).toHaveLength(22);
       expect(BRAIN_VISUAL_PROCESS_REGISTRY_ROWS).toHaveLength(22);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders the external knowledge sources map after Stage 17 sections and before history', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const visualRegistry = container.querySelector('[data-testid="brain-visual-process-registry"]');
+      const externalMap = container.querySelector('[data-testid="external-knowledge-sources-map"]');
+      const firstHistoryItem = container.querySelector('[data-testid="build-progress-item"]');
+
+      expect(visualRegistry).not.toBeNull();
+      expect(externalMap).not.toBeNull();
+      expect(firstHistoryItem).not.toBeNull();
+      expect(Boolean(visualRegistry!.compareDocumentPosition(externalMap!) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+      expect(Boolean(externalMap!.compareDocumentPosition(firstHistoryItem!) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders the exact external source warnings and approved compact rows', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const externalMap = container.querySelector('[data-testid="external-knowledge-sources-map"]');
+      expect(externalMap).not.toBeNull();
+      const externalMapText = externalMap!.textContent ?? '';
+      expect(externalMapText).toContain(EXTERNAL_KNOWLEDGE_SOURCES_MAP_TITLE);
+      expect(externalMapText).toContain(EXTERNAL_KNOWLEDGE_SOURCES_MAP_WARNING);
+      expect(externalMapText).toContain(EXTERNAL_KNOWLEDGE_SOURCE_ROW_WARNING);
+      expect(externalMapText).toContain('Section 102/102A income tax knowledge');
+      expect(externalMapText).toContain('Urgent scans 2026-05-05 mixed intake');
+      expect(externalMap!.querySelectorAll('[data-testid="external-knowledge-source-row"]')).toHaveLength(21);
+      expect(EXTERNAL_KNOWLEDGE_SOURCE_MAP_ROWS).toHaveLength(21);
+      expect(container.querySelectorAll('button')).toHaveLength(0);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('renders provider and folder source candidates as blocked index rows', () => {
+    const { container, cleanup } = mountConsole();
+    try {
+      const externalMapText = container.querySelector('[data-testid="external-knowledge-sources-map"]')?.textContent ?? '';
+      expect(externalMapText).toContain('Gmail data exports');
+      expect(externalMapText).toContain('Drive data exports');
+      expect(externalMapText).toContain('חיבור חי חסום');
+      expect(externalMapText).toContain('סריקות folder');
+      expect(externalMapText).toContain('לקוחות folder');
+      expect(externalMapText).toContain('Maven/VAT source folders');
+      expect(externalMapText).toContain('גישה לקובץ/תיקייה חסומה');
+      expect(externalMapText).toContain('legacy/generated Dima source folders');
+      expect(externalMapText).toContain('legacy/generated Tsila source folders');
+      expect(externalMapText).toContain('לא ידוע, נדרש Audit');
+      expect(externalMapText).toContain('indexOnly:true');
+      expect(externalMapText).toContain('contentRead:false');
+      expect(externalMapText).toContain('sourceParsed:false');
+      expect(externalMapText).toContain('ocrPerformed:false');
+      expect(externalMapText).toContain('providerConnected:false');
+      expect(externalMapText).toContain('sourceVerified:false');
+      expect(externalMapText).toContain('dataCurrentVerified:false');
+      expect(externalMapText).toContain('canCreateRecord:false');
+      expect(externalMapText).toContain('canActOnSource:false');
+      expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {
       cleanup();
     }
