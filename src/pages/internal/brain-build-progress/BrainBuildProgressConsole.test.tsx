@@ -610,7 +610,8 @@ describe('BrainBuildStageRoadmap', () => {
       expect(stage18!.textContent ?? '').toContain('Stage 19 pending explicit approval');
       const stage19 = compactStages.find((el) => el.textContent?.includes('19.'));
       expect(stage19).toBeDefined();
-      expect(stage19!.textContent ?? '').toContain('Stage 19A/19B/19C קיימים כשכבות מטא־דאטה סטטיות בלבד');
+      expect(stage19!.textContent ?? '').toContain('Stage 19A/19B/19C/19D קיימים כשכבות מטא־דאטה ו-review סטטיות בלבד');
+      expect(stage19!.textContent ?? '').toContain('ללא שמירה');
       expect(stage19!.textContent ?? '').toContain('Stage 19 הרחב עדיין ממתין לאישור מפורש');
       expect(stage20!.textContent ?? '').toContain('שער תפעולי מוגבל ראשון');
       expect(stage20!.textContent ?? '').toContain('חסום');

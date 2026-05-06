@@ -366,12 +366,14 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
     expect(stage19).toBeDefined();
     expect(stage19!.status).toBe('next');
     expect(stage19!.relatedCommit).toBeNull();
-    expect(stage19!.compactLine).toContain('Stage 19A/19B/19C קיימים כשכבות מטא־דאטה סטטיות בלבד');
+    expect(stage19!.compactLine).toContain('Stage 19A/19B/19C/19D קיימים כשכבות מטא־דאטה ו-review סטטיות בלבד');
     expect(stage19!.compactLine).toContain('Stage 19 הרחב עדיין ממתין לאישור מפורש');
     expect(stage19!.proofScenario).toContain('SCANNED_INTAKE_STATIC_SNAPSHOT בלבד');
     expect(stage19!.whatIsDone).toContain('Stage 19A metadata-only scan intake preview נרשם כתצוגה סטטית בלבד');
     expect(stage19!.whatIsDone).toContain('Stage 19B metadata classification helper נרשם ככלי סטטי בלבד');
     expect(stage19!.whatIsDone).toContain('Stage 19C classification preview מוצג על בסיס SCANNED_INTAKE_STATIC_SNAPSHOT וה-helper בלבד');
+    expect(stage19!.proofScenario).toContain('metadata-review-gate-helper');
+    expect(stage19!.whatIsDone).toContain('Stage 19D Eldad review gate preview מחובר ל־metadata-review-gate-helper כתצוגה סטטית בלבד ללא persistence');
     expect(stage19!.whatIsNotDone).toContain('Stage 19 הרחב לא נפתח');
     expect(stage19!.whatIsNotDone).toContain('אין confidence גבוה');
   });

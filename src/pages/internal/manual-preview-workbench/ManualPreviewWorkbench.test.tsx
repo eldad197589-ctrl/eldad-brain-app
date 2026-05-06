@@ -15,6 +15,7 @@ import type { Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import BrainKnowledgeInventoryPreview from './BrainKnowledgeInventoryPreview';
+import EldadReviewGatePreview from './EldadReviewGatePreview';
 import HypotheticalScannedTaskShapePreview from './HypotheticalScannedTaskShapePreview';
 import IntakeSignalSummary from './IntakeSignalSummary';
 import ManualPreviewWorkbench from './ManualPreviewWorkbench';
@@ -407,6 +408,9 @@ const getHypotheticalTaskShapePreviews = (container: HTMLElement): HTMLElement[]
 
 const getScannedIntakeMetadataPreview = (container: HTMLElement): HTMLElement | null =>
   container.querySelector<HTMLElement>('[data-testid="scanned-intake-metadata-preview"]');
+
+const getEldadReviewGatePreviews = (container: HTMLElement): HTMLElement[] =>
+  Array.from(container.querySelectorAll<HTMLElement>('[data-testid="eldad-review-gate-preview"]'));
 
 const getIntakeSignalSummary = (container: HTMLElement): HTMLElement | null =>
   container.querySelector<HTMLElement>('[data-testid="intake-signal-summary"]');
@@ -892,6 +896,54 @@ describe('ManualPreviewWorkbench', () => {
     expect(classifications[0]?.textContent).toContain('needsEldadReview:true');
     expect(metadataPreview?.textContent).not.toContain('confidence:high');
     expect(metadataPreview?.querySelector('button')).toBeNull();
+    cleanup();
+  });
+
+  it('renders Stage 19D Eldad review gate preview beside classified candidates without persistence or actions', async () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    const gates = getEldadReviewGatePreviews(container);
+    const gateText = gates.map((gate) => gate.textContent ?? '').join(' ');
+    const gateSource = await readFile('src/pages/internal/manual-preview-workbench/EldadReviewGatePreview.tsx', 'utf8');
+    const helperSource = await readFile('src/work-spine/intake/metadata-review-gate-helper.ts', 'utf8');
+
+    expect(gates.length).toBeGreaterThan(0);
+    expect(gates[0]?.parentElement?.getAttribute('data-testid')).toBe('scanned-intake-metadata-classification');
+    expect(gateText).toContain('שער אישור אלדד');
+    expect(gateText).toContain('תצוגה בלבד');
+    expect(gateText).toContain('אין שמירה');
+    expect(gateText).toContain('אין יצירת משימה / תיק / הפניית מסמך');
+    expect(gateText).toContain('אין פעולה תפעולית');
+    expect(gateText.replace(/\s+/g, '')).toContain('previewOnly:true');
+    expect(gateText.replace(/\s+/g, '')).toContain('noPersistence:true');
+    expect(gateText.replace(/\s+/g, '')).toContain('staticReviewGateOnly:true');
+    expect(gateText.replace(/\s+/g, '')).toContain('operationalExecution:false');
+    expect(gateText.replace(/\s+/g, '')).toContain('contentRead:false');
+    expect(gateText.replace(/\s+/g, '')).toContain('ocrPerformed:false');
+    expect(gateText.replace(/\s+/g, '')).toContain('providerConnected:false');
+    expect(gateText).toContain('reviewGateId:metadata-review-gate:');
+    expect(gateText).toContain('sourceType:static_scan_metadata_snapshot');
+    expect(gateText).toContain('reviewStatus:pending_eldad_review');
+    expect(gateText).toContain('blockedActions:');
+    expect(gateText).toContain('operational_execution_blocked');
+    expect(gateText).toContain('requiresEldadReview:true');
+    expect(container.querySelectorAll('button')).toHaveLength(2);
+    expect(getScannedIntakeMetadataPreview(container)?.querySelector('button')).toBeNull();
+    expect(gateSource).toContain('buildMetadataReviewGatePreview');
+    expect(helperSource).toContain('METADATA_REVIEW_GATE_BLOCKED_ACTIONS');
+    expect(gateSource).not.toContain('localStorage');
+    expect(gateSource).not.toContain('sessionStorage');
+    expect(gateSource).not.toContain('createMatter');
+    expect(gateSource).not.toContain('createWorkItem');
+    expect(gateSource).not.toContain('createDocumentRef');
+    expect(helperSource).not.toContain('localStorage');
+    expect(helperSource).not.toContain('sessionStorage');
+    expect(helperSource).not.toContain('createMatter');
+    expect(helperSource).not.toContain('createWorkItem');
+    expect(helperSource).not.toContain('createDocumentRef');
+    expect(EldadReviewGatePreview.toString()).not.toContain('persist(');
     cleanup();
   });
 

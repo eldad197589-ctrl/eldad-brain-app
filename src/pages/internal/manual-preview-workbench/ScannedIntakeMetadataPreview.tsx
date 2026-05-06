@@ -8,6 +8,7 @@
 // #region Imports
 import { classifyScannedIntakeMetadata } from '../../../work-spine/intake/metadata-classification-helper';
 import { SCANNED_INTAKE_STATIC_SNAPSHOT } from '../../../work-spine/intake/scanned-intake-static-snapshot';
+import EldadReviewGatePreview from './EldadReviewGatePreview';
 // #endregion
 
 // #region Types
@@ -224,6 +225,14 @@ function GroupRow({ group }: GroupRowProps) {
               </div>
               <div style={{ color: '#e2e8f0', fontSize: 12 }}>reason:{classification.reason}</div>
               <div style={{ color: '#a5f3fc', fontSize: 12 }}>sourceSignals:{classification.sourceSignals.join(', ') || 'metadata labels only'}</div>
+              <EldadReviewGatePreview
+                sourceId={`${group.relativeFolder}/${fileName}`}
+                candidateLabel={fileName}
+                sourceType="static_scan_metadata_snapshot"
+                possibleCategory={classification.possibleCategory}
+                confidence={classification.confidence}
+                timestampLabel={null}
+              />
             </li>
           );
         })}
