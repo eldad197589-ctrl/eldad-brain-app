@@ -62,6 +62,7 @@ const REQUIRED_PROGRESS_IDS = [
   'progress-brain-system-source-map-v1',
   'progress-stage-21a-internal-agent-workforce-v1',
   'progress-stage-21c-process-library-blueprints-v1',
+  'progress-stage-21d-agent-process-assignment-map-v1',
   'progress-stage-19a-metadata-only-scan-intake-preview-v1',
   'progress-stage-19-metadata-only-preview-status-v1',
 ] as const;
@@ -142,8 +143,8 @@ const serializedRoadmapText = (): string => JSON.stringify(BRAIN_BUILD_STAGE_ROA
 
 // #region Tests
 describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
-  it('exports exactly the 18 approved build progress items', () => {
-    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(18);
+  it('exports exactly the 19 approved build progress items', () => {
+    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(19);
     expect(progressIds()).toEqual(REQUIRED_PROGRESS_IDS);
   });
 
@@ -158,19 +159,19 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
   });
 
   it('exports the latest committed change summary for the top console section', () => {
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('Stage 21C — ספריית תהליכים מקצועיים');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('7feb0c2');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('Stage 21D — Agent ↔ Process Assignment Map');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('pending-stage-21d');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee).toBe('/internal/brain-build-progress');
-    for (const expectedText of ['שכבת Blueprint סטטית', '13 תהליכים', 'Stage 21B']) {
+    for (const expectedText of ['מפת שיוך סטטית', '30 הסוכנים', '13 תהליכי']) {
       expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain(expectedText);
     }
-    for (const expectedText of ['מה מוצג במסך', '13 blueprints מקצועיים', 'דגל הפעלה false', 'אין UI integration', 'אין שינוי ניווט', 'אין runtime workflow']) {
+    for (const expectedText of ['מה מוצג במסך', '13 static assignments', '30 internal agents', '13 process blueprints', 'operationalExecution:false', 'canRun:false', 'טרם ננעל ב־commit']) {
       expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain(expectedText);
     }
-    for (const expectedText of ['18D remains HOLD', '18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts', 'Stage 20 remains blocked', 'No operational capability introduced', 'Stage 21C is a static Process Library blueprint layer only', 'אין שינוי Sidebar/Layout/Dashboard', 'אין שינוי routes', 'אין שינוי neurons.ts', 'אין runtime workflow', 'אין provider', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין persistence']) {
+    for (const expectedText of ['18D remains HOLD', '18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts', 'Stage 20 remains blocked', 'No operational capability introduced', 'Stage 21D is a static agent-process assignment layer only', 'אין runtime agents', 'אין workflow execution', 'אין UI/navigation changes', 'אין שינוי Sidebar/Layout/Dashboard', 'אין שינוי routes', 'אין שינוי neurons.ts', 'אין provider', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין persistence']) {
       expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain(expectedText);
     }
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe('Stage 21C Process Library — שכבת Blueprint סטטית בלבד, לא הפעלה תפעולית');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe('Stage 21D Agent Process Assignment Map — static preview only, operationalExecution:false');
   });
 
   it('includes every required field and static safety marker', () => {
@@ -185,10 +186,10 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     }
   });
 
-  it('contains the recent commit anchors needed for the console proof chain', () => {
+  it('contains the recent commit and pending anchors needed for the console proof chain', () => {
     const relatedCommits = BRAIN_BUILD_PROGRESS_ITEMS.map((progressItem) => progressItem.relatedCommit);
 
-    for (const relatedCommit of ['ee3a06f', 'edf165d', 'e6c15e9', '4b05db3', 'b25d276', '3dbf61f', '7feb0c2']) {
+    for (const relatedCommit of ['ee3a06f', 'edf165d', 'e6c15e9', '4b05db3', 'b25d276', '3dbf61f', '7feb0c2', 'pending-stage-21d']) {
       expect(relatedCommits).toContain(relatedCommit);
     }
   });
@@ -254,20 +255,20 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     expect(checkpoint!.whatIsStillBlocked).toContain('Stage 20 חסום');
   });
 
-  it('includes the Stage 21C static process library checkpoint', () => {
-    const checkpoint = BRAIN_BUILD_PROGRESS_ITEMS.find((progressItem) => progressItem.progressItemId === 'progress-stage-21c-process-library-blueprints-v1');
+  it('includes the Stage 21D static agent-process assignment checkpoint', () => {
+    const checkpoint = BRAIN_BUILD_PROGRESS_ITEMS.find((progressItem) => progressItem.progressItemId === 'progress-stage-21d-agent-process-assignment-map-v1');
 
     expect(checkpoint).toMatchObject({
-      title: 'Stage 21C — ספריית תהליכים מקצועיים',
-      relatedCommit: '7feb0c2',
+      title: 'Stage 21D — Agent ↔ Process Assignment Map',
+      relatedCommit: 'pending-stage-21d',
       visibleRoute: BRAIN_BUILD_PROGRESS_ROUTE,
       currentStatus: 'built_and_visible',
       proofStatus: 'visible_static_preview',
       surfaceClassification: 'preview_only',
     });
-    for (const expectedText of ['13 תהליכים מקצועיים', 'דגל הפעלה false']) expect(checkpoint!.proofScenario.expectedVisibleResult).toContain(expectedText);
-    for (const expectedText of ['13 blueprints', 'Stage 21B Professional Process Blueprints']) expect(checkpoint!.whatWasBuilt).toContain(expectedText);
-    for (const expectedText of ['אין UI/navigation changes', 'אין Sidebar/Layout/Dashboard changes', 'אין routes changes', 'אין neurons.ts changes', 'אין runtime workflows', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'Stage 20 חסום']) expect(checkpoint!.whatIsStillBlocked).toContain(expectedText);
+    for (const expectedText of ['13 static assignments', '30 internal agents', '13 process blueprints', 'operationalExecution:false', 'canRun:false']) expect(checkpoint!.proofScenario.expectedVisibleResult).toContain(expectedText);
+    for (const expectedText of ['מפת שיוך סטטית', 'סוכנים פנימיים', 'תהליכי Blueprint']) expect(checkpoint!.whatWasBuilt).toContain(expectedText);
+    for (const expectedText of ['אין runtime agents', 'אין workflow execution', 'אין UI/navigation changes', 'אין Sidebar/Layout/Dashboard changes', 'אין routes changes', 'אין neurons.ts changes', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'Stage 20 remains blocked']) expect(checkpoint!.whatIsStillBlocked).toContain(expectedText);
   });
 
   it('includes the Stage 19A metadata-only scan intake preview checkpoint', () => {
@@ -301,7 +302,9 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
   });
 
   it('does not use banned wording outside blocked or negative contexts', () => {
-    const searchableText = serializedNonBlockedProgressText().replaceAll('preview-complete_metadata_only', '');
+    const searchableText = serializedNonBlockedProgressText()
+      .replaceAll('preview-complete_metadata_only', '')
+      .replaceAll('operationalexecution:false', '');
 
     for (const bannedWord of BANNED_LIVE_WORDING) {
       expect(searchableText).not.toContain(bannedWord.toLowerCase());
