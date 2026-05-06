@@ -154,7 +154,7 @@ const REQUIRED_HEBREW_STAGE_TITLES = [
   'תצוגת צורת משימה היפותטית',
   'מפת מצב המוח ומקורותיו',
   'מפת מקורות ידע חיצוניים',
-  'הרחבת ראיות סריקה אמיתיות',
+  'תצוגת מטא־דאטה לסריקות',
   'שער תפעולי מוגבל ראשון',
 ] as const;
 
@@ -235,7 +235,7 @@ describe('BrainBuildProgressConsole', () => {
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_WARNING);
     expect(html.indexOf('מה השתנה עכשיו')).toBeLessThan(html.indexOf('נקודות בנייה שננעלו'));
     expect(html).toContain(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title);
-    expect(html).toContain('3dbf61f');
+    expect(html).toContain('cce44f0');
     for (const text of HEBREW_COPY) {
       expect(html).toContain(text);
     }
@@ -244,10 +244,10 @@ describe('BrainBuildProgressConsole', () => {
   it('renders the static progress item count and top metric values', () => {
     const { container, cleanup } = mountConsole();
     try {
-      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(16);
+      expect(container.querySelectorAll('[data-testid="build-progress-item"]')).toHaveLength(17);
       const metricsText = container.querySelector('[data-testid="build-progress-top-metrics"]')?.textContent ?? '';
       expect(metricsText).toContain(String(BRAIN_BUILD_PROGRESS_ITEMS.length));
-      expect(metricsText).toContain('10');
+      expect(metricsText).toContain('11');
       expect(metricsText).toContain('0');
     } finally {
       cleanup();
@@ -521,7 +521,7 @@ describe('BrainBuildStageRoadmap', () => {
         )}`,
       );
       expect(text).toContain(BRAIN_BUILD_STAGE_ROADMAP_DIVIDER);
-      expect(text).toContain('מפת שלבי בניית המוח: 17 נבנו · 1 עכשיו · 1 ממתין · 1 חסום.');
+      expect(text).toContain('מפת שלבי בניית המוח: 18 נבנו · 1 עכשיו · 0 ממתינים · 1 חסום.');
       for (const group of BRAIN_BUILD_STAGE_ROADMAP_GROUPS) {
         expect(text).toContain(group.title);
         expect(text).toContain(group.subtitle);
@@ -545,11 +545,11 @@ describe('BrainBuildStageRoadmap', () => {
       );
       expect(labels).toContain('נבנה');
       expect(labels).toContain('עכשיו');
-      expect(labels).toContain('ממתין');
+      expect(labels).not.toContain('ממתין');
       expect(labels).toContain('חסום');
       expect(container.textContent).toContain(BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS.built);
       expect(container.textContent).toContain(BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS.current);
-      expect(container.textContent).toContain(BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS.next);
+      expect(container.textContent).not.toContain(BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS.next);
       expect(container.textContent).toContain(BRAIN_BUILD_STAGE_ROADMAP_STATUS_ICONS.blocked);
     } finally {
       cleanup();
@@ -560,7 +560,7 @@ describe('BrainBuildStageRoadmap', () => {
     const { container, cleanup } = mountConsole();
     try {
       const counterText = container.querySelector('[data-testid="roadmap-summary-counter"]')?.textContent ?? '';
-      expect(counterText).toBe('מפת שלבי בניית המוח: 17 נבנו · 1 עכשיו · 1 ממתין · 1 חסום.');
+      expect(counterText).toBe('מפת שלבי בניית המוח: 18 נבנו · 1 עכשיו · 0 ממתינים · 1 חסום.');
     } finally {
       cleanup();
     }
@@ -607,12 +607,13 @@ describe('BrainBuildStageRoadmap', () => {
       expect(stage18!.textContent ?? '').toContain('עכשיו');
       expect(stage18!.textContent ?? '').toContain('Stage 18: index-complete_with_18D_deferred');
       expect(stage18!.textContent ?? '').toContain('18D deferred/HOLD');
-      expect(stage18!.textContent ?? '').toContain('Stage 19 pending explicit approval');
+      expect(stage18!.textContent ?? '').toContain('Stage 19 preview-complete_metadata_only');
       const stage19 = compactStages.find((el) => el.textContent?.includes('19.'));
       expect(stage19).toBeDefined();
-      expect(stage19!.textContent ?? '').toContain('Stage 19A/19B/19C/19D/19E קיימים כשכבות מטא־דאטה, review ו-decision queue סטטיות בלבד');
-      expect(stage19!.textContent ?? '').toContain('ללא שמירה');
-      expect(stage19!.textContent ?? '').toContain('Stage 19 הרחב עדיין ממתין לאישור מפורש');
+      expect(stage19!.textContent ?? '').toContain('תצוגת מטא־דאטה לסריקות');
+      expect(stage19!.textContent ?? '').toContain('נבנה');
+      expect(stage19!.textContent ?? '').toContain('Stage 19: preview-complete_metadata_only');
+      expect(stage19!.textContent ?? '').toContain('אין סריקת תוכן');
       expect(stage20!.textContent ?? '').toContain('שער תפעולי מוגבל ראשון');
       expect(stage20!.textContent ?? '').toContain('חסום');
     } finally {
@@ -620,21 +621,21 @@ describe('BrainBuildStageRoadmap', () => {
     }
   });
 
-  it('renders the Stage 19A metadata preview status in the latest change without completing Stage 19', () => {
+  it('renders the Stage 19 metadata-only preview completion status in the latest change', () => {
     const { container, cleanup } = mountConsole();
     try {
       const latestChangeText = container.querySelector('[data-testid="build-progress-latest-change"]')?.textContent ?? '';
-      expect(latestChangeText).toContain('Stage 19A — תצוגת מטא־דאטה סריקות סטטית');
-      expect(latestChangeText).toContain('3dbf61f');
-      expect(latestChangeText).toContain('SCANNED_INTAKE_STATIC_SNAPSHOT בלבד');
-      expect(latestChangeText).toContain('אין קריאת תיקייה חיה');
+      expect(latestChangeText).toContain('Stage 19: preview-complete_metadata_only');
+      expect(latestChangeText).toContain('cce44f0');
+      expect(latestChangeText).toContain('הושלמה תצוגת מטא-דאטה בלבד');
+      expect(latestChangeText).toContain('18D remains HOLD');
+      expect(latestChangeText).toContain('Stage 20 remains blocked');
+      expect(latestChangeText).toContain('אין סריקת תוכן');
       expect(latestChangeText).toContain('אין OCR');
-      expect(latestChangeText).toContain('אין קריאת תוכן מקור');
-      expect(latestChangeText).toContain('אין יצירת Matter / WorkItem / DocumentRef');
-      expect(latestChangeText).toContain('Stage 19: not complete; pending explicit approval');
-      expect(latestChangeText).toContain('Stage 20: blocked');
+      expect(latestChangeText).toContain('אין שמירת נתונים במסד');
+      expect(latestChangeText).toContain('אין Matter / WorkItem / DocumentRef');
       expect(latestChangeText).toContain('No operational capability introduced');
-      expect(latestChangeText).toContain('לא לפתוח קריאת תיקייה חיה');
+      expect(latestChangeText).toContain('לא לפתוח Stage 20');
       expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {
       cleanup();
@@ -651,7 +652,7 @@ describe('BrainBuildStageRoadmap', () => {
       expect(renderedText).toContain('דגל הפעלה false');
       expect(renderedText).toContain('אין runtime agents');
       expect(renderedText).toContain('אין UI integration');
-      expect(renderedText).toContain('Stage 19 הרחב לא נפתח');
+      expect(renderedText).toContain('Stage 19 נרשם כ־preview-complete_metadata_only בלבד');
       expect(renderedText).toContain('Stage 20 חסום');
       expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {
@@ -672,7 +673,7 @@ describe('BrainBuildStageRoadmap', () => {
       expect(renderedText).toContain('אין OCR');
       expect(renderedText).toContain('אין קריאת תוכן מקור');
       expect(renderedText).toContain('אין הסקת סוג מסמך/לקוח/מס/שכר/דחיפות');
-      expect(renderedText).toContain('Stage 19 לא נחתם');
+      expect(renderedText).toContain('Stage 19 נרשם כ־preview-complete_metadata_only בלבד');
       expect(renderedText).toContain('Stage 20 חסום');
       expect(container.querySelectorAll('button')).toHaveLength(0);
     } finally {

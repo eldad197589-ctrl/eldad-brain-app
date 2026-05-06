@@ -62,6 +62,7 @@ const REQUIRED_PROGRESS_IDS = [
   'progress-brain-system-source-map-v1',
   'progress-stage-21a-internal-agent-workforce-v1',
   'progress-stage-19a-metadata-only-scan-intake-preview-v1',
+  'progress-stage-19-metadata-only-preview-status-v1',
 ] as const;
 
 const REQUIRED_ROADMAP_STAGE_TITLES = [
@@ -83,7 +84,7 @@ const REQUIRED_ROADMAP_STAGE_TITLES = [
   'תצוגת צורת משימה היפותטית',
   'מפת מצב המוח ומקורותיו',
   'מפת מקורות ידע חיצוניים',
-  'הרחבת ראיות סריקה אמיתיות',
+  'תצוגת מטא־דאטה לסריקות',
   'שער תפעולי מוגבל ראשון',
 ] as const;
 
@@ -140,8 +141,8 @@ const serializedRoadmapText = (): string => JSON.stringify(BRAIN_BUILD_STAGE_ROA
 
 // #region Tests
 describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
-  it('exports exactly the 16 approved build progress items', () => {
-    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(16);
+  it('exports exactly the 17 approved build progress items', () => {
+    expect(BRAIN_BUILD_PROGRESS_ITEMS).toHaveLength(17);
     expect(progressIds()).toEqual(REQUIRED_PROGRESS_IDS);
   });
 
@@ -156,20 +157,20 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
   });
 
   it('exports the latest committed change summary for the top console section', () => {
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('Stage 19A — תצוגת מטא־דאטה סריקות סטטית');
-    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('3dbf61f');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.title).toBe('Stage 19: preview-complete_metadata_only');
+    expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.relatedCommit).toBe('cce44f0');
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whereToSee).toBe('/internal/manual-preview-workbench');
-    for (const expectedText of ['Stage 19A', 'SCANNED_INTAKE_STATIC_SNAPSHOT בלבד', 'ספירות', 'תוויות תיקייה יחסיות']) {
+    for (const expectedText of ['הושלמה תצוגת מטא-דאטה בלבד', 'Stage 19A–19E', 'תור החלטות אלדד']) {
       expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.whatChanged).toContain(expectedText);
     }
-    for (const expectedText of ['מה מוצג במסך', 'רמזי סריקות', 'SCANNED_INTAKE_STATIC_SNAPSHOT בלבד', 'אין קריאת תיקייה חיה', 'אין OCR', 'אין קריאת תוכן מקור', 'אין יצירת Matter / WorkItem / DocumentRef']) {
+    for (const expectedText of ['מה מוצג במסך', 'Stage 19: preview-complete_metadata_only', 'אין סריקת תוכן', 'אין OCR', 'אין שמירת נתונים במסד', 'אין Matter / WorkItem / DocumentRef']) {
       expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.proofOfLife).toContain(expectedText);
     }
-    for (const expectedText of ['18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts', 'Stage 19: not complete; pending explicit approval', 'Stage 20: blocked', 'No operational capability introduced', 'אין קריאת תיקייה חיה', 'אין OCR', 'אין קריאת תוכן מקור', 'אין חיבור ספקים', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין persistence']) {
+    for (const expectedText of ['18D remains HOLD', '18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts', 'Stage 20 remains blocked', 'No operational capability introduced', 'אין סריקת תוכן', 'אין OCR', 'אין שמירת נתונים במסד', 'אין WorkItem', 'אין Matter', 'אין DocumentRef', 'אין persistence']) {
       expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.stillBlocked).toContain(expectedText);
     }
     expect(BRAIN_BUILD_LATEST_CHANGE_SUMMARY.safetyStatus).toBe(
-      'Stage 19A metadata-only preview — סטטוס תצוגה סטטית בלבד',
+      'Stage 19 preview-complete_metadata_only — תצוגת מטא-דאטה בלבד, לא מוכנות תפעולית',
     );
   });
 
@@ -267,7 +268,7 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     expect(checkpoint!.proofScenario.expectedVisibleResult).toContain('דגל הפעלה false');
     expect(checkpoint!.whatIsStillBlocked).toContain('אין runtime agents');
     expect(checkpoint!.whatIsStillBlocked).toContain('אין UI integration');
-    expect(checkpoint!.whatIsStillBlocked).toContain('Stage 19 הרחב לא נפתח');
+    expect(checkpoint!.whatIsStillBlocked).toContain('Stage 19 נרשם כ־preview-complete_metadata_only בלבד');
     expect(checkpoint!.whatIsStillBlocked).toContain('Stage 20 חסום');
   });
 
@@ -288,7 +289,7 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
     }
     expect(checkpoint!.whatWasBuilt).toContain('SCANNED_INTAKE_STATIC_SNAPSHOT בלבד');
     expect(checkpoint!.whatEldadCanSee).toContain('snapshot סטטי בלבד');
-    for (const expectedText of ['אין קריאת תיקייה חיה', 'אין OCR', 'אין קריאת תוכן מקור', 'אין הסקת סוג מסמך/לקוח/מס/שכר/דחיפות', 'אין Matter', 'אין WorkItem', 'אין DocumentRef', 'Stage 19 לא נחתם', 'Stage 20 חסום']) {
+    for (const expectedText of ['אין קריאת תיקייה חיה', 'אין OCR', 'אין קריאת תוכן מקור', 'אין הסקת סוג מסמך/לקוח/מס/שכר/דחיפות', 'אין Matter', 'אין WorkItem', 'אין DocumentRef', 'Stage 19 נרשם כ־preview-complete_metadata_only בלבד', 'Stage 20 חסום']) {
       expect(checkpoint!.whatIsStillBlocked).toContain(expectedText);
     }
   });
@@ -302,7 +303,7 @@ describe('BRAIN_BUILD_PROGRESS_ITEMS', () => {
   });
 
   it('does not use banned wording outside blocked or negative contexts', () => {
-    const searchableText = serializedNonBlockedProgressText();
+    const searchableText = serializedNonBlockedProgressText().replaceAll('preview-complete_metadata_only', '');
 
     for (const bannedWord of BANNED_LIVE_WORDING) {
       expect(searchableText).not.toContain(bannedWord.toLowerCase());
@@ -335,7 +336,7 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
       expected[i] = 'built';
     }
     expected[18] = 'current';
-    expected[19] = 'next';
+    expected[19] = 'built';
     expected[20] = 'blocked';
 
     for (const stage of roadmapStages()) {
@@ -356,20 +357,21 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
     expect(stage18!.status).toBe('current');
     expect(stage18!.compactLine).toContain('Stage 18: index-complete_with_18D_deferred');
     expect(stage18!.compactLine).toContain('18D deferred/HOLD');
-    expect(stage18!.compactLine).toContain('Stage 19 pending explicit approval');
+    expect(stage18!.compactLine).toContain('Stage 19 preview-complete_metadata_only');
     expect(stage18!.proofScenario).toContain('18D deferred/HOLD');
     expect(stage18!.proofScenario).toContain('src/data/neurons.ts dirty');
     expect(stage18!.whatIsNotDone).toContain('18D Visual Brain Alignment: deferred/HOLD due dirty neurons.ts');
-    expect(stage18!.whatIsNotDone).toContain('Stage 19: pending explicit approval');
+    expect(stage18!.whatIsNotDone).toContain('Stage 20 remains blocked');
     expect(stage18!.whatIsNotDone).toContain('No operational capability introduced');
     const stage19 = roadmapStages().find((stage) => stage.order === 19);
     expect(stage19).toBeDefined();
-    expect(stage19!.status).toBe('next');
-    expect(stage19!.relatedCommit).toBeNull();
-    ['Stage 19A/19B/19C/19D/19E קיימים כשכבות מטא־דאטה, review ו-decision queue סטטיות בלבד', 'Stage 19 הרחב עדיין ממתין לאישור מפורש'].forEach((text) => expect(stage19!.compactLine).toContain(text));
-    ['SCANNED_INTAKE_STATIC_SNAPSHOT בלבד', 'Stage 19E מוצג כתור החלטות אלדד סטטי', 'metadata-review-gate-helper'].forEach((text) => expect(stage19!.proofScenario).toContain(text));
-    ['Stage 19A metadata-only scan intake preview נרשם כתצוגה סטטית בלבד', 'Stage 19B metadata classification helper נרשם ככלי סטטי בלבד', 'Stage 19C classification preview מוצג על בסיס SCANNED_INTAKE_STATIC_SNAPSHOT וה-helper בלבד', 'Stage 19D Eldad review gate preview מחובר ל־metadata-review-gate-helper כתצוגה סטטית בלבד ללא persistence', 'Stage 19E Eldad decision queue preview מוצג כתור החלטות סטטי בלבד ללא persistence וללא queue state אמיתי'].forEach((text) => expect(stage19!.whatIsDone).toContain(text));
-    ['Stage 19 הרחב לא נפתח', 'אין confidence גבוה', 'אין אישור/דחייה אמיתיים'].forEach((text) => expect(stage19!.whatIsNotDone).toContain(text));
+    expect(stage19!.title).toBe('תצוגת מטא־דאטה לסריקות');
+    expect(stage19!.status).toBe('built');
+    expect(stage19!.relatedCommit).toBe('cce44f0');
+    ['Stage 19: preview-complete_metadata_only', 'הושלמה תצוגת מטא-דאטה בלבד', 'אין סריקת תוכן', 'Stage 20 remains blocked'].forEach((text) => expect(stage19!.compactLine).toContain(text));
+    ['אין OCR', 'אין שמירת נתונים במסד', 'אין Matter / WorkItem / DocumentRef'].forEach((text) => expect(stage19!.proofScenario).toContain(text));
+    ['Stage 19: preview-complete_metadata_only', 'Stage 19E Eldad decision queue preview מוצג כתור החלטות סטטי בלבד ללא persistence וללא queue state אמיתי'].forEach((text) => expect(stage19!.whatIsDone).toContain(text));
+    ['18D remains HOLD', 'Stage 20 remains blocked', 'אין confidence גבוה', 'אין אישור/דחייה אמיתיים'].forEach((text) => expect(stage19!.whatIsNotDone).toContain(text));
   });
 
   it('marks every roadmap stage as static roadmap only', () => {
@@ -380,7 +382,7 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
 
   it('includes commit hashes for all built stages', () => {
     const builtStages = roadmapStages().filter((stage) => stage.status === 'built');
-    expect(builtStages.length).toBe(17);
+    expect(builtStages.length).toBe(18);
     for (const stage of builtStages) {
       expect(stage.relatedCommit).not.toBeNull();
       expect((stage.relatedCommit ?? '').length).toBeGreaterThan(0);
@@ -448,6 +450,7 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
     const searchableText = roadmapStages()
       .flatMap((stage) => [stage.title, stage.proofScenario, ...stage.whatIsDone])
       .join(' ')
+      .replaceAll('preview-complete_metadata_only', '')
       .toLowerCase();
 
     for (const word of banned) {
