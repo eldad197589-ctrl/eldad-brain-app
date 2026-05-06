@@ -366,16 +366,10 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
     expect(stage19).toBeDefined();
     expect(stage19!.status).toBe('next');
     expect(stage19!.relatedCommit).toBeNull();
-    expect(stage19!.compactLine).toContain('Stage 19A/19B/19C/19D קיימים כשכבות מטא־דאטה ו-review סטטיות בלבד');
-    expect(stage19!.compactLine).toContain('Stage 19 הרחב עדיין ממתין לאישור מפורש');
-    expect(stage19!.proofScenario).toContain('SCANNED_INTAKE_STATIC_SNAPSHOT בלבד');
-    expect(stage19!.whatIsDone).toContain('Stage 19A metadata-only scan intake preview נרשם כתצוגה סטטית בלבד');
-    expect(stage19!.whatIsDone).toContain('Stage 19B metadata classification helper נרשם ככלי סטטי בלבד');
-    expect(stage19!.whatIsDone).toContain('Stage 19C classification preview מוצג על בסיס SCANNED_INTAKE_STATIC_SNAPSHOT וה-helper בלבד');
-    expect(stage19!.proofScenario).toContain('metadata-review-gate-helper');
-    expect(stage19!.whatIsDone).toContain('Stage 19D Eldad review gate preview מחובר ל־metadata-review-gate-helper כתצוגה סטטית בלבד ללא persistence');
-    expect(stage19!.whatIsNotDone).toContain('Stage 19 הרחב לא נפתח');
-    expect(stage19!.whatIsNotDone).toContain('אין confidence גבוה');
+    ['Stage 19A/19B/19C/19D/19E קיימים כשכבות מטא־דאטה, review ו-decision queue סטטיות בלבד', 'Stage 19 הרחב עדיין ממתין לאישור מפורש'].forEach((text) => expect(stage19!.compactLine).toContain(text));
+    ['SCANNED_INTAKE_STATIC_SNAPSHOT בלבד', 'Stage 19E מוצג כתור החלטות אלדד סטטי', 'metadata-review-gate-helper'].forEach((text) => expect(stage19!.proofScenario).toContain(text));
+    ['Stage 19A metadata-only scan intake preview נרשם כתצוגה סטטית בלבד', 'Stage 19B metadata classification helper נרשם ככלי סטטי בלבד', 'Stage 19C classification preview מוצג על בסיס SCANNED_INTAKE_STATIC_SNAPSHOT וה-helper בלבד', 'Stage 19D Eldad review gate preview מחובר ל־metadata-review-gate-helper כתצוגה סטטית בלבד ללא persistence', 'Stage 19E Eldad decision queue preview מוצג כתור החלטות סטטי בלבד ללא persistence וללא queue state אמיתי'].forEach((text) => expect(stage19!.whatIsDone).toContain(text));
+    ['Stage 19 הרחב לא נפתח', 'אין confidence גבוה', 'אין אישור/דחייה אמיתיים'].forEach((text) => expect(stage19!.whatIsNotDone).toContain(text));
   });
 
   it('marks every roadmap stage as static roadmap only', () => {

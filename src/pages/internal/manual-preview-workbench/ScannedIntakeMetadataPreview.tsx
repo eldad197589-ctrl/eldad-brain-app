@@ -7,7 +7,10 @@
 
 // #region Imports
 import { classifyScannedIntakeMetadata } from '../../../work-spine/intake/metadata-classification-helper';
+import { buildMetadataReviewGatePreview } from '../../../work-spine/intake/metadata-review-gate-helper';
 import { SCANNED_INTAKE_STATIC_SNAPSHOT } from '../../../work-spine/intake/scanned-intake-static-snapshot';
+import EldadDecisionQueuePreview from './EldadDecisionQueuePreview';
+import type { EldadDecisionQueuePreviewItem } from './EldadDecisionQueuePreview';
 import EldadReviewGatePreview from './EldadReviewGatePreview';
 // #endregion
 
@@ -162,6 +165,30 @@ const classifySampleFile = (group: MetadataGroupPreview, fileName: string) =>
     relativePathLabel: group.relativeFolder,
     snapshotGroupLabels: [group.parentFolderName, group.relativeFolder],
   });
+
+const buildDecisionQueueItems = (groups: readonly MetadataGroupPreview[]): readonly EldadDecisionQueuePreviewItem[] =>
+  groups.flatMap((group) =>
+    group.sampleFileNames.map((fileName) => {
+      const sourceId = `${group.relativeFolder}/${fileName}`;
+      const classification = classifySampleFile(group, fileName);
+      const reviewGate = buildMetadataReviewGatePreview({
+        sourceId,
+        sourceLabel: fileName,
+        sourceType: 'static_scan_metadata_snapshot',
+        timestampLabel: null,
+      });
+
+      return {
+        queueItemId: `decision-queue-preview:${reviewGate.reviewGateId}`,
+        sourceLabel: fileName,
+        possibleCategory: classification.possibleCategory,
+        confidence: classification.confidence,
+        sourceSignals: classification.sourceSignals,
+        reviewGateId: reviewGate.reviewGateId,
+        reviewStatus: reviewGate.reviewStatus,
+      };
+    }),
+  );
 // #endregion
 
 // #region Subcomponents
@@ -266,6 +293,7 @@ export default function ScannedIntakeMetadataPreview({ searchableText }: Props) 
 
   const { summary, listing } = SCANNED_INTAKE_STATIC_SNAPSHOT;
   const groups = getSnapshotGroups();
+  const decisionQueueItems = buildDecisionQueueItems(groups);
 
   return (
     <article data-testid="scanned-intake-metadata-preview" style={wrapperStyle}>
@@ -290,6 +318,7 @@ export default function ScannedIntakeMetadataPreview({ searchableText }: Props) 
         errors={summary.errors + listing.errors}
       />
       <SafetyFlags />
+      <EldadDecisionQueuePreview items={decisionQueueItems} />
       <GroupsSection groups={groups} />
     </article>
   );

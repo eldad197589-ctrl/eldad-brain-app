@@ -15,6 +15,7 @@ import type { Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import BrainKnowledgeInventoryPreview from './BrainKnowledgeInventoryPreview';
+import EldadDecisionQueuePreview from './EldadDecisionQueuePreview';
 import EldadReviewGatePreview from './EldadReviewGatePreview';
 import HypotheticalScannedTaskShapePreview from './HypotheticalScannedTaskShapePreview';
 import IntakeSignalSummary from './IntakeSignalSummary';
@@ -411,6 +412,9 @@ const getScannedIntakeMetadataPreview = (container: HTMLElement): HTMLElement | 
 
 const getEldadReviewGatePreviews = (container: HTMLElement): HTMLElement[] =>
   Array.from(container.querySelectorAll<HTMLElement>('[data-testid="eldad-review-gate-preview"]'));
+
+const getEldadDecisionQueuePreview = (container: HTMLElement): HTMLElement | null =>
+  container.querySelector<HTMLElement>('[data-testid="eldad-decision-queue-preview"]');
 
 const getIntakeSignalSummary = (container: HTMLElement): HTMLElement | null =>
   container.querySelector<HTMLElement>('[data-testid="intake-signal-summary"]');
@@ -944,6 +948,47 @@ describe('ManualPreviewWorkbench', () => {
     expect(helperSource).not.toContain('createWorkItem');
     expect(helperSource).not.toContain('createDocumentRef');
     expect(EldadReviewGatePreview.toString()).not.toContain('persist(');
+    cleanup();
+  });
+
+  it('renders Stage 19E Eldad decision queue preview without real approval state or actions', async () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    const queuePreview = getEldadDecisionQueuePreview(container);
+    const queueText = queuePreview?.textContent ?? '';
+    const queueItems = Array.from(container.querySelectorAll('[data-testid="eldad-decision-queue-item"]'));
+    const queueSource = await readFile('src/pages/internal/manual-preview-workbench/EldadDecisionQueuePreview.tsx', 'utf8');
+
+    expect(queuePreview).not.toBeNull();
+    expect(queueItems.length).toBeGreaterThan(0);
+    expect(queueText).toContain('תור החלטות אלדד');
+    expect(queueText).toContain('תצוגה בלבד');
+    expect(queueText).toContain('ממתין לאישור אלדד');
+    expect(queueText).toContain('אין שמירה');
+    expect(queueText).toContain('אין אישור/דחייה אמיתיים');
+    expect(queueText).toContain('אין יצירת משימה / תיק / הפניית מסמך');
+    expect(queueText.replace(/\s+/g, '')).toContain('previewOnly:true');
+    expect(queueText.replace(/\s+/g, '')).toContain('decisionPreviewOnly:true');
+    expect(queueText.replace(/\s+/g, '')).toContain('noPersistence:true');
+    expect(queueText.replace(/\s+/g, '')).toContain('staticQueueOnly:true');
+    expect(queueText.replace(/\s+/g, '')).toContain('noRealApproval:true');
+    expect(queueText.replace(/\s+/g, '')).toContain('operationalExecution:false');
+    expect(queueText.replace(/\s+/g, '')).toContain('canCreateMatter:false');
+    expect(queueText.replace(/\s+/g, '')).toContain('canCreateWorkItem:false');
+    expect(queueText.replace(/\s+/g, '')).toContain('canCreateDocumentRef:false');
+    expect(queueText).toContain('reviewStatus:pending_eldad_review');
+    expect(queuePreview?.querySelector('button')).toBeNull();
+    expect(container.querySelectorAll('button')).toHaveLength(2);
+    expect(queueSource).not.toContain('useState');
+    expect(queueSource).not.toContain('onClick');
+    expect(queueSource).not.toContain('localStorage');
+    expect(queueSource).not.toContain('sessionStorage');
+    expect(queueSource).not.toContain('createMatter');
+    expect(queueSource).not.toContain('createWorkItem');
+    expect(queueSource).not.toContain('createDocumentRef');
+    expect(EldadDecisionQueuePreview.toString()).not.toContain('persist(');
     cleanup();
   });
 
