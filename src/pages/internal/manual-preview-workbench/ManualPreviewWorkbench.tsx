@@ -11,6 +11,7 @@ import type { ChangeEvent } from 'react';
 import BrainKnowledgeInventoryPreview from './BrainKnowledgeInventoryPreview';
 import IntakeSignalSummary from './IntakeSignalSummary';
 import ScannedEvidenceBatchPreview from './ScannedEvidenceBatchPreview';
+import ScannedIntakeMetadataPreview from './ScannedIntakeMetadataPreview';
 import VatMappingTablePreview from './VatMappingTablePreview';
 import { EVIDENCE_FILE_OPERATION_BLOCK_POLICY, EVIDENCE_FOLDER_RELATIONSHIP_POLICY } from '../../../work-spine/evidence/evidence-spine-policy';
 import { OUTPUT_PREVIEW_TYPE_REGISTRY, STATIC_OUTPUT_PREVIEWS } from '../../../work-spine/output-preview/output-preview-seed';
@@ -533,6 +534,7 @@ export default function ManualPreviewWorkbench() {
               searchableText={searchableText}
             />
             <ScannedEvidenceBatchPreview searchableText={searchableText} />
+            <ScannedIntakeMetadataPreview searchableText={searchableText} />
             <BrainKnowledgeInventoryPreview searchableText={searchableText} />
           </>
         ) : null}

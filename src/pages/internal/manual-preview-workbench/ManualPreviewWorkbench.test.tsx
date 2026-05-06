@@ -8,6 +8,7 @@
 // @vitest-environment happy-dom
 
 // #region Dependencies
+import { readFile } from 'node:fs/promises';
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
@@ -19,6 +20,7 @@ import IntakeSignalSummary from './IntakeSignalSummary';
 import ManualPreviewWorkbench from './ManualPreviewWorkbench';
 import ScannedEvidenceApprovalGatePreview from './ScannedEvidenceApprovalGatePreview';
 import ScannedEvidenceBatchPreview from './ScannedEvidenceBatchPreview';
+import ScannedIntakeMetadataPreview from './ScannedIntakeMetadataPreview';
 import VatMappingTablePreview from './VatMappingTablePreview';
 // #endregion
 
@@ -83,6 +85,8 @@ const SCANNED_APPROVAL_WARNING_TEXT =
   'תצוגת אישור בלבד — לא נוצרת משימה, לא נשלח דבר, ולא מתבצעת פעולה.';
 const HYPOTHETICAL_TASK_SHAPE_WARNING_TEXT =
   'תצוגת משימה היפותטית בלבד — לא נוצרה משימה, לא נוצר WorkItem, לא נוצר Matter, לא נוצר DocumentRef, ולא נשמר דבר.';
+const SCANNED_INTAKE_METADATA_WARNING_TEXT =
+  'תצוגת Stage 19A מבוססת על SCANNED_INTAKE_STATIC_SNAPSHOT בלבד. אין קריאת תיקייה חיה, אין OCR, אין קריאת תוכן קבצים, אין הסקת סוג מסמך/לקוח/מס/שכר/דחיפות, ואין יצירת Matter / WorkItem / DocumentRef.';
 const INTAKE_SIGNAL_GLOBAL_WARNING_TEXT =
   'סיכום רמזי קלט בלבד — זוהו מילים/רמזים בטקסט ידני. לא בוצע ניתוח תוכן, לא נקראו קבצים, לא הופעל OCR, לא אומת מקור, לא בוצע חישוב, לא בוצעה התאמה, ולא נוצרה משימה או רשומה.';
 const DIMA_SIGNAL_SUMMARY_TEXT =
@@ -239,6 +243,44 @@ const REQUIRED_INTAKE_SIGNAL_FLAGS = [
   'canPersist:false',
 ] as const;
 
+const REQUIRED_SCANNED_INTAKE_METADATA_FLAGS = [
+  'previewOnly:true',
+  'staticOnly:true',
+  'metadataOnly:true',
+  'contentRead:false',
+  'liveFolderRead:false',
+  'ocrRun:false',
+  'sourceVerified:false',
+  'documentTypeInferred:false',
+  'clientInferred:false',
+  'taxMeaningInferred:false',
+  'payrollMeaningInferred:false',
+  'urgencyInferred:false',
+  'canCreateMatter:false',
+  'canCreateWorkItem:false',
+  'canCreateDocumentRef:false',
+  'canPersist:false',
+  'canMoveOrRenameFiles:false',
+] as const;
+
+const FORBIDDEN_SCANNED_INTAKE_METADATA_SOURCE_TERMS = [
+  'scanned-folder-listing',
+  'node:fs',
+  'node:path',
+  'localStorage',
+  'sessionStorage',
+  'indexedDB',
+  'fetch(',
+  'FileReader',
+  'createMatter',
+  'createWorkItem',
+  'createDocumentRef',
+  'run-create-work-item',
+  'use-cases',
+  'persistence/',
+  'providers/',
+] as const;
+
 const BANNED_INTAKE_SIGNAL_POSITIVE_WORDING = [
   'הבין',
   'ניתח',
@@ -362,6 +404,9 @@ const getApprovalPreviews = (container: HTMLElement): HTMLElement[] =>
 
 const getHypotheticalTaskShapePreviews = (container: HTMLElement): HTMLElement[] =>
   Array.from(container.querySelectorAll<HTMLElement>('[data-testid="hypothetical-scanned-task-shape-preview"]'));
+
+const getScannedIntakeMetadataPreview = (container: HTMLElement): HTMLElement | null =>
+  container.querySelector<HTMLElement>('[data-testid="scanned-intake-metadata-preview"]');
 
 const getIntakeSignalSummary = (container: HTMLElement): HTMLElement | null =>
   container.querySelector<HTMLElement>('[data-testid="intake-signal-summary"]');
@@ -766,6 +811,85 @@ describe('ManualPreviewWorkbench', () => {
     expect(container.textContent).not.toContain('תצוגת אצוות סריקות סטטית');
     expect(container.querySelector('[data-testid="scanned-evidence-batch-preview"]')).toBeNull();
     cleanup();
+  });
+
+  it('renders Stage 19A metadata-only scan intake preview from the static snapshot', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    const metadataPreview = getScannedIntakeMetadataPreview(container);
+    expect(metadataPreview).not.toBeNull();
+    expect(metadataPreview?.textContent).toContain('Stage 19A');
+    expect(metadataPreview?.textContent).toContain('תצוגת מטא־דאטה סריקות סטטית');
+    expect(metadataPreview?.textContent).toContain(SCANNED_INTAKE_METADATA_WARNING_TEXT);
+    expect(metadataPreview?.textContent).toContain('SCANNED_INTAKE_STATIC_SNAPSHOT');
+    expect(metadataPreview?.textContent).toContain('מועמדי מטא־דאטה');
+    expect(metadataPreview?.textContent).toContain('61');
+    expect(metadataPreview?.textContent).toContain('קבוצות סריקה');
+    expect(metadataPreview?.textContent).toContain('18');
+    expect(metadataPreview?.textContent).toContain('תיקיות שנספרו ב־snapshot');
+    expect(metadataPreview?.textContent).toContain('35');
+    cleanup();
+  });
+
+  it('renders grouped scan metadata labels and sample file names without local absolute paths', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    const metadataPreview = getScannedIntakeMetadataPreview(container);
+    const groups = Array.from(container.querySelectorAll('[data-testid="scanned-intake-metadata-group"]'));
+
+    expect(groups).toHaveLength(18);
+    expect(metadataPreview?.textContent).toContain('אוזנה ניסים טיפול מס');
+    expect(metadataPreview?.textContent).toContain('טופס יפוי כוח חתום אוזנה ניסים.pdf');
+    expect(metadataPreview?.textContent).toContain('חומר למע דוד אלדד 3-4.26');
+    expect(metadataPreview?.textContent).toContain('Gmail - הקבלה שלך על הזמנה ב-Google Play');
+    expect(metadataPreview?.textContent).not.toContain('C:\\Users');
+    expect(metadataPreview?.textContent).not.toContain('folderPath');
+    cleanup();
+  });
+
+  it('renders Stage 19A safety flags and no action buttons', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    const metadataPreview = getScannedIntakeMetadataPreview(container);
+    const metadataPreviewText = metadataPreview?.textContent?.replace(/\s+/g, '') ?? '';
+
+    REQUIRED_SCANNED_INTAKE_METADATA_FLAGS.forEach((flag) => {
+      expect(metadataPreviewText).toContain(flag);
+    });
+    expect(metadataPreview?.querySelector('button')).toBeNull();
+    expect(metadataPreview?.textContent).toContain('No live folder read');
+    expect(metadataPreview?.textContent).toContain('No OCR');
+    expect(metadataPreview?.textContent).toContain('No file content read');
+    cleanup();
+  });
+
+  it('does not render Stage 19A metadata preview for unrelated input', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    changeField(container, '#manual-preview-title', 'בדיקה ידנית רגילה');
+    changeField(container, '#manual-preview-source-type', 'manual_text');
+    changeField(container, '#manual-preview-summary', 'תקציר רגיל לבדיקה פנימית');
+    changeField(container, '#manual-preview-client', 'בדיקת עבודה');
+    changeField(container, '#manual-preview-domain', 'כללי');
+
+    expect(getScannedIntakeMetadataPreview(container)).toBeNull();
+    cleanup();
+  });
+
+  it('keeps Stage 19A preview source on the static snapshot boundary only', async () => {
+    const source = await readFile('src/pages/internal/manual-preview-workbench/ScannedIntakeMetadataPreview.tsx', 'utf8');
+
+    expect(source).toContain('SCANNED_INTAKE_STATIC_SNAPSHOT');
+    FORBIDDEN_SCANNED_INTAKE_METADATA_SOURCE_TERMS.forEach((term) => {
+      expect(source).not.toContain(term);
+    });
+    expect(ScannedIntakeMetadataPreview.toString()).not.toContain('listScannedFolderFiles');
   });
 
   it('shows Dima as partial_static and scanned intake as committed_static for scan Dima input', () => {
