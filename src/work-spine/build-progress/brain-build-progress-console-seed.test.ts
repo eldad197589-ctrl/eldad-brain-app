@@ -366,11 +366,14 @@ describe('BRAIN_BUILD_STAGE_ROADMAP', () => {
     expect(stage19).toBeDefined();
     expect(stage19!.status).toBe('next');
     expect(stage19!.relatedCommit).toBeNull();
-    expect(stage19!.compactLine).toContain('Stage 19A מטא־דאטה סטטי נרשם');
+    expect(stage19!.compactLine).toContain('Stage 19A/19B/19C קיימים כשכבות מטא־דאטה סטטיות בלבד');
     expect(stage19!.compactLine).toContain('Stage 19 הרחב עדיין ממתין לאישור מפורש');
     expect(stage19!.proofScenario).toContain('SCANNED_INTAKE_STATIC_SNAPSHOT בלבד');
     expect(stage19!.whatIsDone).toContain('Stage 19A metadata-only scan intake preview נרשם כתצוגה סטטית בלבד');
+    expect(stage19!.whatIsDone).toContain('Stage 19B metadata classification helper נרשם ככלי סטטי בלבד');
+    expect(stage19!.whatIsDone).toContain('Stage 19C classification preview מוצג על בסיס SCANNED_INTAKE_STATIC_SNAPSHOT וה-helper בלבד');
     expect(stage19!.whatIsNotDone).toContain('Stage 19 הרחב לא נפתח');
+    expect(stage19!.whatIsNotDone).toContain('אין confidence גבוה');
   });
 
   it('marks every roadmap stage as static roadmap only', () => {

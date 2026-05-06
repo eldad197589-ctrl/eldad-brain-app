@@ -869,6 +869,32 @@ describe('ManualPreviewWorkbench', () => {
     cleanup();
   });
 
+  it('renders Stage 19C metadata-only classification preview without high confidence or action controls', () => {
+    const { container, cleanup } = mountWorkbench();
+
+    fillScannedBatchInput(container);
+
+    const metadataPreview = getScannedIntakeMetadataPreview(container);
+    const classifications = Array.from(
+      container.querySelectorAll('[data-testid="scanned-intake-metadata-classification"]'),
+    );
+
+    expect(metadataPreview?.textContent).toContain('סיווג אפשרי לפי מטא־דאטה בלבד');
+    expect(metadataPreview?.textContent).toContain('לא נקרא תוכן');
+    expect(metadataPreview?.textContent).toContain('לא בוצע OCR');
+    expect(metadataPreview?.textContent).toContain('דורש אישור אלדד');
+    expect(metadataPreview?.textContent).toContain('לא נוצרה משימה / תיק / הפניית מסמך');
+    expect(classifications.length).toBeGreaterThan(0);
+    expect(classifications[0]?.textContent).toContain('possibleCategory:');
+    expect(classifications[0]?.textContent).toContain('confidence:');
+    expect(classifications[0]?.textContent).toContain('reason:');
+    expect(classifications[0]?.textContent).toContain('sourceSignals:');
+    expect(classifications[0]?.textContent).toContain('needsEldadReview:true');
+    expect(metadataPreview?.textContent).not.toContain('confidence:high');
+    expect(metadataPreview?.querySelector('button')).toBeNull();
+    cleanup();
+  });
+
   it('does not render Stage 19A metadata preview for unrelated input', () => {
     const { container, cleanup } = mountWorkbench();
 

@@ -608,6 +608,10 @@ describe('BrainBuildStageRoadmap', () => {
       expect(stage18!.textContent ?? '').toContain('Stage 18: index-complete_with_18D_deferred');
       expect(stage18!.textContent ?? '').toContain('18D deferred/HOLD');
       expect(stage18!.textContent ?? '').toContain('Stage 19 pending explicit approval');
+      const stage19 = compactStages.find((el) => el.textContent?.includes('19.'));
+      expect(stage19).toBeDefined();
+      expect(stage19!.textContent ?? '').toContain('Stage 19A/19B/19C קיימים כשכבות מטא־דאטה סטטיות בלבד');
+      expect(stage19!.textContent ?? '').toContain('Stage 19 הרחב עדיין ממתין לאישור מפורש');
       expect(stage20!.textContent ?? '').toContain('שער תפעולי מוגבל ראשון');
       expect(stage20!.textContent ?? '').toContain('חסום');
     } finally {

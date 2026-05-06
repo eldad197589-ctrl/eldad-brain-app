@@ -6,6 +6,7 @@
    ============================================ */
 
 // #region Imports
+import { classifyScannedIntakeMetadata } from '../../../work-spine/intake/metadata-classification-helper';
 import { SCANNED_INTAKE_STATIC_SNAPSHOT } from '../../../work-spine/intake/scanned-intake-static-snapshot';
 // #endregion
 
@@ -63,6 +64,10 @@ const SAFETY_BADGES = [
   'No OCR',
   'No file content read',
   'No Matter / WorkItem / DocumentRef',
+  'לא נקרא תוכן',
+  'לא בוצע OCR',
+  'דורש אישור אלדד',
+  'לא נוצרה משימה / תיק / הפניית מסמך',
 ] as const;
 
 const SAFETY_FLAGS = [
@@ -148,6 +153,14 @@ const getSnapshotGroups = (): readonly MetadataGroupPreview[] =>
     candidatesCount: group.candidatesCount,
     sampleFileNames: group.sampleFileNames,
   }));
+
+const classifySampleFile = (group: MetadataGroupPreview, fileName: string) =>
+  classifyScannedIntakeMetadata({
+    fileName,
+    folderLabel: group.parentFolderName,
+    relativePathLabel: group.relativeFolder,
+    snapshotGroupLabels: [group.parentFolderName, group.relativeFolder],
+  });
 // #endregion
 
 // #region Subcomponents
@@ -201,9 +214,19 @@ function GroupRow({ group }: GroupRowProps) {
       <span>מועמדים בקבוצה: {group.candidatesCount}</span>
       <span>שמות קבצים לדוגמה מתוך snapshot בלבד:</span>
       <ul style={{ margin: 0, paddingInlineStart: 18, color: '#cbd5e1', lineHeight: 1.55 }}>
-        {group.sampleFileNames.map((fileName) => (
-          <li key={`${group.relativeFolder}-${fileName}`}>{fileName}</li>
-        ))}
+        {group.sampleFileNames.map((fileName) => {
+          const classification = classifySampleFile(group, fileName);
+          return (
+            <li key={`${group.relativeFolder}-${fileName}`} data-testid="scanned-intake-metadata-classification">
+              <strong>{fileName}</strong>
+              <div style={{ color: '#bfdbfe', fontSize: 12 }}>
+                סיווג אפשרי לפי מטא־דאטה בלבד · possibleCategory:{classification.possibleCategory} · confidence:{classification.confidence} · needsEldadReview:{String(classification.needsEldadReview)}
+              </div>
+              <div style={{ color: '#e2e8f0', fontSize: 12 }}>reason:{classification.reason}</div>
+              <div style={{ color: '#a5f3fc', fontSize: 12 }}>sourceSignals:{classification.sourceSignals.join(', ') || 'metadata labels only'}</div>
+            </li>
+          );
+        })}
       </ul>
     </article>
   );
@@ -247,6 +270,9 @@ export default function ScannedIntakeMetadataPreview({ searchableText }: Props) 
       </p>
 
       <SafetyBadges />
+      <p style={{ margin: 0, color: '#bae6fd', fontWeight: 800 }}>
+        סיווג אפשרי לפי מטא־דאטה בלבד — לא נקרא תוכן, לא בוצע OCR, דורש אישור אלדד, ולא נוצרה משימה / תיק / הפניית מסמך.
+      </p>
       <CountsSection
         totalCandidates={summary.totalCandidates}
         groupsCount={summary.groupsCount}
