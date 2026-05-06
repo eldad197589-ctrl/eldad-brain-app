@@ -70,20 +70,6 @@ export interface NavSection {
  */
 export const SIDEBAR_SECTIONS: NavSection[] = [
 
-  /* ═══ 0. תחנת עבודה (Work Spine) ═══ */
-  {
-    id: 'work-spine',
-    emoji: '⚡',
-    label: 'תחנות עבודה',
-    description: 'הפעלת המוח · משימות יומיות',
-    defaultOpen: true,
-    alwaysOpen: true,
-    accentColor: '#f59e0b',
-    items: [
-      { to: '/work-spine', emoji: '⚡', label: 'שולחן עבודה' },
-    ],
-  },
-
   /* ═══ 1. לשכת מנכ"ל (CEO Dashboard) ═══ */
   {
     id: 'ceo',
@@ -96,6 +82,7 @@ export const SIDEBAR_SECTIONS: NavSection[] = [
     items: [
       { to: '/', emoji: '📊', label: 'דשבורד ראשי' },
       { to: '/ceo', emoji: '🏢', label: 'לוח מנכ"ל' },
+      { to: '/work-spine', emoji: '⚡', label: 'שולחן עבודה' },
     ],
   },
 
@@ -118,7 +105,30 @@ export const SIDEBAR_SECTIONS: NavSection[] = [
     ],
   },
 
-  /* ═══ 3. תפעול משרדי (Office Operations) ═══ */
+  /* ═══ 3. ספריית תהליכים (Process Library) ═══ */
+  {
+    id: 'process-library',
+    emoji: '📋',
+    label: 'ספריית תהליכים',
+    description: 'תהליכים מקצועיים · תרשימי זרימה · Blueprints',
+    accentColor: '#f59e0b',
+    defaultOpen: false,
+    items: [
+      { to: '/internal/process-library', emoji: '📋', label: 'כל התהליכים' },
+      { to: '#', emoji: '📐', label: 'תרשימי תהליכים', isDivider: true },
+      { to: '/flow/attendance', emoji: '⏰', label: 'נוכחות' },
+      { to: '/flow/capital-gains', emoji: '💰', label: 'רווח הון' },
+      { to: '/flow/guardian-pro', emoji: '🏛️', label: 'אפוטרופוס' },
+      { to: '/flow/war-compensation', emoji: '🛡️', label: 'פיצויי מלחמה' },
+      { to: '/flow/insolvency', emoji: '📉', label: 'חדלות פירעון' },
+      { to: '/flow/expert-opinion', emoji: '📝', label: 'חוות דעת' },
+      { to: '/flow/institutional-reports', emoji: '📋', label: 'דיווחי מוסדות' },
+      { to: '/flow/declaration-of-capital', emoji: '📜', label: 'הצהרת הון' },
+      { to: '/flow/penalty-cancellation', emoji: '🚨', label: 'ביטול קנסות' },
+    ],
+  },
+
+  /* ═══ 4. תפעול משרדי (Office Operations) ═══ */
   {
     id: 'operations',
     emoji: '⚙️',
@@ -127,7 +137,6 @@ export const SIDEBAR_SECTIONS: NavSection[] = [
     accentColor: '#3b82f6',
     defaultOpen: false,
     items: [
-      // הנהלת חשבונות
       { to: '#', emoji: '📊', label: 'הנהלת חשבונות', isDivider: true },
       { to: '/coming-soon', emoji: '📊', label: 'דו"ח מע"מ', dim: true },
     ],
@@ -151,27 +160,16 @@ export const SIDEBAR_SECTIONS: NavSection[] = [
     ],
   },
 
-  /* ═══ 5. מרכז ידע (Knowledge & AI) ═══ */
+  /* ═══ 6. מרכז ידע (Knowledge & AI) ═══ */
   {
     id: 'knowledge',
     emoji: '🧠',
     label: 'מרכז ידע',
-    description: 'תרשימים · פרוטוקולים · Brain Router',
+    description: 'ידע מקצועי · מקורות · Brain Router',
     accentColor: '#06b6d4',
     defaultOpen: false,
     items: [
       { to: '/flow/brain-router', emoji: '🧠', label: 'Brain Router' },
-      // תרשימים ופרוטוקולים — domain playbooks
-      { to: '#', emoji: '📐', label: 'תרשימי תהליכים', isDivider: true },
-      { to: '/flow/attendance', emoji: '⏰', label: 'נוכחות' },
-      { to: '/flow/capital-gains', emoji: '💰', label: 'רווח הון' },
-      { to: '/flow/guardian-pro', emoji: '🏛️', label: 'אפוטרופוס' },
-      { to: '/flow/war-compensation', emoji: '🛡️', label: 'פיצויי מלחמה' },
-      { to: '/flow/insolvency', emoji: '📉', label: 'חדלות פירעון' },
-      { to: '/flow/expert-opinion', emoji: '📝', label: 'חוות דעת' },
-      { to: '/flow/institutional-reports', emoji: '📋', label: 'דיווחי מוסדות' },
-      { to: '/flow/declaration-of-capital', emoji: '📜', label: 'הצהרת הון' },
-      { to: '/flow/penalty-cancellation', emoji: '🚨', label: 'ביטול קנסות' },
     ],
   },
 
