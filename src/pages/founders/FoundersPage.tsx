@@ -60,7 +60,7 @@ export default function FoundersPage() {
       </header>
 
       <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 28, flexWrap: 'wrap' }}>
-        <Link to="/" className="flow-nav-btn"><Home size={16} /> דשבורד</Link>
+        <Link to="/" className="flow-nav-btn"><Home size={16} /> תצוגת המוח</Link>
         <Link to="/agreement/diff" className="flow-nav-btn" style={{ background: 'rgba(59,130,246,0.1)' }}>השוואת הסכמי מייסדים</Link>
         <Link to="/founders/kirill-dispute" className="flow-nav-btn" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}>
           ניתוח משבר קיריל (60%)

@@ -16,7 +16,7 @@ export const CORE_PROCESS_DEFINITIONS: ProcessDefinition[] = [
   // ═══════════════════════════════════════════
   {
     id: 'dashboard',
-    title: 'דשבורד',
+    title: 'תצוגת המוח',
     emoji: '📊',
     domain: 'core',
     parentDomains: [],

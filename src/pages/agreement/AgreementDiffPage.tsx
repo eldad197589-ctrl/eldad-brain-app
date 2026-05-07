@@ -41,7 +41,7 @@ export default function AgreementDiffPage() {
       <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 24, flexWrap: 'wrap' }}>
         <Link to="/agreement/review" className="flow-nav-btn">📋 סקירת הסכם</Link>
         <Link to="/founders" className="flow-nav-btn">🤝 פורטל עימות</Link>
-        <Link to="/" className="flow-nav-btn">🏠 דשבורד</Link>
+        <Link to="/" className="flow-nav-btn">🧠 תצוגת המוח</Link>
       </div>
 
       {/* Stats Bar */}

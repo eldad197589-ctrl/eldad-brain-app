@@ -61,7 +61,7 @@ export default function IncubatorAgreementsPage() {
 
       {/* Nav */}
       <div className="no-print" style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 28, flexWrap: 'wrap' }}>
-        <Link to="/" className="flow-nav-btn"><Home size={16} /> דשבורד</Link>
+        <Link to="/" className="flow-nav-btn"><Home size={16} /> תצוגת המוח</Link>
         <Link to="/incubator" className="flow-nav-btn"><Users size={16} /> צוות חממה</Link>
         <Link to="/agreement/review" className="flow-nav-btn"><FileText size={16} /> הסכם מייסדים</Link>
         <button onClick={() => window.print()} className="flow-nav-btn" style={{ border: 'none', cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(16,185,129,0.15)', color: '#10b981' }}>

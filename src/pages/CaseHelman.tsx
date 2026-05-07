@@ -100,7 +100,7 @@ export default function CaseHelman() {
           display: 'inline-flex', alignItems: 'center', gap: 6,
           color: '#94a3b8', textDecoration: 'none', fontSize: '0.85rem', marginBottom: 12,
         }}>
-          <Home size={14} /> חזרה לדשבורד
+          <Home size={14} /> חזרה לתצוגת המוח
         </Link>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>

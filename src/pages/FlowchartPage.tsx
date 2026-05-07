@@ -27,7 +27,7 @@ export default function FlowchartPage() {
         <div style={{ fontSize: '3rem', marginBottom: 16 }}>🧠</div>
         <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: 8 }}>תרשים זרימה לא נמצא</h2>
         <p style={{ color: '#94a3b8', marginBottom: 24 }}>התרשים "{flowId}" עדיין לא הועבר למערכת</p>
-        <Link to="/" style={{ color: '#d4af37', fontWeight: 600, textDecoration: 'none' }}>← חזרה לדשבורד</Link>
+        <Link to="/" style={{ color: '#d4af37', fontWeight: 600, textDecoration: 'none' }}>← חזרה לתצוגת המוח</Link>
       </div>
     );
   }
@@ -50,7 +50,7 @@ export default function FlowchartPage() {
 
       {/* Nav */}
       <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 36, flexWrap: 'wrap' }}>
-        <Link to="/" className="flow-nav-btn"><Home size={16} /> דשבורד</Link>
+        <Link to="/" className="flow-nav-btn"><Home size={16} /> תצוגת המוח</Link>
         {flow.relatedLinks?.map((link: { to: string; label: string }, i: number) => (
           <Link key={i} to={link.to} className="flow-nav-btn">{link.label}</Link>
         ))}

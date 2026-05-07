@@ -39,6 +39,7 @@ export default function ClientsPage() {
         files_count: c.documents.length,
         last_ingest_date: c.updatedAt || c.createdAt,
         created_at: c.createdAt,
+        processType: c.processType
       }));
 
       // Merge: case clients first, then service clients (skip duplicates by name)
@@ -52,12 +53,15 @@ export default function ClientsPage() {
 
   const filtered = useMemo(() => {
     let list = clients;
+    if (filter !== 'all') {
+      list = list.filter(c => c.processType === filter);
+    }
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       list = list.filter(c => c.name.toLowerCase().includes(q));
     }
     return list;
-  }, [clients, search]);
+  }, [clients, search, filter]);
 
   const activeCount = clients.filter(c => c.status === 'פעיל').length;
 
@@ -86,14 +90,14 @@ export default function ClientsPage() {
               </span>
             </h1>
             <p style={{ color: '#94a3b8', fontSize: '0.88rem', margin: 0 }}>
-              {clients.length} תיקים · 8 תהליכים · {activeCount} פעילים · 25+ שנות ניסיון
+              {clients.length} תיקים במערכת · {activeCount} פעילים
             </p>
           </div>
           <Link to="/" style={{
             textDecoration: 'none', color: '#c9a84c', fontSize: '0.85rem', fontWeight: 600,
             display: 'flex', alignItems: 'center', gap: 6,
           }}>
-            <ArrowLeft size={16} /> חזרה לדשבורד
+            <ArrowLeft size={16} /> חזרה לתצוגת המוח
           </Link>
         </div>
       </header>
@@ -102,9 +106,8 @@ export default function ClientsPage() {
       <div className="brain-stats-bar" style={{ marginBottom: 20 }}>
         {[
           { n: clients.length, l: 'סה"כ תיקים', c: '#c9a84c' },
-          { n: activeCount, l: 'פעילים', c: '#34d399' },
-          { n: clients.length - activeCount, l: 'הושלמו', c: '#64748b' },
-          { n: 1, l: 'תהליכים (מערכת לומדת)', c: '#a78bfa' },
+          { n: activeCount, l: 'תיקים פעילים', c: '#34d399' },
+          { n: clients.length - activeCount, l: 'תיקים שהושלמו', c: '#64748b' },
         ].map((s, i) => (
           <div key={i} className="brain-stat">
             <div className="brain-stat-num" style={{ color: s.c }}>{s.n}</div>
@@ -126,21 +129,30 @@ export default function ClientsPage() {
           />
         </div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {FILTER_OPTIONS.map(f => (
-            <button
-              key={f.key}
-              onClick={() => setFilter(f.key)}
-              style={{
-                padding: '8px 18px', borderRadius: 10, fontSize: '0.82rem', fontWeight: filter === f.key ? 600 : 500,
-                border: `1px solid ${filter === f.key ? '#c9a84c' : 'rgba(148,163,184,0.2)'}`,
-                background: filter === f.key ? 'linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))' : 'transparent',
-                color: filter === f.key ? '#c9a84c' : '#94a3b8',
-                cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'Heebo, sans-serif',
-              }}
-            >
-              {f.label}{f.count ? ` (${f.count})` : ''}
-            </button>
-          ))}
+          {FILTER_OPTIONS.map(f => {
+            const count = f.key === 'all'
+              ? clients.length
+              : clients.filter(c => c.processType === f.key).length;
+              
+            // Hide filter buttons that have 0 items unless it's 'all'
+            if (count === 0 && f.key !== 'all') return null;
+
+            return (
+              <button
+                key={f.key}
+                onClick={() => setFilter(f.key)}
+                style={{
+                  padding: '8px 18px', borderRadius: 10, fontSize: '0.82rem', fontWeight: filter === f.key ? 600 : 500,
+                  border: `1px solid ${filter === f.key ? '#c9a84c' : 'rgba(148,163,184,0.2)'}`,
+                  background: filter === f.key ? 'linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))' : 'transparent',
+                  color: filter === f.key ? '#c9a84c' : '#94a3b8',
+                  cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'Heebo, sans-serif',
+                }}
+              >
+                {f.label} ({count})
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -168,9 +180,11 @@ export default function ClientsPage() {
             </thead>
             <tbody>
               {filtered.map((c, i) => {
-                const matchedCase = storeCases.find(sc => sc.caseId === c.id);
-                const processKey: ClientProcess = matchedCase?.processType === 'war_compensation_appeal' ? 'war' : 'accounting';
-                const p = PROCESS_LABELS[processKey];
+                const rawProcess = c.processType || 'accounting';
+                const processKey = Object.keys(PROCESS_LABELS).includes(rawProcess) 
+                  ? (rawProcess as ClientProcess) 
+                  : (rawProcess === 'war_compensation_appeal' ? 'war' : 'accounting');
+                const p = PROCESS_LABELS[processKey] || PROCESS_LABELS.accounting;
                 return (
                   <tr key={i} style={{ transition: 'background 0.15s', cursor: 'pointer' }}
                     onClick={() => {

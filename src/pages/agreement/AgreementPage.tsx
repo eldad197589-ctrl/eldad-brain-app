@@ -113,7 +113,7 @@ export default function AgreementPage() {
 
       {/* Nav */}
       <div className="no-print" style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 28, flexWrap: 'wrap' }}>
-        <Link to="/" className="flow-nav-btn"><Home size={16} /> דשבורד</Link>
+        <Link to="/" className="flow-nav-btn"><Home size={16} /> תצוגת המוח</Link>
         <Link to="/hub" className="flow-nav-btn"><ClipboardList size={16} /> מרכז שליטה</Link>
         <Link to="/founders" className="flow-nav-btn"><FileText size={16} /> פורטל עימות</Link>
         <a href="/legacy/robium_osnat_track_changes.html" target="_blank" rel="noopener noreferrer" className="flow-nav-btn" style={{ background: 'rgba(14, 165, 233, 0.15)', borderColor: '#0284c7', color: '#6be7ff', fontWeight: 'bold' }}>

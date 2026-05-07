@@ -26,7 +26,7 @@ export default function LetterPage() {
         className="no-print"
       >
         <Link to="/case/helman" className="flow-nav-btn"><ArrowRight size={16} /> חזרה לתיק</Link>
-        <Link to="/" className="flow-nav-btn"><Home size={16} /> דשבורד</Link>
+        <Link to="/" className="flow-nav-btn"><Home size={16} /> תצוגת המוח</Link>
         <button onClick={handlePrint} className="flow-nav-btn" style={{ border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
           <Printer size={16} /> הדפסה
         </button>

@@ -41,7 +41,7 @@ function registryTitle(route: string, fallback: string): string {
  * Processes in the Registry derive emoji/title from the single source of truth.
  */
 export const BREADCRUMB_MAP: Record<string, BreadcrumbNode> = {
-  '/': { emoji: registryEmoji('/', '📊'), label: registryTitle('/', 'דשבורד') },
+  '/': { emoji: registryEmoji('/', '🧠'), label: registryTitle('/', 'תצוגת המוח') },
   '/ceo': { emoji: registryEmoji('/ceo', '🏢'), label: registryTitle('/ceo', 'לשכת מנכ"ל'), parent: '/' },
   '/hub': { emoji: '🎛️', label: 'מרכז שליטה', parent: '/' },
   '/clients': { emoji: '👥', label: 'כל הלקוחות', parent: '/' },

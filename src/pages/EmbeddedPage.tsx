@@ -52,7 +52,7 @@ export default function EmbeddedPage({ title, src, badge, badgeColor = '#7C3AED'
           <h1 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800 }}>{title}</h1>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <Link to="/" className="flow-nav-btn"><Home size={16} /> דשבורד</Link>
+          <Link to="/" className="flow-nav-btn"><Home size={16} /> תצוגת המוח</Link>
           <a
             href={src}
             target="_blank"
